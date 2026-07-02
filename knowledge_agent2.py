@@ -1,145 +1,279 @@
-import google.generativeai as genai
+from openai import OpenAI
+from dotenv import load_dotenv
+from pathlib import Path
+import os
+import json
+
 import chromadb
 from sentence_transformers import SentenceTransformer
 
-# ─────────────────────────────────────────────────────────────
-# CONFIGURATION
-# ─────────────────────────────────────────────────────────────
-GEMINI_API_KEY = "AQ.Ab8RN6ICdxKK0R7Y0H8cMMLxxI-j-nQigjbWfo404lA2IHmo7Q"  # ← paste your key here
-
-# Known products and their SKUs
-# Add more products here later when you scale to all 10
-PRODUCTS = {
-    "Frontline" : 229
-}
 
 # ─────────────────────────────────────────────────────────────
-# SETUP — Gemini, ChromaDB, Embedding Model
+# ENV SETUP
 # ─────────────────────────────────────────────────────────────
-genai.configure(api_key=GEMINI_API_KEY)
-gemini = genai.GenerativeModel("gemini-2.5-flash")
 
-print("Loading embedding model...")
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-print("Embedding model loaded!")
+env_path = Path(__file__).resolve().parent / "APIKeys.env"
+load_dotenv(dotenv_path=env_path)
 
-# Connect to ChromaDB — creates chroma_db folder if it doesn't exist
-client = chromadb.PersistentClient(path="./chroma_db")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 
-# Delete existing collection and start fresh
-try:
-    client.delete_collection("vet_products")
-    print("Cleared existing collection")
-except:
-    pass
+if not DEEPSEEK_API_KEY:
+    raise ValueError(f"Missing DEEPSEEK_API_KEY in {env_path}")
 
-collection = client.create_collection(
-    name="vet_products",
-    metadata={"hnsw:space": "cosine"}
+
+# ─────────────────────────────────────────────────────────────
+# LLM CLIENT (DEEPSEEK)
+# ─────────────────────────────────────────────────────────────
+
+client_llm = OpenAI(
+    api_key=DEEPSEEK_API_KEY,
+    base_url="https://api.deepseek.com"
 )
 
+
 # ─────────────────────────────────────────────────────────────
-# STEP 1 — Ask Gemini to Research Each Product on the Web
+# EMBEDDING MODEL
 # ─────────────────────────────────────────────────────────────
 
-def research_product_with_gemini(product_name: str, sku: int) -> str:
-    """
-    Asks Gemini to search the web and return rich product knowledge
-    for a given veterinary product.
-    """
-    print(f"\nResearching '{product_name}' with Gemini...")
-
-    prompt = f"""
-    You are a veterinary product research assistant.
-    
-    Search the web and find detailed information about this veterinary product:
-    Product: {product_name}
-    
-    Look at sources like:
-    - The official product website: https://uk.frontline.com/products
-    - Amazon UK product listing: https://www.amazon.co.uk/stores/page/8F24B330-051E-41C4-87D7-F8353AC9669B/search?terms=frontline
-    - UK vet retailer sites like VioVet, PetDrugsOnline, VetUK
-    
-    Return a comprehensive product description that includes ALL of the following, for all products found from the specific brand in {product_name}:
-    - Full product name and any alternative names it is known by
-    - Active ingredients and chemical names (e.g. Fipronil)
-    - What animals it is used for (cats, dogs, rabbits etc)
-    - What parasites it treats (fleas, ticks, lice, mites etc)
-    - Pack size (e.g. 100ml, 250ml)
-    - How it is applied (spray, spot-on, tablet etc)
-    - Dosage information
-    - How long it protects for
-    - Any other names vets or pet owners commonly use for this product
-    - The manufacturer name
-    
-    Write this as a rich, detailed paragraph — include as many relevant 
-    keywords as possible so it can be used for semantic search matching.
-    The more detail the better. try to identify all variants of the product 
-    and include them in the description, at the start of the paragraph. 
-    If you can't find information, say "No information found".
-    after that, create a text based | seperated table labeled "Product Information: {product_name}" for the product with the following columns:
-    Product Name | Size | Active Ingredients | Animals | Parasites | Application Method | extra relevant unique info based on product in entry
-    and create a new entry for every unique combination found on any of the reference sources, 
-    including defferent sizes, i.e. 3 pipettes get a different row that 6 pipettes, 
-    and the same for different tablets or bottle sizes.
-    include active ingredients by all names found in the text paragraph.
-    then delete the paragraph and only return the table, with no extra text or commentary.
-    """
-
-    response = gemini.generate_content(prompt)
-    description = response.text.strip()
-
-    print(f"Gemini returned {len(description)} characters of product knowledge")
-    print(f"\nSample of what Gemini found:")
-    print(description[:300] + "...")
-
-    return description
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 # ─────────────────────────────────────────────────────────────
-# STEP 2 — Store the Knowledge in ChromaDB
+# CHROMADB
 # ─────────────────────────────────────────────────────────────
 
-def store_in_chromadb(product_name: str, description: str, sku: int):
-    """
-    Converts Gemini's product description into an embedding
-    and stores it in ChromaDB with the SKU label.
-    """
-    print(f"\nStoring '{product_name}' in ChromaDB...")
+client = chromadb.PersistentClient(path="./chroma_db")
+collection = client.get_collection("vet_products")
 
-    # Convert the rich description to a vector
-    embedding = embedding_model.encode(description).tolist()
+print(f"Connected to ChromaDB. Total entries: {collection.count()}")
 
-    # Store in ChromaDB
-    collection.add(
-        documents=[description],
-        embeddings=[embedding],
-        ids=[f"sku_{sku}"],
-        metadatas=[{
-            "product_name": product_name,
-            "sku_id": sku
-        }]
+
+# ─────────────────────────────────────────────────────────────
+# CONFIG
+# ─────────────────────────────────────────────────────────────
+
+VECTOR_THRESHOLD = 0.30   # include all relevant product families
+
+
+# ─────────────────────────────────────────────────────────────
+# STEP 1 — VECTOR SEARCH (RETRIEVE PRODUCT FAMILIES)
+# ─────────────────────────────────────────────────────────────
+
+def search_chromadb(query: str):
+
+    embedding = embedding_model.encode(
+        query,
+        normalize_embeddings=True
+    ).tolist()
+
+    results = collection.query(
+        query_embeddings=[embedding],
+        n_results=collection.count()
     )
 
-    print(f"Stored successfully! ChromaDB now has {collection.count()} entries")
+    candidates = []
+
+    for doc, meta, distance in zip(
+        results["documents"][0],
+        results["metadatas"][0],
+        results["distances"][0]
+    ):
+
+        similarity = 1 - distance
+
+        if similarity >= VECTOR_THRESHOLD:
+
+            candidates.append({
+                "product_name": meta.get("product_name"),
+                "sku": meta.get("sku_id"),
+                "description": doc,
+                "similarity": round(similarity, 3)
+            })
+
+    candidates.sort(key=lambda x: x["similarity"], reverse=True)
+
+    return candidates
 
 
 # ─────────────────────────────────────────────────────────────
-# STEP 3 — Run it for all products
+# STEP 2 — FORMAT CONTEXT FOR LLM
 # ─────────────────────────────────────────────────────────────
 
-print("=" * 60)
-print("KNOWLEDGE BUILDER — Gemini + ChromaDB")
-print("=" * 60)
+def build_context(candidates):
 
-for product_name, sku in PRODUCTS.items():
-    # Ask Gemini to research the product
-    description = research_product_with_gemini(product_name, sku)
+    context = ""
 
-    # Store in ChromaDB
-    store_in_chromadb(product_name, description, sku)
+    for i, c in enumerate(candidates):
 
-print("\n" + "=" * 60)
-print("Done! ChromaDB is now populated with Gemini's product knowledge.")
-print("Run query_agent.py next to test it.")
-print("=" * 60)
+        context += f"""
+────────────────────────────────────────────
+CANDIDATE {i+1}
+PRODUCT FAMILY: {c['product_name']}
+SKU: {c['sku']}
+SIMILARITY: {c['similarity']}
+
+FULL PRODUCT TABLE:
+{c['description']}
+"""
+
+    return context
+
+
+# ─────────────────────────────────────────────────────────────
+# STEP 3 — DEEPSEEK REASONING
+# ─────────────────────────────────────────────────────────────
+
+def ask_deepseek(query: str, context: str):
+
+    prompt = f"""
+You are a veterinary product matching system.
+
+You will be given:
+- a messy user query
+- a database of veterinary product families and variants
+
+Your task:
+1. Identify the BEST matching product variant
+2. Also identify TWO additional plausible alternatives
+3. Rank them by likelihood
+4. Use ONLY provided data (do not invent products)
+
+────────────────────────────────────────────
+RULES:
+- Primary match = highest confidence
+- Alternatives = lower or equal confidence
+- All 3 must be different variants if possible
+- If only 1 real match exists, repeat it as alternatives with LOWER confidence
+- "variant" generates the full name given in Product name column of the database table eg: Spot On for FRONTLINE Spot On Dog Small (2-10kg)
+- "exact_variant" generates the products specific name, eg: Spot On for FRONTLINE Spot On Dog Small (2-10kg), or Plus, or Spray etc.
+- "animal_size" should also include tags like S, M, L, XL if known, in addition to the range of weights in the product name, eg: 2-10kg, 10-20kg, 20-40kg etc.
+
+────────────────────────────────────────────
+OUTPUT FORMAT (STRICT JSON ONLY):
+
+{{
+  "primary_match": {{
+    "product_family": "",
+    "variant": "",
+    "exact_variant": "",
+    "sku": "",
+    "species": "",
+    "animal_size": "",
+    "pack_size": "",
+    "pack_quantity": "",
+    "animal_age": "",
+    "confidence": "",
+    "reason": ""
+  }},
+  "alternative_matches": [
+    {{
+        "product_family": "",
+        "variant": "",
+        "exact_variant": "",
+        "sku": "",
+        "species": "",
+        "animal_size": "",
+        "pack_size": "",
+        "pack_quantity": "",
+        "animal_age": "",
+        "confidence": "",
+        "reason": ""
+    }},
+    {{
+        "product_family": "",
+        "variant": "",
+        "exact_variant": "",
+        "sku": "",
+        "species": "",
+        "animal_size": "",
+        "pack_size": "",
+        "pack_quantity": "",
+        "animal_age": "",
+        "confidence": "",
+        "reason": ""
+    }}
+  ]
+}}
+
+────────────────────────────────────────────
+USER QUERY:
+{query}
+
+────────────────────────────────────────────
+DATABASE:
+{context}
+"""
+
+    response = client_llm.chat.completions.create(
+        model="deepseek-reasoner",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0,
+        response_format={"type": "json_object"}
+    )
+
+    raw = response.choices[0].message.content.strip()
+
+    return json.loads(raw)
+
+
+# ─────────────────────────────────────────────────────────────
+# MAIN PIPELINE
+# ─────────────────────────────────────────────────────────────
+
+def identify_product(query: str):
+
+    if not query.strip():
+        return {"error": "Empty query"}
+
+    # Step 1: retrieve relevant product families
+    candidates = search_chromadb(query)
+
+    if not candidates:
+        return {
+            "product_family": "Unknown",
+            "alternative_matches": [],
+            "confidence": "Low",
+            "reason": "No matching product families found in ChromaDB."
+        }
+
+    # Step 2: build context
+    context = build_context(candidates)
+
+    # DEBUG: show what is being sent to LLM
+    print("\n================ CONTEXT SENT TO DEEPSEEK ================\n")
+    # print(context[:3000])  # avoid flooding terminal
+
+    # Step 3: reasoning
+    result = ask_deepseek(query, context)
+
+    return result
+
+
+# ─────────────────────────────────────────────────────────────
+# TESTING
+# ─────────────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+
+    test_queries = [
+        "Frontline Spray 100ml for dogs",
+        "Frontline spot on large dog",
+        "fleas treatment cat 3 pipettes",
+        "frontline 250ml spray",
+        "tick treatment small dog frontline",
+        "frontline spot on dog xl 6",
+        "frontline plus dog 3 pack"
+    ]
+
+    print("=" * 60)
+    print("DEEPSEEK VETERINARY PRODUCT CLASSIFIER")
+    print("=" * 60)
+
+    for q in test_queries:
+
+        print(f"\nQUERY: {q}")
+
+        result = identify_product(q)
+
+        print(json.dumps(result, indent=2))
+        print("-" * 60)
