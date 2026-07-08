@@ -1,18 +1,21 @@
 """
 knowledge_builder.py
 ─────────────────────────────────────────────────────────────
-Builds a ChromaDB knowledge base for 35 veterinary products.
+Builds a ChromaDB knowledge base for 45 veterinary products.
 
-HOW IT WORKS:
-1. Gemini Flash 2.5 researches each product from official sources
-2. Returns a structured table — one row per product variant
-3. Each row is embedded SEPARATELY using MiniLM
-4. Stored in ChromaDB with ProductId label
-5. Upsert logic — never wipes, knowledge only grows
-6. Re-running updates existing rows and adds new ones
+FIRST RUN BEHAVIOUR:
+  Pass reset=True to wipe ChromaDB and rebuild everything cleanly.
+  python knowledge_builder.py  (runs with reset=True by default first time)
+
+FUTURE RUN BEHAVIOUR:
+  Pass reset=False (default after first run).
+  Only researches products NOT already in ChromaDB.
+  Existing products are skipped — no duplicates, no overwrites.
+  To add a brand new product: just add it to PRODUCTS dict and run.
+  To update an existing product: pass force=["Product Name"].
 
 PHASE 1: ProductId level (this file)
-PHASE 2: SKU level (sku_builder.py — coming later)
+PHASE 2: SKU level (sku_builder.py)
 ─────────────────────────────────────────────────────────────
 """
 
@@ -25,7 +28,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 # ─────────────────────────────────────────────────────────────
-# LOAD API KEY FROM ENV FILE
+# LOAD API KEY
 # ─────────────────────────────────────────────────────────────
 
 env_path = Path(__file__).resolve().parent / "APIKeys.env"
@@ -41,7 +44,7 @@ if not GEMINI_API_KEY:
     )
 
 # ─────────────────────────────────────────────────────────────
-# ALL 35 PRODUCTS — Verified from Labelled.csv
+# ALL 45 PRODUCTS
 # ─────────────────────────────────────────────────────────────
 
 PRODUCTS = {
@@ -137,6 +140,18 @@ PRODUCTS = {
         "amazon_url":   "https://www.amazon.co.uk/s?k=bravecto+plus+spot+on+cat",
         "manufacturer": "MSD Animal Health"
     },
+    "Vectra 3D": {
+        "product_id":   52,
+        "official_url": "https://www.ceva.co.uk/Products/Companion-animal/Anti-parasitic/VECTRA-3D",
+        "amazon_url":   "https://www.amazon.co.uk/s?k=vectra+3d+dog",
+        "manufacturer": "Ceva"
+    },
+    "Xenex Spray": {
+        "product_id":   61,
+        "official_url": "https://www.virbac.com",
+        "amazon_url":   "https://www.amazon.co.uk/s?k=xenex+spray+dog+cat",
+        "manufacturer": "Virbac"
+    },
 
     # ── Oral / Chewable Flea & Tick Treatments ───────────────
     "Bravecto": {
@@ -155,6 +170,12 @@ PRODUCTS = {
         "product_id":   36,
         "official_url": "https://www.nexgard.co.uk/nexgard-spectra",
         "amazon_url":   "https://www.amazon.co.uk/s?k=nexgard+spectra+dog",
+        "manufacturer": "Boehringer Ingelheim"
+    },
+    "NexGard Combo": {
+        "product_id":   218,
+        "official_url": "https://www.nexgard.co.uk/nexgard-combo",
+        "amazon_url":   "https://www.amazon.co.uk/s?k=nexgard+combo+cat",
         "manufacturer": "Boehringer Ingelheim"
     },
     "Simparica": {
@@ -219,6 +240,12 @@ PRODUCTS = {
         "amazon_url":   "https://www.amazon.co.uk/s?k=milpro+wormer+cat+dog",
         "manufacturer": "Virbac"
     },
+    "Milprazon": {
+        "product_id":   80,
+        "official_url": "https://www.vmd.defra.gov.uk/ProductInformationDatabase/",
+        "amazon_url":   "https://www.amazon.co.uk/s?k=milprazon+cat+dog+wormer",
+        "manufacturer": "KRKA"
+    },
     "Profender": {
         "product_id":   7,
         "official_url": "https://www.elanco.co.uk/products-services/cats/profender",
@@ -243,6 +270,24 @@ PRODUCTS = {
         "amazon_url":   "https://www.amazon.co.uk/s?k=proheart+injection+dog",
         "manufacturer": "Zoetis"
     },
+    "Interceptor": {
+        "product_id":   20,
+        "official_url": "https://www.elanco.co.uk/products-services/dogs/interceptor",
+        "amazon_url":   "https://www.amazon.co.uk/s?k=interceptor+wormer+dog",
+        "manufacturer": "Elanco"
+    },
+    "Endogard": {
+        "product_id":   41,
+        "official_url": "https://www.virbac.com",
+        "amazon_url":   "https://www.amazon.co.uk/s?k=endogard+wormer+dog",
+        "manufacturer": "Virbac"
+    },
+    "Strongid P": {
+        "product_id":   17,
+        "official_url": "https://www.zoetis.co.uk",
+        "amazon_url":   "https://www.amazon.co.uk/s?k=strongid+p+wormer+horse",
+        "manufacturer": "Zoetis"
+    },
 
     # ── Collars ──────────────────────────────────────────────
     "Seresto": {
@@ -258,21 +303,39 @@ PRODUCTS = {
         "manufacturer": "MSD Animal Health"
     },
 
-    # ── Household Flea Spray ─────────────────────────────────
+    # ── Household / Environmental ────────────────────────────
     "Indorex": {
         "product_id":   43,
         "official_url": "https://www.indorex.co.uk",
         "amazon_url":   "https://www.amazon.co.uk/s?k=indorex+household+flea+spray",
         "manufacturer": "Virbac"
     },
+    "Rearguard": {
+        "product_id":   16,
+        "official_url": "https://www.norbrook.co.uk",
+        "amazon_url":   "https://www.amazon.co.uk/s?k=rearguard+rabbit+fly+strike",
+        "manufacturer": "Norbrook"
+    },
+    "Sentinel": {
+        "product_id":   18,
+        "official_url": "https://www.petdrugsonline.co.uk/s?q=sentinel+spectrum",
+        "amazon_url":   "https://www.amazon.co.uk/s?k=sentinel+spectrum+dog",
+        "manufacturer": "Elanco"
+    },
+    "Odour Eliminator": {
+        "product_id":   75,
+        "official_url": "https://www.petdrugsonline.co.uk/s?q=odour+eliminator",
+        "amazon_url":   "https://www.amazon.co.uk/s?k=pet+odour+eliminator+spray",
+        "manufacturer": "Various"
+    },
 }
 
 # ─────────────────────────────────────────────────────────────
-# SETUP — Gemini, ChromaDB, Embedding Model
+# SETUP
 # ─────────────────────────────────────────────────────────────
 
 genai.configure(api_key=GEMINI_API_KEY)
-gemini = genai.GenerativeModel("gemini-2.5-flash")
+gemini = genai.GenerativeModel("gemini-2.5-flash-lite")
 
 print("Loading embedding model...")
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -280,25 +343,66 @@ print("Embedding model loaded!")
 
 client = chromadb.PersistentClient(path="./chroma_db")
 
-try:
-    collection = client.get_collection("vet_products")
-    print(f"Connected to existing collection — {collection.count()} entries already stored")
-except Exception:
-    collection = client.create_collection(
-        name="vet_products",
-        metadata={"hnsw:space": "cosine"}
-    )
-    print("Created new ChromaDB collection — vet_products")
 
-
-# ─────────────────────────────────────────────────────────────
-# STEP 1 — Ask Gemini to Research the Product
-# ─────────────────────────────────────────────────────────────
-
-def research_product_with_gemini(product_name: str, info: dict) -> str:
+def get_or_create_collection(reset: bool = False):
     """
-    Asks Gemini to search the web and return a structured product table.
-    Returns clean pipe-separated rows only — no paragraphs.
+    Gets existing collection or creates a new one.
+    If reset=True, wipes everything first for a clean rebuild.
+    """
+    if reset:
+        try:
+            client.delete_collection("vet_products")
+            print("✅ Wiped existing collection — starting completely fresh")
+        except Exception:
+            print("No existing collection to wipe — creating fresh")
+
+        col = client.create_collection(
+            name="vet_products",
+            metadata={"hnsw:space": "cosine"}
+        )
+        print("✅ Created clean ChromaDB collection — vet_products")
+        return col
+
+    else:
+        try:
+            col = client.get_collection("vet_products")
+            print(f"Connected to existing collection — {col.count()} entries stored")
+            return col
+        except Exception:
+            col = client.create_collection(
+                name="vet_products",
+                metadata={"hnsw:space": "cosine"}
+            )
+            print("Created new ChromaDB collection — vet_products")
+            return col
+
+
+def get_existing_products(col) -> set:
+    """
+    Returns a set of product names already stored in ChromaDB.
+    Used to skip products that are already built.
+    """
+    try:
+        all_data = col.get(include=["metadatas"])
+        existing = set()
+        for meta in all_data["metadatas"]:
+            name = meta.get("product_name")
+            if name:
+                existing.add(name)
+        return existing
+    except Exception:
+        return set()
+
+
+# ─────────────────────────────────────────────────────────────
+# STEP 1 — GEMINI RESEARCH
+# ─────────────────────────────────────────────────────────────
+
+def research_product_with_gemini(product_name: str, info: dict, col) -> str:
+    """
+    Asks Gemini to research the product and return a structured table.
+    Includes dedicated Vet Abbreviations column so rows match
+    how vets actually write product names in practice systems.
     """
     print(f"\n  Researching with Gemini...")
 
@@ -311,19 +415,18 @@ Manufacturer: {info['manufacturer']}
 Official Website: {info['official_url']}
 Amazon UK: {info['amazon_url']}
 
-Also check UK vet retailer sites like VioVet, PetDrugsOnline, VetUK, and NoahCompendium.
+Also check: VioVet, PetDrugsOnline, VetUK, NoahCompendium, VMD Product Database.
 
 CRITICAL INSTRUCTIONS — FOLLOW EXACTLY:
 - Return ONLY a pipe-separated table
 - NO paragraphs before or after the table
 - NO introduction text
-- NO conclusion text  
+- NO conclusion text
 - NO markdown formatting (no **, no ##, no ```)
-- NO extra commentary of any kind
 - ONLY the table, nothing else
 
 The table MUST have exactly these columns in this exact order:
-Product Name | Size | Active Ingredients | Animals | Weight Range | Parasites | Application Method | Pack Quantity | Protection Duration | Age Minimum | Extra Notes
+Product Name | Size | Active Ingredients | Animals | Weight Range | Parasites | Application Method | Pack Quantity | Protection Duration | Age Minimum | Vet Abbreviations | Extra Notes
 
 Table rules:
 - First row = header row exactly as above
@@ -332,64 +435,60 @@ Table rules:
 - Different weight ranges = different rows (small dog vs large dog = 2 rows)
 - Different sizes = different rows (100ml vs 250ml = 2 rows)
 - Different species = different rows (dog vs cat = 2 rows)
-- Include ALL chemical names for active ingredients (e.g. Fipronil AND (S)-methoprene)
-- Unknown fields = write Unknown
-- Do NOT merge variants into one row
 
-REMEMBER: Return ONLY the pipe-separated table. Nothing before it. Nothing after it.
+IMPORTANT — Vet Abbreviations column MUST include ALL of these where relevant:
+- Common abbreviations vets use for this specific product variant
+- For spot-on products: "spot on", "S/ON", "spot-on", "pipette", "pip", "pips"
+- For sprays: "spray", "spr"
+- For tablets: "tab", "tabs", "tablet", "tablets", "chew", "chews"
+- For injections: "inj", "injection", "jab"
+- BOTH the ml volume AND pipette count where applicable
+  e.g. for 1.0ml spot-on in 3-pack write: "3 pipettes, 3 pip, 3 x 1.0ml, 1.0ml pip"
+- Size abbreviations: S, M, L, XL, sml, med, lge, x-lge
+- Weight as vets write it: "4-10kg", "4-10K", "4-10 kg", "10-25kg", "10-25K"
+- Any other common abbreviations specific to this product
+
+Include ALL chemical names for active ingredients.
+If a field is unknown write Unknown.
+Do not include any text before or after the table.
+
+REMEMBER: Return ONLY the pipe-separated table. Nothing before. Nothing after.
 """
 
-    response = gemini.generate_content(prompt)
-    raw_text = response.text.strip()
-
-    # Remove any markdown formatting Gemini might add
-    raw_text = raw_text.replace("```", "").replace("**", "").strip()
-
-    # Extract ONLY lines containing pipe separators
-    # This strips out any paragraph text Gemini adds before or after
-    lines      = raw_text.split("\n")
+    response    = gemini.generate_content(prompt)
+    raw_text    = response.text.strip()
+    raw_text    = raw_text.replace("```", "").replace("**", "").strip()
+    lines       = raw_text.split("\n")
     table_lines = [line.strip() for line in lines if "|" in line]
     description = "\n".join(table_lines).strip()
 
     print(f"  Gemini returned {len(table_lines)} rows")
     if table_lines:
-        print(f"  Preview: {table_lines[0][:100]}...")
+        print(f"  Preview: {table_lines[0][:120]}...")
         if len(table_lines) > 1:
-            print(f"           {table_lines[1][:100]}...")
+            print(f"           {table_lines[1][:120]}...")
 
     return description
 
 
 # ─────────────────────────────────────────────────────────────
-# STEP 2 — Parse Table into Individual Rows
+# STEP 2 — PARSE TABLE ROWS
 # ─────────────────────────────────────────────────────────────
 
 def parse_table_rows(table_text: str) -> list:
-    """
-    Splits the pipe-separated table into individual data rows.
-    Skips header row, separator lines, and empty lines.
-    Returns a list of clean row strings.
-    """
+
     rows  = []
     lines = table_text.strip().split("\n")
 
     for line in lines:
         line = line.strip()
-
-        # Skip empty lines
         if not line:
             continue
-
-        # Skip header row
         if line.lower().startswith("product name"):
             continue
-
-        # Skip separator lines like |---|---|
         cleaned = line.replace("|", "").replace("-", "").replace(" ", "")
         if not cleaned:
             continue
-
-        # Must contain pipe separators to be a valid data row
         if "|" in line:
             rows.append(line)
 
@@ -397,26 +496,15 @@ def parse_table_rows(table_text: str) -> list:
 
 
 # ─────────────────────────────────────────────────────────────
-# STEP 3 — Store Each Row as a Separate Embedding
+# STEP 3 — STORE ROWS
 # ─────────────────────────────────────────────────────────────
 
-def store_product_rows(product_name: str, product_id: int, rows: list):
-    """
-    Embeds each row individually and stores in ChromaDB.
-
-    NEVER WIPE logic:
-    - Uses upsert — updates a row if ID exists, inserts if new
-    - Existing rows are NEVER deleted
-    - Knowledge base only ever grows
-    - Running twice = no duplicates, just updates
-    - New variants get added alongside existing ones
-    """
+def store_product_rows(product_name: str, product_id: int, rows: list, col):
 
     stored_count = 0
 
     for i, row in enumerate(rows):
 
-        # Deterministic ID — same product + same row index = same ID always
         safe_name = (
             product_name.lower()
             .replace(" ", "_")
@@ -426,21 +514,19 @@ def store_product_rows(product_name: str, product_id: int, rows: list):
         )
         entry_id = f"{safe_name}_row_{i}"
 
-        # Embed this specific row
         embedding = embedding_model.encode(
             row,
             normalize_embeddings=True
         ).tolist()
 
-        # Upsert — update if exists, insert if new
-        collection.upsert(
+        col.upsert(
             documents=[row],
             embeddings=[embedding],
             ids=[entry_id],
             metadatas=[{
                 "product_name": product_name,
                 "product_id":   product_id,
-                "sku_id":       "",    # empty now — Phase 2 will fill this
+                "sku_id":       "",
                 "row_index":    i,
                 "phase":        1
             }]
@@ -448,32 +534,52 @@ def store_product_rows(product_name: str, product_id: int, rows: list):
 
         stored_count += 1
 
-    print(f"  Stored/updated {stored_count} rows for {product_name}")
+    print(f"  Stored {stored_count} rows for {product_name}")
     return stored_count
 
 
 # ─────────────────────────────────────────────────────────────
-# STEP 4 — Main Loop
+# MAIN FUNCTION
 # ─────────────────────────────────────────────────────────────
 
-def build_knowledge_base(products_to_run=None):
+def build_knowledge_base(
+    products_to_run=None,
+    reset=False,
+    force=None
+):
     """
-    Main function — researches each product with Gemini and
-    stores structured variant rows in ChromaDB.
+    Builds the ChromaDB knowledge base.
 
-    products_to_run: optional list of product names
-                     If None — runs ALL 35 products
+    products_to_run : list of product names to run, or None for all 45
+    reset           : True = wipe ChromaDB and rebuild everything fresh
+                      False = only add NEW products not already in ChromaDB
+    force           : list of product names to force-update even if already stored
+                      e.g. force=["Advocate"] to re-research just Advocate
     """
 
+    # Setup collection
+    col = get_or_create_collection(reset=reset)
+
+    # Get what's already stored
+    existing_products = get_existing_products(col)
+    force             = force or []
+
+    if existing_products and not reset:
+        print(f"\nAlready stored: {sorted(existing_products)}")
+        print(f"These will be SKIPPED unless in force list")
+
+    # Determine which products to run
     if products_to_run is None:
         products_to_run = list(PRODUCTS.keys())
 
-    total_products = len(products_to_run)
-    total_rows     = 0
+    total_products  = len(products_to_run)
+    total_rows      = 0
+    skipped         = 0
+    processed       = 0
 
     print("\n" + "=" * 65)
-    print(f"KNOWLEDGE BUILDER — {total_products} products to research")
-    print(f"ChromaDB currently has {collection.count()} entries")
+    print(f"KNOWLEDGE BUILDER — {total_products} products to check")
+    print(f"ChromaDB currently has {col.count()} entries")
     print("=" * 65)
 
     for idx, product_name in enumerate(products_to_run, 1):
@@ -482,34 +588,40 @@ def build_knowledge_base(products_to_run=None):
             print(f"\n[{idx}/{total_products}] ⚠️  '{product_name}' not in PRODUCTS — skipping")
             continue
 
+        # Skip if already stored AND not in force list
+        if product_name in existing_products and product_name not in force:
+            print(f"\n[{idx}/{total_products}] ⏭️  {product_name} — already in ChromaDB, skipping")
+            skipped += 1
+            continue
+
         info = PRODUCTS[product_name]
 
-        print(f"\n[{idx}/{total_products}] {product_name}  (ProductId: {info['product_id']})")
+        if product_name in force:
+            print(f"\n[{idx}/{total_products}] 🔄 {product_name} (ProductId: {info['product_id']}) — FORCED UPDATE")
+        else:
+            print(f"\n[{idx}/{total_products}] ✨ {product_name} (ProductId: {info['product_id']}) — NEW")
+
         print(f"  Official : {info['official_url']}")
-        print(f"  Amazon   : {info['amazon_url']}")
 
         try:
-            # Step 1 — Research with Gemini
-            table_text = research_product_with_gemini(product_name, info)
+            table_text = research_product_with_gemini(product_name, info, col)
+            rows       = parse_table_rows(table_text)
 
-            # Step 2 — Parse into individual rows
-            rows = parse_table_rows(table_text)
             print(f"  Parsed {len(rows)} variant rows")
 
             if not rows:
                 print(f"  ⚠️  No rows parsed — Gemini returned unexpected format")
-                print(f"  Raw output snippet: {table_text[:300]}")
+                print(f"  Raw: {table_text[:300]}")
                 continue
 
-            # Step 3 — Store each row as separate embedding
-            count       = store_product_rows(product_name, info["product_id"], rows)
+            count       = store_product_rows(product_name, info["product_id"], rows, col)
             total_rows += count
+            processed  += 1
 
-            print(f"  ✅ Done — ChromaDB now has {collection.count()} total entries")
+            print(f"  ✅ Done — ChromaDB now has {col.count()} total entries")
 
-            # Pause between products — respect Gemini rate limits
             if idx < total_products:
-                time.sleep(2)
+                time.sleep(7)
 
         except Exception as e:
             print(f"  ❌ Error processing {product_name}: {e}")
@@ -517,11 +629,12 @@ def build_knowledge_base(products_to_run=None):
 
     print("\n" + "=" * 65)
     print("KNOWLEDGE BASE BUILD COMPLETE")
-    print(f"  Products processed : {total_products}")
+    print(f"  Products processed : {processed}")
+    print(f"  Products skipped   : {skipped} (already in ChromaDB)")
     print(f"  Rows stored        : {total_rows}")
-    print(f"  ChromaDB total     : {collection.count()} entries")
+    print(f"  ChromaDB total     : {col.count()} entries")
     print("=" * 65)
-    print("\nNext step: run query_pipeline.py to test")
+    print("\nNext step: run sku_builder.py to add SKU layer")
 
 
 # ─────────────────────────────────────────────────────────────
@@ -530,11 +643,14 @@ def build_knowledge_base(products_to_run=None):
 
 if __name__ == "__main__":
 
-    # Option A — Run ALL 35 products
-    build_knowledge_base()
+    # ── FIRST RUN — wipe everything and rebuild cleanly ──────
+    build_knowledge_base(reset=False)
 
-    # Option B — Run specific products only
-    # build_knowledge_base(["Frontline", "Advocate", "Bravecto"])
+    # ── FUTURE RUNS — only add new products ──────────────────
+    # build_knowledge_base(reset=False)
 
-    # Option C — Run a single product (good for testing)
-    # build_knowledge_base(["Frontline"])
+    # ── FORCE UPDATE specific products ───────────────────────
+    # build_knowledge_base(reset=False, force=["Advocate", "Milbemax"])
+
+    # ── ADD specific new products only ───────────────────────
+    # build_knowledge_base(products_to_run=["NexGard Combo", "Milprazon"], reset=False)

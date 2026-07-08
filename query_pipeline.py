@@ -1,25 +1,24 @@
 """
 query_pipeline.py
 ─────────────────────────────────────────────────────────────
-Identifies veterinary products from messy vet entries.
+Two-phase veterinary product identification pipeline.
 
-HOW IT WORKS:
-1. Search ChromaDB for similar product variants
-2. If confident enough → pass to DeepSeek for final answer
-3. If NOT confident → Gemini researches the product live
-   - Gemini decides if it matches an existing ProductId
-   - If yes → merges new knowledge into ChromaDB
-   - If no  → stores as new unknown product
-   - Re-searches ChromaDB with enriched knowledge
-   - Passes to DeepSeek for final answer
+PHASE 1 — Product Identification (vet_products collection)
+  Searches Gemini-researched knowledge base
+  Returns: product_name + product_id
 
-NEVER WIPES — knowledge base only ever grows
+PHASE 2 — SKU Identification (sku_knowledge collection)
+  Searches real labelled data examples filtered to product_id
+  Returns: exact sku_id
+
+FALLBACK — Live Gemini Research
+  If Phase 1 confidence too low → Gemini researches live
+  Merges new knowledge → re-searches → continues pipeline
 ─────────────────────────────────────────────────────────────
 """
 
 import os
 import json
-import time
 import google.generativeai as genai
 import chromadb
 from openai import OpenAI
@@ -39,12 +38,11 @@ DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 
 if not GEMINI_API_KEY:
     raise ValueError("Missing GEMINI_API_KEY in APIKeys.env")
-
 if not DEEPSEEK_API_KEY:
     raise ValueError("Missing DEEPSEEK_API_KEY in APIKeys.env")
 
 # ─────────────────────────────────────────────────────────────
-# KNOWN PRODUCTS — used by Gemini to match new queries
+# KNOWN PRODUCTS
 # ─────────────────────────────────────────────────────────────
 
 KNOWN_PRODUCTS = {
@@ -66,6 +64,7 @@ KNOWN_PRODUCTS = {
     "Bravecto":                 22,
     "NexGard":                  35,
     "NexGard Spectra":          36,
+    "NexGard Combo":            218,
     "Simparica":                74,
     "Simparica Trio":           199,
     "Comfortis":                10,
@@ -76,6 +75,7 @@ KNOWN_PRODUCTS = {
     "Milbemax":                 13,
     "Milbemax Worming Program":  211,
     "Milpro":                   44,
+    "Milprazon":                80,
     "Profender":                7,
     "Program":                  12,
     "Droncit":                  4,
@@ -83,21 +83,26 @@ KNOWN_PRODUCTS = {
     "Seresto":                  6,
     "Scalibor":                 27,
     "Indorex":                  43,
+    "Rearguard":                16,
+    "Sentinel":                 18,
+    "Interceptor":              20,
+    "Endogard":                 41,
+    "Strongid P":               17,
+    "Vectra 3D":                52,
+    "Xenex Spray":              61,
+    "Odour Eliminator":         75,
 }
 
 # ─────────────────────────────────────────────────────────────
 # CONFIGURATION
 # ─────────────────────────────────────────────────────────────
 
-# Below this threshold → trigger live Gemini research
-# Raised to 0.55 so edge cases like "Bravecto Plus Dog" get researched
-CONFIDENCE_THRESHOLD = 0.55
-
-# How many ChromaDB candidates to pass to DeepSeek
-MAX_CANDIDATES = 10
+CONFIDENCE_THRESHOLD = 0.55   # below → trigger live Gemini research
+MAX_CANDIDATES       = 10     # candidates passed to DeepSeek
+SKU_CANDIDATES       = 5      # top SKU matches to consider
 
 # ─────────────────────────────────────────────────────────────
-# SETUP — Gemini, DeepSeek, ChromaDB, Embeddings
+# SETUP
 # ─────────────────────────────────────────────────────────────
 
 genai.configure(api_key=GEMINI_API_KEY)
@@ -110,66 +115,132 @@ deepseek = OpenAI(
 
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-client     = chromadb.PersistentClient(path="./chroma_db")
-collection = client.get_collection("vet_products")
+client = chromadb.PersistentClient(path="./chroma_db")
 
-print(f"Connected to ChromaDB — {collection.count()} entries loaded")
+# Phase 1 collection
+try:
+    vet_collection = client.get_collection("vet_products")
+    print(f"vet_products    : {vet_collection.count()} entries")
+except Exception as e:
+    raise ValueError(f"vet_products collection not found: {e}")
+
+# Phase 2 collection
+try:
+    sku_collection = client.get_collection("sku_knowledge")
+    print(f"sku_knowledge   : {sku_collection.count()} entries")
+except Exception as e:
+    raise ValueError(f"sku_knowledge collection not found: {e}")
 
 
 # ─────────────────────────────────────────────────────────────
-# STEP 1 — VECTOR SEARCH
+# PHASE 1 — VECTOR SEARCH (vet_products)
 # ─────────────────────────────────────────────────────────────
 
-def search_chromadb(query: str, n_results: int = MAX_CANDIDATES) -> list:
+def search_vet_products(query: str) -> list:
     """
-    Converts the query to a vector and searches ChromaDB.
-    Returns a list of candidate matches with similarity scores.
+    Searches the Gemini-built product knowledge base.
+    Returns top candidates with product_name and product_id.
     """
     embedding = embedding_model.encode(
-        query,
-        normalize_embeddings=True
+        query, normalize_embeddings=True
     ).tolist()
 
-    n_results = min(n_results, collection.count())
+    n = min(MAX_CANDIDATES, vet_collection.count())
 
-    results = collection.query(
+    results = vet_collection.query(
         query_embeddings=[embedding],
-        n_results=n_results
+        n_results=n
     )
 
     candidates = []
-
     for doc, meta, distance in zip(
         results["documents"][0],
         results["metadatas"][0],
         results["distances"][0]
     ):
-        similarity = round(1 - distance, 3)
-
         candidates.append({
-            "product_name": meta.get("product_name"),
+            "product_name": str(meta.get("product_name", "")),
             "product_id":   meta.get("product_id"),
-            "sku_id":       meta.get("sku_id", ""),
-            "description":  doc,
-            "similarity":   similarity
+            "description":  str(doc),
+            "similarity":   round(1 - distance, 3)
         })
 
     candidates.sort(key=lambda x: x["similarity"], reverse=True)
-
     return candidates
 
 
 # ─────────────────────────────────────────────────────────────
-# STEP 2 — LIVE GEMINI RESEARCH (fallback for unknown products)
+# PHASE 2 — SKU SEARCH (sku_knowledge)
 # ─────────────────────────────────────────────────────────────
 
-def research_unknown_with_gemini(query: str) -> dict:
+def search_sku(query: str, product_id: int) -> list:
     """
-    Called when ChromaDB confidence is too low.
-    Gemini researches the product on the web and decides:
-    - Does it match an existing known product? → return that ProductId
-    - Is it genuinely new? → return product_id = "new_unknown"
+    Searches the SKU knowledge base filtered to a specific ProductId.
+    Returns top SKU candidates from real labelled data.
     """
+    try:
+        embedding = embedding_model.encode(
+            query, normalize_embeddings=True
+        ).tolist()
+
+        # Get all entries for this product_id
+        all_entries = sku_collection.get(
+            where={"product_id": int(product_id)},
+            include=["documents", "metadatas", "embeddings"]
+        )
+
+        if not all_entries["ids"]:
+            return []
+
+        # Score each entry by cosine similarity manually
+        import numpy as np
+        query_vec = np.array(embedding)
+        scored    = []
+
+        for i, (doc, meta, emb) in enumerate(zip(
+            all_entries["documents"],
+            all_entries["metadatas"],
+            all_entries["embeddings"]
+        )):
+            stored_vec = np.array(emb)
+            similarity = float(
+                np.dot(query_vec, stored_vec) /
+                (np.linalg.norm(query_vec) * np.linalg.norm(stored_vec) + 1e-10)
+            )
+            scored.append({
+                "sku_id":             int(meta.get("sku_id", 0)),
+                "product_variant_id": int(meta.get("product_variant_id", 0)),
+                "product_name":       str(meta.get("product_name", "")),
+                "example_note":       str(doc),
+                "similarity":         round(similarity, 3)
+            })
+
+        # Sort and deduplicate by SKU
+        scored.sort(key=lambda x: x["similarity"], reverse=True)
+
+        seen     = set()
+        top_skus = []
+        for entry in scored:
+            sku = entry["sku_id"]
+            if sku not in seen:
+                seen.add(sku)
+                top_skus.append(entry)
+            if len(top_skus) >= SKU_CANDIDATES:
+                break
+
+        return top_skus
+
+    except Exception as e:
+        print(f"  SKU search error: {e}")
+        return []
+
+
+# ─────────────────────────────────────────────────────────────
+# LIVE GEMINI RESEARCH (fallback)
+# ─────────────────────────────────────────────────────────────
+
+def research_with_gemini(query: str) -> dict:
+    """Triggered when Phase 1 confidence is too low."""
     print(f"\n  Low confidence — triggering live Gemini research...")
 
     known_list = "\n".join([
@@ -179,292 +250,252 @@ def research_unknown_with_gemini(query: str) -> dict:
 
     prompt = f"""
 You are a veterinary product research assistant.
+A vet practice entered: "{query}"
 
-A vet practice entered this product name: "{query}"
-
-TASK 1 — IDENTIFY THE PRODUCT:
-Search the web to find out what veterinary product this refers to.
-Look at official manufacturer websites, Amazon UK, VioVet, PetDrugsOnline, VetUK.
-
-TASK 2 — MATCH TO KNOWN PRODUCTS:
-Here is a list of known products in our database:
+Search the web for this product. Then check if it matches any of these:
 {known_list}
 
-Does this query refer to one of the above known products?
-- If YES → return the exact product name and ProductId from the list above
-- If NO  → return product_name as the full product name you found, and product_id as "new_unknown"
+Reply in EXACTLY this format:
 
-TASK 3 — BUILD PRODUCT TABLE:
-Return a pipe-separated table of ALL variants of this product.
-
-Table columns (exactly):
-Product Name | Size | Active Ingredients | Animals | Weight Range | Parasites | Application Method | Pack Quantity | Protection Duration | Age Minimum | Extra Notes
-
-Table rules:
-- First row = header
-- One row per unique variant
-- Different sizes/weights/pack quantities = different rows
-- NO paragraphs, NO markdown, NO commentary
-
-Return your response in this EXACT format:
-
-MATCHED_PRODUCT_NAME: [exact name from known list, or full product name if new]
-MATCHED_PRODUCT_ID: [ProductId number from known list, or new_unknown]
+MATCHED_PRODUCT_NAME: [name from list above, or full product name if new]
+MATCHED_PRODUCT_ID: [ProductId number, or new_unknown]
 
 TABLE:
-[pipe-separated table here]
+[pipe-separated table with columns:
+Product Name | Size | Active Ingredients | Animals | Weight Range | Parasites | Application Method | Pack Quantity | Protection Duration | Age Minimum | Vet Abbreviations | Extra Notes]
 """
 
-    response = gemini.generate_content(prompt)
-    raw      = response.text.strip()
+    try:
+        response     = gemini.generate_content(prompt)
+        raw          = response.text.strip()
+        product_name = "Unknown"
+        product_id   = "new_unknown"
+        table_text   = ""
+        in_table     = False
 
-    product_name = "Unknown"
-    product_id   = "new_unknown"
-    table_text   = ""
+        for line in raw.split("\n"):
+            line = line.strip()
+            if line.startswith("MATCHED_PRODUCT_NAME:"):
+                product_name = line.replace("MATCHED_PRODUCT_NAME:", "").strip()
+            elif line.startswith("MATCHED_PRODUCT_ID:"):
+                pid_raw = line.replace("MATCHED_PRODUCT_ID:", "").strip()
+                product_id = int(pid_raw) if pid_raw.isdigit() else "new_unknown"
+            elif line == "TABLE:":
+                in_table = True
+            elif in_table and "|" in line:
+                table_text += line + "\n"
 
-    lines    = raw.split("\n")
-    in_table = False
+        print(f"  Gemini identified: {product_name} (ProductId: {product_id})")
+        return {
+            "product_name": product_name,
+            "product_id":   product_id,
+            "table_text":   table_text.strip()
+        }
 
-    for line in lines:
-        line = line.strip()
+    except Exception as e:
+        print(f"  Gemini research failed: {e}")
+        return {"product_name": "Unknown", "product_id": "new_unknown", "table_text": ""}
 
-        if line.startswith("MATCHED_PRODUCT_NAME:"):
-            product_name = line.replace("MATCHED_PRODUCT_NAME:", "").strip()
-
-        elif line.startswith("MATCHED_PRODUCT_ID:"):
-            pid_raw = line.replace("MATCHED_PRODUCT_ID:", "").strip()
-            if pid_raw.isdigit():
-                product_id = int(pid_raw)
-            else:
-                product_id = "new_unknown"
-
-        elif line == "TABLE:":
-            in_table = True
-
-        elif in_table and "|" in line:
-            table_text += line + "\n"
-
-    print(f"  Gemini identified: {product_name} (ProductId: {product_id})")
-
-    return {
-        "product_name": product_name,
-        "product_id":   product_id,
-        "table_text":   table_text.strip()
-    }
-
-
-# ─────────────────────────────────────────────────────────────
-# STEP 3 — MERGE NEW KNOWLEDGE INTO CHROMADB
-# ─────────────────────────────────────────────────────────────
 
 def merge_into_chromadb(product_name: str, product_id, table_text: str):
-    """
-    Merges Gemini's new research into ChromaDB.
-    NEVER WIPES — uses upsert, knowledge only grows.
-    New rows get unique IDs so they don't overwrite existing ones.
-    """
-
+    """Merges Gemini research into vet_products. Never wipes."""
     if not table_text:
-        print("  No table to store — skipping merge")
         return 0
 
-    rows = []
-    for line in table_text.split("\n"):
-        line = line.strip()
-        if not line:
-            continue
-        if line.lower().startswith("product name"):
-            continue
-        cleaned = line.replace("|", "").replace("-", "").replace(" ", "")
-        if not cleaned:
-            continue
-        if "|" in line:
-            rows.append(line)
+    rows = [
+        line.strip() for line in table_text.split("\n")
+        if "|" in line.strip()
+        and not line.strip().lower().startswith("product name")
+        and line.strip().replace("|", "").replace("-", "").replace(" ", "")
+    ]
 
     if not rows:
-        print("  No valid rows found in table")
         return 0
 
     safe_name = (
         product_name.lower()
-        .replace(" ", "_")
-        .replace("/", "_")
-        .replace("(", "")
-        .replace(")", "")
+        .replace(" ", "_").replace("/", "_")
+        .replace("(", "").replace(")", "")
     )
 
     try:
-        existing    = collection.get(where={"product_name": product_name})
+        existing    = vet_collection.get(where={"product_name": product_name})
         start_index = len(existing["ids"])
     except Exception:
         start_index = 0
 
     stored = 0
-
     for i, row in enumerate(rows):
         entry_id  = f"{safe_name}_live_{start_index + i}"
         embedding = embedding_model.encode(
-            row,
-            normalize_embeddings=True
+            row, normalize_embeddings=True
         ).tolist()
 
-        collection.upsert(
+        vet_collection.upsert(
             documents=[row],
             embeddings=[embedding],
             ids=[entry_id],
             metadatas=[{
-                "product_name": product_name,
-                "product_id":   product_id,
+                "product_name": str(product_name),
+                "product_id":   int(product_id) if str(product_id).isdigit() else 0,
                 "sku_id":       "",
-                "row_index":    start_index + i,
                 "phase":        1,
                 "source":       "live_research"
             }]
         )
         stored += 1
 
-    print(f"  Merged {stored} new rows into ChromaDB for '{product_name}'")
-    print(f"  ChromaDB now has {collection.count()} total entries")
+    print(f"  Merged {stored} new rows into vet_products")
     return stored
 
 
 # ─────────────────────────────────────────────────────────────
-# STEP 4 — DEEPSEEK REASONING
+# DEEPSEEK — PHASE 1 REASONING
 # ─────────────────────────────────────────────────────────────
 
-def build_context(candidates: list) -> str:
-    """Formats ChromaDB candidates into context for DeepSeek."""
+def normalise_confidence(conf: str) -> str:
+    """Converts any confidence value to High/Medium/Low/Very Low."""
+    if not conf:
+        return "Low"
+    s = str(conf).lower().replace("%", "").strip()
+    try:
+        v = float(s)
+        if v >= 0.7 or v >= 70:   return "High"
+        elif v >= 0.5 or v >= 50: return "Medium"
+        else:                      return "Low"
+    except ValueError:
+        if "very low" in s:   return "Very Low"
+        elif "high" in s:     return "High"
+        elif "medium" in s:   return "Medium"
+        else:                  return "Low"
+
+
+def ask_deepseek_phase1(query: str, candidates: list) -> dict:
+    """
+    DeepSeek reasons over Phase 1 candidates to identify the product family.
+    Returns product_family, product_id, confidence, reason.
+    """
 
     context = ""
     for i, c in enumerate(candidates):
         context += f"""
-────────────────────────────────────────────
 CANDIDATE {i+1}
-PRODUCT FAMILY : {c['product_name']}
-PRODUCT ID     : {c['product_id']}
-SIMILARITY     : {c['similarity']}
-
-VARIANT ROW:
-{c['description']}
+  PRODUCT FAMILY : {c['product_name']}
+  PRODUCT ID     : {c['product_id']}
+  SIMILARITY     : {c['similarity']}
+  VARIANT ROW    : {c['description']}
 """
-    return context
-
-
-def ask_deepseek(query: str, context: str) -> dict:
-    """
-    Passes the query and ChromaDB candidates to DeepSeek.
-    Returns structured JSON with primary match + 2 alternatives.
-    """
 
     prompt = f"""
 You are a veterinary product matching system.
 
-You will be given:
-- A messy product name entered by a vet practice
-- A database of veterinary product variants from ChromaDB
+Identify which product family this messy vet entry belongs to.
 
-Your task:
-1. Identify the BEST matching product variant
-2. Identify TWO additional plausible alternatives
-3. Rank them by likelihood
-4. Use ONLY data provided — do not invent products
+CRITICAL RULES:
+1. If the query contains an explicit brand name, that brand MUST be the primary match.
+2. Scan ALL candidates carefully before deciding — the brand may be in a lower-ranked candidate.
+3. "NexGard Spectra" and "NexGard" are DIFFERENT products. Match the most specific one.
+4. Use ONLY: High, Medium, Low, Very Low for confidence — no numbers or percentages.
 
-────────────────────────────────────────────
-CRITICAL RULES — FOLLOW EXACTLY:
-
-RULE 1 — BRAND NAME TAKES ABSOLUTE PRIORITY:
-If the query contains an explicit brand name (e.g. "Advocate", "Frontline",
-"Bravecto", "NexGard", "Milbemax", "Simparica" etc.), that product family
-MUST be the primary match — even if another product scores higher similarity.
-Never return a different brand as primary when a brand is explicitly named in the query.
-Only ignore the brand name if it genuinely does not exist in ANY candidate.
-
-RULE 2 — PRODUCT VARIANT MATTERS:
-"NexGard Spectra" and "NexGard" are different products.
-"Frontline" and "Frontline Plus" are different products.
-"Bravecto" and "Bravecto Plus" are different products.
-Match the most specific variant mentioned in the query.
-
-RULE 3 — CONFIDENCE SCORING:
-- High = brand name matches AND weight/size/pack matches
-- Medium = brand name matches but size/pack uncertain
-- Low = brand name matches but other details don't match or species mismatch
-- Very Low = no brand name match, just similar product type
-
-RULE 4 — OUTPUT FORMAT:
-- "variant" = full product name from the database row
-- "exact_variant" = specific type e.g. Spray, Spot On, Plus, Combo, Chewable
-- "animal_size" = include weight range AND size tag (S/M/L/XL) if known
-- "confidence" = use words: High, Medium, Low, Very Low (not numbers or percentages)
-
-────────────────────────────────────────────
-OUTPUT FORMAT (STRICT JSON ONLY):
-
+OUTPUT FORMAT (JSON only):
 {{
-  "primary_match": {{
-    "product_family": "",
-    "product_id": "",
-    "variant": "",
-    "exact_variant": "",
-    "sku": "",
-    "species": "",
-    "animal_size": "",
-    "pack_size": "",
-    "pack_quantity": "",
-    "animal_age": "",
-    "confidence": "",
-    "reason": ""
-  }},
-  "alternative_matches": [
-    {{
-      "product_family": "",
-      "product_id": "",
-      "variant": "",
-      "exact_variant": "",
-      "sku": "",
-      "species": "",
-      "animal_size": "",
-      "pack_size": "",
-      "pack_quantity": "",
-      "animal_age": "",
-      "confidence": "",
-      "reason": ""
-    }},
-    {{
-      "product_family": "",
-      "product_id": "",
-      "variant": "",
-      "exact_variant": "",
-      "sku": "",
-      "species": "",
-      "animal_size": "",
-      "pack_size": "",
-      "pack_quantity": "",
-      "animal_age": "",
-      "confidence": "",
-      "reason": ""
-    }}
-  ]
+  "product_family": "",
+  "product_id": "",
+  "confidence": "",
+  "reason": ""
 }}
 
-────────────────────────────────────────────
-USER QUERY:
-{query}
+USER QUERY: {query}
 
-────────────────────────────────────────────
-DATABASE:
+CANDIDATES:
 {context}
 """
 
-    response = deepseek.chat.completions.create(
-        model="deepseek-reasoner",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0,
-        response_format={"type": "json_object"}
-    )
+    try:
+        response = deepseek.chat.completions.create(
+            model="deepseek-reasoner",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0,
+            response_format={"type": "json_object"}
+        )
+        result = json.loads(response.choices[0].message.content.strip())
+        result["confidence"] = normalise_confidence(result.get("confidence", ""))
+        return result
+    except Exception as e:
+        print(f"  DeepSeek Phase 1 error: {e}")
+        top = candidates[0] if candidates else {}
+        return {
+            "product_family": top.get("product_name", "Unknown"),
+            "product_id":     top.get("product_id", ""),
+            "confidence":     "Low",
+            "reason":         f"DeepSeek error — fell back to top similarity match"
+        }
 
-    raw = response.choices[0].message.content.strip()
-    return json.loads(raw)
+
+# ─────────────────────────────────────────────────────────────
+# DEEPSEEK — PHASE 2 REASONING
+# ─────────────────────────────────────────────────────────────
+
+def ask_deepseek_phase2(query: str, sku_candidates: list, product_name: str) -> dict:
+    """
+    DeepSeek reasons over Phase 2 SKU candidates to identify the exact SKU.
+    Returns sku_id, confidence, reason.
+    """
+
+    context = ""
+    for i, c in enumerate(sku_candidates):
+        context += f"""
+SKU CANDIDATE {i+1}
+  SKU ID         : {c['sku_id']}
+  SIMILARITY     : {c['similarity']}
+  EXAMPLE NOTE   : {c['example_note']}
+"""
+
+    prompt = f"""
+You are a veterinary product SKU matching system.
+
+The product has already been identified as: {product_name}
+
+Now identify the EXACT SKU variant from the candidates below.
+
+Rules:
+- Match on weight range, pack size, species, application method
+- Use ONLY: High, Medium, Low, Very Low for confidence
+- If unsure between two SKUs, pick the higher similarity one
+
+OUTPUT FORMAT (JSON only):
+{{
+  "sku_id": "",
+  "confidence": "",
+  "reason": "",
+  "matched_example": ""
+}}
+
+USER QUERY: {query}
+
+SKU CANDIDATES:
+{context}
+"""
+
+    try:
+        response = deepseek.chat.completions.create(
+            model="deepseek-reasoner",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0,
+            response_format={"type": "json_object"}
+        )
+        result = json.loads(response.choices[0].message.content.strip())
+        result["confidence"] = normalise_confidence(result.get("confidence", ""))
+        return result
+    except Exception as e:
+        print(f"  DeepSeek Phase 2 error: {e}")
+        top = sku_candidates[0] if sku_candidates else {}
+        return {
+            "sku_id":          top.get("sku_id", ""),
+            "confidence":      "Low",
+            "reason":          "DeepSeek error — fell back to top similarity SKU",
+            "matched_example": top.get("example_note", "")
+        }
 
 
 # ─────────────────────────────────────────────────────────────
@@ -473,13 +504,8 @@ DATABASE:
 
 def identify_product(query: str) -> dict:
     """
-    Full pipeline:
-    1. Search ChromaDB
-    2. If confident → DeepSeek → answer
-    3. If not confident → Gemini researches live
-                       → merges into ChromaDB
-                       → re-searches ChromaDB
-                       → DeepSeek → answer
+    Full two-phase pipeline.
+    Returns product_name, product_id, sku_id, confidences, reasons.
     """
 
     if not query.strip():
@@ -487,28 +513,29 @@ def identify_product(query: str) -> dict:
 
     print(f"\nQuery: '{query}'")
 
-    # ── Step 1: Vector Search ──────────────────────────────
-    candidates = search_chromadb(query)
+    # ── PHASE 1: Product Identification ───────────────────────
 
-    if not candidates:
+    p1_candidates  = search_vet_products(query)
+
+    if not p1_candidates:
         return {
-            "error": "ChromaDB is empty",
-            "primary_match": {
-                "product_family": "Unknown",
-                "confidence":     "Low",
-                "reason":         "No products in knowledge base"
-            }
+            "query":           query,
+            "product_family":  "Unknown",
+            "product_id":      None,
+            "sku_id":          None,
+            "p1_confidence":   "Low",
+            "p2_confidence":   None,
+            "reason":          "No products found in knowledge base",
+            "sku_reason":      None
         }
 
-    top_similarity = candidates[0]["similarity"]
-    print(f"  Top similarity: {top_similarity} ({candidates[0]['product_name']})")
+    top_similarity = p1_candidates[0]["similarity"]
+    print(f"  Phase 1 top: {top_similarity} ({p1_candidates[0]['product_name']})")
 
-    # ── Step 2: Check confidence ───────────────────────────
+    # Trigger live Gemini research if confidence too low
     if top_similarity < CONFIDENCE_THRESHOLD:
-
-        print(f"  Similarity {top_similarity} below threshold {CONFIDENCE_THRESHOLD}")
-
-        research = research_unknown_with_gemini(query)
+        print(f"  Below threshold {CONFIDENCE_THRESHOLD} — researching live...")
+        research = research_with_gemini(query)
 
         if research["table_text"]:
             merge_into_chromadb(
@@ -516,21 +543,57 @@ def identify_product(query: str) -> dict:
                 research["product_id"],
                 research["table_text"]
             )
-
-            print(f"  Re-searching ChromaDB with enriched knowledge...")
-            candidates     = search_chromadb(query)
-            top_similarity = candidates[0]["similarity"]
+            p1_candidates  = search_vet_products(query)
+            top_similarity = p1_candidates[0]["similarity"]
             print(f"  New top similarity: {top_similarity}")
 
+    # DeepSeek Phase 1 reasoning
+    p1_result = ask_deepseek_phase1(query, p1_candidates)
+    print(f"  Phase 1 result: {p1_result.get('product_family')} "
+          f"(ProductId: {p1_result.get('product_id')}) "
+          f"— {p1_result.get('confidence')}")
+
+    product_id = p1_result.get("product_id")
+
+    # ── PHASE 2: SKU Identification ───────────────────────────
+
+    sku_result = {
+        "sku_id":          None,
+        "confidence":      "Low",
+        "reason":          "No SKU data available for this product",
+        "matched_example": ""
+    }
+
+    if product_id and str(product_id).lstrip("-").isdigit():
+        pid_int      = int(product_id)
+        sku_candidates = search_sku(query, pid_int)
+
+        if sku_candidates:
+            print(f"  Phase 2 top SKU: {sku_candidates[0]['sku_id']} "
+                  f"(similarity: {sku_candidates[0]['similarity']})")
+            sku_result = ask_deepseek_phase2(
+                query,
+                sku_candidates,
+                p1_result.get("product_family", "")
+            )
+            print(f"  Phase 2 result: SKU {sku_result.get('sku_id')} "
+                  f"— {sku_result.get('confidence')}")
         else:
-            print("  Gemini returned no table — using original candidates")
+            print(f"  Phase 2: no SKU data found for ProductId {pid_int}")
 
-    # ── Step 3: DeepSeek Reasoning ─────────────────────────
-    print(f"  Passing {len(candidates)} candidates to DeepSeek...")
-    context = build_context(candidates)
-    result  = ask_deepseek(query, context)
+    # ── COMPILE FINAL RESULT ──────────────────────────────────
 
-    return result
+    return {
+        "query":          query,
+        "product_family": p1_result.get("product_family", "Unknown"),
+        "product_id":     product_id,
+        "p1_confidence":  p1_result.get("confidence", "Low"),
+        "p1_reason":      p1_result.get("reason", ""),
+        "sku_id":         sku_result.get("sku_id"),
+        "p2_confidence":  sku_result.get("confidence"),
+        "p2_reason":      sku_result.get("reason", ""),
+        "matched_example":sku_result.get("matched_example", "")
+    }
 
 
 # ─────────────────────────────────────────────────────────────
@@ -543,19 +606,25 @@ if __name__ == "__main__":
         "Frontline Spray 100ml for dogs",
         "FRONTLINE S/ON LGE 20-40K 6 PIP",
         "Advocate medium dog 3 pipettes",
-        "NexGard Spectra 3.5-7.5kg 3 pack",
-        "Bravecto chew large dog 20-40kg",
         "fipronil spray cat",
-        "flea tick treatment small dog spot on",
-        "milbemax wormer cat each",
-        "Bravecto Plus Dog Large",
+        "Stronghold small cat 45mg 3 pack",
+        "Effipro spot on large dog 6 pipettes",
+        "random product xyz",
     ]
 
     print("=" * 65)
-    print("QUERY PIPELINE TEST")
+    print("TWO-PHASE QUERY PIPELINE TEST")
     print("=" * 65)
 
     for q in test_queries:
         print(f"\n{'─' * 65}")
         result = identify_product(q)
-        print(json.dumps(result, indent=2))
+        print(f"\nRESULT:")
+        print(f"  Product Family : {result.get('product_family')}")
+        print(f"  Product ID     : {result.get('product_id')}")
+        print(f"  P1 Confidence  : {result.get('p1_confidence')}")
+        print(f"  P1 Reason      : {result.get('p1_reason')}")
+        print(f"  SKU ID         : {result.get('sku_id')}")
+        print(f"  P2 Confidence  : {result.get('p2_confidence')}")
+        print(f"  P2 Reason      : {result.get('p2_reason')}")
+        print(f"  Matched Note   : {result.get('matched_example')}")
