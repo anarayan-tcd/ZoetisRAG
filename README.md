@@ -15,7 +15,7 @@ A React + FastAPI app is the active interface. An earlier Gradio prototype has b
 ## Project layout
 
 ```
-CodeProjects/
+ZoetisRAG/
 ├── backend/          FastAPI app + the core matching pipeline
 │   └── knowledge/     offline scripts that build the ChromaDB knowledge base
 │   └── data/           raw/generated CSVs and the ChromaDB store
