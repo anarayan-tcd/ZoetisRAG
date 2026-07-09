@@ -173,9 +173,11 @@ def normalise_confidence(conf) -> str:
 
     try:
         v = float(s)
-        if v >= 0.7 or v >= 70:
+        if v > 1:
+            v = v / 100.0
+        if v >= 0.7:
             return "High"
-        elif v >= 0.5 or v >= 50:
+        elif v >= 0.5:
             return "Medium"
         else:
             return "Low"
