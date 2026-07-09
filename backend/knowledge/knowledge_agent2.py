@@ -433,7 +433,7 @@ def store_variant_in_chromadb(brand: str, variant: dict, existing_docs: dict) ->
     if existing_docs.get(vid) == description:
         return False
 
-    embedding = embedding_model.encode(description).tolist()
+    embedding = embedding_model.encode(description, normalize_embeddings=True).tolist()
 
     collection.upsert(
         documents=[description],
