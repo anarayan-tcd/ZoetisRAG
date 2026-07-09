@@ -46,7 +46,7 @@ Run in order to (re)build the product knowledge base; none of these are called b
 | File | Description |
 |---|---|
 | `extract_brands.py` | Turns the messy `Notes` column in `Labelled.csv` into a clean, deduplicated brand list (`brand_seed_list.csv`) via a heuristic pass plus DeepSeek classification for ambiguous groups. |
-| `knowledge_agent2.py` | For each brand in the seed list, researches it live via Gemini + Google Search grounding and stores structured product variants (one ChromaDB document per variant, tagged with region) — only writing what's new or changed. |
+| `knowledge_agent2.py` | For each brand in the seed list, researches it live via Gemini + Google Search grounding and stores structured product variants (one ChromaDB document per variant, tagged with region) — only writing what's new or changed, and checkpointed per-brand so a crash or credit exhaustion doesn't force re-researching already-completed brands. |
 | `sku_examples_builder.py` | Builds a second ChromaDB collection of real historical vet-entered phrasing per brand, used as authentic style/id context in Phase 2 matching. |
 
 ### `backend/data/`
@@ -57,6 +57,7 @@ Run in order to (re)build the product knowledge base; none of these are called b
 | `raw/FrontlineDemo.csv` | Small sample file for manual batch-upload testing. |
 | `generated/brand_seed_list.csv` | Output of `extract_brands.py` — the canonical brand list fed into `knowledge_agent2.py`. |
 | `generated/brand_extraction_checkpoint.json` | Resumable checkpoint so a crash during `extract_brands.py` doesn't lose already-completed LLM calls. |
+| `generated/knowledge_research_checkpoint.json` | Resumable checkpoint so a crash or Gemini credit exhaustion during `knowledge_agent2.py` doesn't lose already-researched brands or force re-spending credits on a restart. |
 | `chroma_db/` | Persistent ChromaDB store — `vet_products` (researched variants) and `sku_examples` (real historical phrasing) collections. |
 
 ---
