@@ -38,6 +38,7 @@ if not GEMINI_API_KEY:
 
 BRAND_SEED_CSV = BACKEND_ROOT / "data" / "generated" / "brand_seed_list.csv"
 EXPORT_CSV = BACKEND_ROOT / "data" / "generated" / "brands_products_export.csv"
+CHECKPOINT_FILE = BACKEND_ROOT / "data" / "generated" / "knowledge_research_checkpoint.json"
 
 GEMINI_MODEL = "gemini-2.5-flash"
 
@@ -457,6 +458,27 @@ def store_variant_in_chromadb(brand: str, variant: dict, existing_docs: dict) ->
 
 
 # ─────────────────────────────────────────────────────────────
+# CHECKPOINT — resume without re-spending Gemini credits on a crash
+# ─────────────────────────────────────────────────────────────
+
+def load_checkpoint() -> dict:
+    """Returns {brand: research_data_dict} for brands already researched
+    in a previous (possibly crashed/credit-exhausted) run."""
+    if not CHECKPOINT_FILE.exists():
+        return {}
+    try:
+        with open(CHECKPOINT_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def save_checkpoint(checkpoint: dict):
+    with open(CHECKPOINT_FILE, "w", encoding="utf-8") as f:
+        json.dump(checkpoint, f, indent=2)
+
+
+# ─────────────────────────────────────────────────────────────
 # STEP 3 — Export a flat Brand / Product / Official URL CSV
 # ─────────────────────────────────────────────────────────────
 
@@ -474,9 +496,20 @@ def export_brand_product_csv(all_results: list):
                 "OfficialBrandURL": variant.get("official_brand_url") or brand_url,
             })
 
-    pd.DataFrame(rows).to_csv(EXPORT_CSV, index=False)
+    try:
+        pd.DataFrame(rows).to_csv(EXPORT_CSV, index=False)
+        output_path = EXPORT_CSV
+    except PermissionError:
+        fallback_path = EXPORT_CSV.with_stem(EXPORT_CSV.stem + "_new")
+        pd.DataFrame(rows).to_csv(fallback_path, index=False)
+        output_path = fallback_path
+        print(
+            f"\nWARNING: {EXPORT_CSV} is open in another program and could not be "
+            f"overwritten. Wrote to {fallback_path} instead — close the original "
+            f"file and rename/replace it manually."
+        )
 
-    print(f"Exported brand/product/URL list to {EXPORT_CSV} ({len(rows)} row(s))")
+    print(f"Exported brand/product/URL list to {output_path} ({len(rows)} row(s))")
 
 
 # ─────────────────────────────────────────────────────────────
@@ -500,27 +533,41 @@ if __name__ == "__main__":
     print("=" * 60)
 
     seed_df = load_brand_seed_list()
-    all_results = []
 
     # One bulk fetch of everything already stored, instead of a
     # collection.get(ids=[vid]) round trip per variant.
     existing_docs = get_all_variant_documents()
     print(f"Prefetched {len(existing_docs)} existing variant document(s) for diffing.\n")
 
+    # Resumable checkpoint: {brand: research_data_dict}, saved to disk after
+    # every single brand (not batched) so a crash or a Gemini credit
+    # exhaustion partway through the ~146-brand loop never loses more than
+    # the one in-flight call, and a restart skips brands already researched
+    # instead of re-spending API credits on them.
+    checkpoint = load_checkpoint()
+    if checkpoint:
+        print(f"Resuming from checkpoint — {len(checkpoint)} brand(s) already researched.\n")
+
     for _, row in seed_df.iterrows():
 
         brand = str(row["Brand"]).strip()
+
+        if brand in checkpoint:
+            continue
+
         known_lines = str(row.get("KnownProductLines", "") or "")
 
         data = research_brand_with_gemini(brand, known_lines)
-        all_results.append(data)
 
         variants = data.get("variants", [])
         updated = sum(store_variant_in_chromadb(brand, v, existing_docs) for v in variants)
 
         print(f"'{brand}': {updated} variant(s) added/updated, {len(variants) - updated} unchanged.")
 
-    export_brand_product_csv(all_results)
+        checkpoint[brand] = data
+        save_checkpoint(checkpoint)
+
+    export_brand_product_csv(list(checkpoint.values()))
 
     print("\n" + "=" * 60)
     print(f"Done! ChromaDB now has {collection.count()} variant(s) total.")
