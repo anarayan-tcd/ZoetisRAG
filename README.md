@@ -1,8 +1,8 @@
 # Veterinary Product Matching System
 
-Matches messy, real-world vet prescription text (e.g. `"FRONTLINE SPOT ON XL DOG 3PK"`) against
-a database of real veterinary products. Built as a two-phase retrieval + LLM reasoning pipeline:
-a vector search narrows candidates down, then DeepSeek reasons over them to pick the best match —
+Matches vet prescription text (e.g. `"FRONTLINE SPOT ON XL DOG 3PK"`) against
+a database of veterinary products. Built as a two-phase retrieval + LLM reasoning pipeline:
+a vector search in ChromaDB narrows candidates down, then DeepSeek reasons over them to pick the best match —
 first the **brand**, then the exact **product variant** within that brand.
 
 The product knowledge base itself is built offline by asking Gemini to research each brand live
@@ -32,7 +32,7 @@ CodeProjects/
 | File | Description |
 |---|---|
 | `main.py` | FastAPI app; exposes `/api/query`, `/api/batch/*`, and `/api/cache/*` endpoints. |
-| `query_agent.py` | The core two-phase matching pipeline — ChromaDB search, DeepSeek reasoning (Phase 1: brand, Phase 2: variant), result caching, the opt-in live-research fallback, and a deterministic post-check that clears any product/SKU id DeepSeek claims that doesn't match a real historical record. |
+| `query_agent.py` | The core two-phase matching pipeline built on ChromaDB search, DeepSeek reasoning (Phase 1: brand, Phase 2: variant), result caching, the opt-in live-research fallback, and a deterministic post-check that clears any product/SKU id DeepSeek claims that doesn't match a real historical record. THIS AGENT USES AI BASED REASONING AND COSTS MONEY. |
 | `schemas.py` | Pydantic request/response models for the API (`QueryRequest`, `ProductMatch`, `QueryResponse`). |
 | `batch.py` | In-memory job store and background execution for batch file uploads. |
 | `export.py` | Writes a completed batch job's rows out to CSV, Excel, or JSON for download. |
@@ -45,20 +45,20 @@ Run in order to (re)build the product knowledge base; none of these are called b
 
 | File | Description |
 |---|---|
-| `extract_brands.py` | Turns the messy `Notes` column in `Labelled.csv` into a clean, deduplicated brand list (`brand_seed_list.csv`) via a heuristic pass plus DeepSeek classification for ambiguous groups. |
-| `knowledge_agent2.py` | For each brand in the seed list, researches it live via Gemini + Google Search grounding and stores structured product variants (one ChromaDB document per variant, tagged with region) — only writing what's new or changed, and checkpointed per-brand so a crash or credit exhaustion doesn't force re-researching already-completed brands. |
-| `sku_examples_builder.py` | Builds a second ChromaDB collection of real historical vet-entered phrasing per brand, used as authentic style/id context in Phase 2 matching. |
+| `extract_brands.py` | Turns the `Notes` column in `Labelled.csv` into a clean, deduplicated brand list (`brand_seed_list.csv`) via a heuristic pass plus DeepSeek classification for ambiguous groups. THIS AGENT USES AI BASED REASONING AND COSTS MONEY. |
+| `knowledge_agent2.py` | For each brand in the seed list, researches it live via Gemini + Google Search grounding and stores structured product variants (one ChromaDB document per variant, tagged with region) — only writing what's new or changed, and checkpointed per-brand so a crash or credit exhaustion doesn't force re-researching already-completed brands. THIS AGENT USES AI BASED REASONING AND COSTS MONEY. GEMINI IS CURRENTLY RUNNING ON THE FLASH 2.5 FREE PLAN. FULL 146 BRAND SEARCH GROUNDING MIGHT REQUIRE ADDITIONAL TOKENS. |
+| `sku_examples_builder.py` | Builds a second ChromaDB collection of real historical vet-entered phrasing per brand, used as authentic style/id context in Phase 2 matching. This is critical to building confidence for what the AI would assume to be ambiguous or low-confidence guesses. This takes the most cleanly defined combinations in Labelled.csv and uses them as samples for the AI model to take into account when classifying the messy input string. It accounts for shorthand, misspellings etc. |
 
 ### `backend/data/`
 
 | Path | Description |
 |---|---|
-| `raw/Labelled.csv` | Historical vet prescription notes (~328k rows) — the source data for brand discovery and real-phrasing examples. |
+| `raw/Labelled.csv` | Historical vet prescription notes (~328k rows). Source data for brand discovery and real-phrasing examples. |
 | `raw/FrontlineDemo.csv` | Small sample file for manual batch-upload testing. |
-| `generated/brand_seed_list.csv` | Output of `extract_brands.py` — the canonical brand list fed into `knowledge_agent2.py`. |
+| `generated/brand_seed_list.csv` | Output of `extract_brands.py`. Canonical brand list fed into `knowledge_agent2.py`. |
 | `generated/brand_extraction_checkpoint.json` | Resumable checkpoint so a crash during `extract_brands.py` doesn't lose already-completed LLM calls. |
 | `generated/knowledge_research_checkpoint.json` | Resumable checkpoint so a crash or Gemini credit exhaustion during `knowledge_agent2.py` doesn't lose already-researched brands or force re-spending credits on a restart. |
-| `chroma_db/` | Persistent ChromaDB store — `vet_products` (researched variants) and `sku_examples` (real historical phrasing) collections. |
+| `chroma_db/` | Persistent ChromaDB stores `vet_products` (researched variants) and `sku_examples` (real historical phrasing) collections. |
 
 ---
 
