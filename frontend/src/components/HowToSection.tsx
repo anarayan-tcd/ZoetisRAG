@@ -23,7 +23,7 @@ export default function HowToSection() {
           <dt>Primary Match / Alternatives</dt>
           <dd>
             The Primary Match is the system's best guess. The two Alternatives are other
-            plausible products, ranked by likelihood if their is any ambiguity in the input.
+            plausible products, ranked by likelihood if there is any ambiguity in the input.
           </dd>
           <dt>Brand / Products / Full Product Name</dt>
           <dd>
