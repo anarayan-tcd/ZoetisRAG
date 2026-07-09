@@ -1,0 +1,29 @@
+:root {
+  color-scheme: dark;
+  font: 16px/145% system-ui, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #0f1115;
+  color: #cbd5e1;
+}
+
+h1,
+h2,
+h3 {
+  color: #f3f4f6;
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+}

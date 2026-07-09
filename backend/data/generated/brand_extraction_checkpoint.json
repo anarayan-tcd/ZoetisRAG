@@ -1,0 +1,1514 @@
+{
+  "1": {
+    "Brand": "Advocate",
+    "KnownProductLines": "Spot-on for dogs and cats by weight",
+    "SourceProductIds": "1",
+    "SourceProductVariantIds": "1;2;3;4;5;6;7;8;1764;1765;1846",
+    "SourceSkuIds": "2;3;4;7;8;9;11;14;15;16;18;20;21;424;607;673;1193;1194;1195;1196;1197;1198;1322;2353;2354;2355;2356;2357;2447;2973;2974;3108;3175;3176;3177;3178;3179",
+    "TotalHistoricalRows": 25099,
+    "Method": "llm (high)"
+  },
+  "2": {
+    "Brand": "Advantix",
+    "KnownProductLines": "Spot-on for dogs by weight",
+    "SourceProductIds": "2",
+    "SourceProductVariantIds": "9;10;11;12;13;14;477;478;479;480;1847;2086",
+    "SourceSkuIds": "22;23;24;25;27;730;731;733;734;736;737;739;740;741;959;960;961;962;963;964;965;966;2358;2359;2360;2361;2630;2631;2632;2633;3324;3325;3326;3327;3737",
+    "TotalHistoricalRows": 8777,
+    "Method": "llm (high)"
+  },
+  "3": {
+    "Brand": "Drontal",
+    "KnownProductLines": "Tablets for dogs and cats, suspension for puppies",
+    "SourceProductIds": "3",
+    "SourceProductVariantIds": "15;16;17;18;19;20;21;22;23;24;26;27;28;29;592;593;594;595;596;597;678;1762;1763;1786;1798;1799;1807;1978",
+    "SourceSkuIds": "28;29;30;31;32;33;35;36;37;38;39;40;41;43;44;45;46;47;574;594;614;615;616;617;618;982;983;984;985;986;987;988;1199;1200;1201;1250;1251;2362;2363;2364;2365;2366;2367;2368;2369;2370;2742;2743;2744;2745;2746;2822;2910;2911;2927;2930;2971;2972;3057;3106;3107;3132;3133;3134;3161;3180;3181;3182;3187;3352;3353;3359;3360;3361;3362;3363;3364;3365;3382;3383;3384;3385;3386;3398;3427;3451;3469;3530;3531;3571;3572;3612;3724;3725;3726;3818",
+    "TotalHistoricalRows": 13569,
+    "Method": "llm (high)"
+  },
+  "4": {
+    "Brand": "Droncit",
+    "KnownProductLines": "Tablets and Spot-On for dogs and cats",
+    "SourceProductIds": "4",
+    "SourceProductVariantIds": "30;31;32;33;590",
+    "SourceSkuIds": "48;49;50;51;52;978;980;981;2371;2372;2741;3183;3389;3397;3440;3520;3591",
+    "TotalHistoricalRows": 4304,
+    "Method": "llm (high)"
+  },
+  "5": {
+    "Brand": "Advantage",
+    "KnownProductLines": "Spot-on pipettes for cats and dogs",
+    "SourceProductIds": "5",
+    "SourceProductVariantIds": "34;35;36;37;38;40;431;432;507;508;509;510;1723;1724;1725;1726;1727;1728;1849",
+    "SourceSkuIds": "90;91;92;93;94;95;595;690;807;808;809;810;811;813;814;816;817;818;2373;2374;2375;2376;2377;2378;2589;2590;2660;2661;2662;2663;2858;2859;2860;2861;2862;2863;2894;2895;2896;2897;2898;2944;3104;3105;3122;3123;3124;3206;3334;3335;3336;3337;3338;3339;3370;3371;3435;3439;3452;3453;3454;3456;3610;3798",
+    "TotalHistoricalRows": 15335,
+    "Method": "llm (high)"
+  },
+  "6": {
+    "Brand": "Seresto",
+    "KnownProductLines": "Flea and tick collars for cats and dogs",
+    "SourceProductIds": "6",
+    "SourceProductVariantIds": "44;45;46;47;49;680;681",
+    "SourceSkuIds": "96;97;99;100;101;619;620;621;1262;1263;2474;2824;2825",
+    "TotalHistoricalRows": 5194,
+    "Method": "llm (high)"
+  },
+  "7": {
+    "Brand": "Profender",
+    "KnownProductLines": "Spot-On for cats",
+    "SourceProductIds": "7",
+    "SourceProductVariantIds": "51;52;53;54;2082;2083;2084;2085",
+    "SourceSkuIds": "103;105;107;108;109;1202;1203;1204;2379;2380;2381;2382;2605;3184;3185;3186;3372;3373;3374;3521;3522;3523;3733;3734;3735;3736;3799;3800;3801",
+    "TotalHistoricalRows": 8460,
+    "Method": "llm (high)"
+  },
+  "8": {
+    "Brand": "Endectrid",
+    "KnownProductLines": "spot-on pipettes for dogs and cats by weight range",
+    "SourceProductIds": "8",
+    "SourceProductVariantIds": "55;56;57;58;59;60",
+    "SourceSkuIds": "579;580;581;582;583;584;2383;2384;2385;2386;2387;2388;3608;3639",
+    "TotalHistoricalRows": 355,
+    "Method": "llm (high)"
+  },
+  "9": {
+    "Brand": "Kiltix",
+    "KnownProductLines": "Tick and flea collars for dogs",
+    "SourceProductIds": "9",
+    "SourceProductVariantIds": "1900",
+    "SourceSkuIds": "3322",
+    "TotalHistoricalRows": 3,
+    "Method": "llm (high)"
+  },
+  "10": {
+    "Brand": "Comfortis",
+    "KnownProductLines": "Tablets for dogs and cats",
+    "SourceProductIds": "10",
+    "SourceProductVariantIds": "61;62;63;64;65;66;67;68;69;70;71;520;521;522;523;524;525;526;527;528;529;1747;1748;1749;1795;1796;1797;1810;1844;1845;1851;1857",
+    "SourceSkuIds": "53;54;55;56;57;58;59;60;61;622;623;837;839;843;845;847;849;851;853;969;971;989;2353;2389;2390;2391;2392;2393;2394;2395;2396;2397;2398;2673;2674;2675;2676;2677;2678;2679;2680;2681;2682;2912;2913;2914;2915;2916;2917;2960;2961;2962;2963;2964;3097;3100;3101;3102;3103;3136;3169;3170;3171;3202;3203;3204;3205;3217;3428;3434;3499;3694",
+    "TotalHistoricalRows": 9728,
+    "Method": "llm (high)"
+  },
+  "11": {
+    "Brand": "Trifexis",
+    "KnownProductLines": "Chewable tablets for dogs",
+    "SourceProductIds": "11",
+    "SourceProductVariantIds": "73;502;503;504;505;506;687;688;689;690;691",
+    "SourceSkuIds": "63;797;799;801;803;805;1272;1273;1274;1275;1276;2399;2655;2656;2657;2658;2659;2829;2830;2831;2832;2833",
+    "TotalHistoricalRows": 916,
+    "Method": "llm (high)"
+  },
+  "12": {
+    "Brand": "Program",
+    "KnownProductLines": "Tablets, injectable suspension, Plus variants for dogs and cats",
+    "SourceProductIds": "12",
+    "SourceProductVariantIds": "74;75;76;77;78;79;80;81;82;83;84;85;1824",
+    "SourceSkuIds": "64;65;66;67;68;69;70;71;72;73;74;75;1323;2400;2401;2402;2403;2404;2405;2406;2407;2408;2409;3081;3157;3458;3460;3524;3525;3526",
+    "TotalHistoricalRows": 10960,
+    "Method": "llm (high)"
+  },
+  "13": {
+    "Brand": "Milbemax",
+    "KnownProductLines": "Tablets and chewable tablets for dogs and cats",
+    "SourceProductIds": "13",
+    "SourceProductVariantIds": "86;87;88;89;90;91;92;93;94;95;96;594;598;599;1741;1742;1947",
+    "SourceSkuIds": "110;111;115;116;117;118;119;120;121;122;123;124;992;993;994;995;996;997;1212;1213;1310;1311;1312;1313;1314;1315;1316;1317;1324;1329;2410;2411;2412;2413;2414;2415;2416;2417;2744;2747;2748;2852;2853;2854;2899;2900;2929;2945;2981;2982;2983;2984;3188;3342;3366;3367;3368;3369;3375;3377;3387;3388;3405;3406;3407;3408;3409;3410;3411;3412;3413;3414;3436;3512;3513;3543;3544;3586;3587;3592;3594",
+    "TotalHistoricalRows": 12162,
+    "Method": "llm (high)"
+  },
+  "14": {
+    "Brand": "Prac-Tic",
+    "KnownProductLines": "Spot-on for dogs, multiple size variants and pack sizes",
+    "SourceProductIds": "14",
+    "SourceProductVariantIds": "97;98;99;100;101",
+    "SourceSkuIds": "125;126;127;128;129;130;131;132;133;2418;2419;2420;2421",
+    "TotalHistoricalRows": 4013,
+    "Method": "llm (high)"
+  },
+  "15": {
+    "Brand": "Capstar",
+    "KnownProductLines": "Tablets for dogs and cats",
+    "SourceProductIds": "15",
+    "SourceProductVariantIds": "102;103;104;465;466;467;468;586;587;588",
+    "SourceSkuIds": "134;135;136;697;698;699;700;956;957;958;2422;2423;2618;2619;2620;2621;2738;2739;2740",
+    "TotalHistoricalRows": 2459,
+    "Method": "llm (high)"
+  },
+  "16": {
+    "Brand": "Rearguard",
+    "KnownProductLines": "Cutaneous solution for rabbits",
+    "SourceProductIds": "16",
+    "SourceProductVariantIds": "106",
+    "SourceSkuIds": "138;1214;3162",
+    "TotalHistoricalRows": 1473,
+    "Method": "llm (high)"
+  },
+  "17": {
+    "Brand": "Strongid",
+    "KnownProductLines": "Paste, Granules, Syringe for horses and dogs",
+    "SourceProductIds": "17",
+    "SourceProductVariantIds": "107;108;1901",
+    "SourceSkuIds": "324;325;2424;3341;3564",
+    "TotalHistoricalRows": 1093,
+    "Method": "llm (high)"
+  },
+  "18": {
+    "Brand": "Sentinel",
+    "KnownProductLines": "Chewable tablets for dogs (weight-based color variants)",
+    "SourceProductIds": "18",
+    "SourceProductVariantIds": "109;110;111;112;516;517;518;519",
+    "SourceSkuIds": "444;445;446;447;829;830;831;832;833;834;835;836;2425;2426;2427;2428;2669;2670;2671;2672;2956;2957;2958;2959;3172;3173",
+    "TotalHistoricalRows": 1292,
+    "Method": "llm (high)"
+  },
+  "19": {
+    "Brand": "Sentinel Spectrum",
+    "KnownProductLines": "Chewable tablets for dogs",
+    "SourceProductIds": "19",
+    "SourceProductVariantIds": "109;110;111;112;113;114;115;116;530;531;532;533;1856",
+    "SourceSkuIds": "444;445;446;447;448;449;450;451;855;857;859;861;2429;2430;2431;2432;2683;2684;2685;2686;2887;2888;2889;2890",
+    "TotalHistoricalRows": 730,
+    "Method": "llm (high)"
+  },
+  "20": {
+    "Brand": "Interceptor",
+    "KnownProductLines": "Chewable tablets for dogs, various sizes and colors",
+    "SourceProductIds": "20",
+    "SourceProductVariantIds": "117;118;119;120;569;570;571;572;1729",
+    "SourceSkuIds": "452;453;454;455;927;928;929;930;931;932;933;934;2433;2434;2435;2436;2721;2722;2723;2724;2864;2901;2902;2903;2904;3609",
+    "TotalHistoricalRows": 1533,
+    "Method": "llm (high)"
+  },
+  "21": {
+    "Brand": "Panoramis",
+    "KnownProductLines": "Tablets for dogs (weight-based variants)",
+    "SourceProductIds": "21",
+    "SourceProductVariantIds": "121;122;123;124;125;126",
+    "SourceSkuIds": "456;457;458;459;460;461;2437;2438;2439;2440;2441;2442;3168",
+    "TotalHistoricalRows": 622,
+    "Method": "llm (high)"
+  },
+  "22": {
+    "Brand": "Bravecto",
+    "KnownProductLines": "Tablets/chews for dogs by weight",
+    "SourceProductIds": "22",
+    "SourceProductVariantIds": "127;128;129;130;131;132;133;134;135;511;512;513;514;515;682;683;710;1815;1816;1817;1818;1819;1820;1825;1826;1827;1829;1850;1906;2007",
+    "SourceSkuIds": "76;77;598;607;608;609;610;611;637;638;639;640;641;819;820;821;822;823;825;826;827;1258;1259;1264;1265;1342;2664;2665;2666;2667;2668;3148;3149;3150;3151;3152;3158;3159;3160;3174;3355;3356;3378;3379;3380;3381;3623;3759",
+    "TotalHistoricalRows": 24464,
+    "Method": "llm (high)"
+  },
+  "23": {
+    "Brand": "Panacur",
+    "KnownProductLines": "Granules, Paste, Liquid, Tablets for dogs, cats, rabbits, horses, sheep, cattle",
+    "SourceProductIds": "23",
+    "SourceProductVariantIds": "136;137;138;139;140;141;142;143;444;445;446;1801;1859;1903;1904;2073;2074",
+    "SourceSkuIds": "78;79;80;81;82;83;87;88;89;2443;2444;2445;2446;2447;2448;2600;3110;3156;3214;3215;3219;3220;3340;3349;3350;3351;3415;3416;3417;3418;3419;3420;3421;3441;3498;3533;3701;3703;3704;3705",
+    "TotalHistoricalRows": 14531,
+    "Method": "llm (high)"
+  },
+  "24": {
+    "Brand": "Activyl",
+    "KnownProductLines": "Spot-On for dogs and cats, including Tick Plus variants",
+    "SourceProductIds": "24",
+    "SourceProductVariantIds": "144;145;146;147;148;149;150;151;152;153;154;195;534;535;536;537;538;539;540;1737;1848",
+    "SourceSkuIds": "139;140;141;142;143;144;145;146;147;148;149;150;151;152;153;435;863;865;867;869;871;872;873;875;2449;2450;2451;2452;2453;2454;2455;2687;2688;2689;2690;2691;2692;2693;2882;2883;2954;2955;3111;3163;3164;3165;3166;3167;3771;3773;3774;3775;3776",
+    "TotalHistoricalRows": 3713,
+    "Method": "llm (high)"
+  },
+  "25": {
+    "Brand": "Plerion",
+    "KnownProductLines": "Chewable tablets for dogs",
+    "SourceProductIds": "25",
+    "SourceProductVariantIds": "155;157",
+    "SourceSkuIds": "330;334;335;2459;3817",
+    "TotalHistoricalRows": 278,
+    "Method": "llm (high)"
+  },
+  "26": {
+    "Brand": "Pyratape P",
+    "KnownProductLines": "Equine oral paste dewormer",
+    "SourceProductIds": "26",
+    "SourceProductVariantIds": "158;159",
+    "SourceSkuIds": "336;337",
+    "TotalHistoricalRows": 205,
+    "Method": "llm (high)"
+  },
+  "27": {
+    "Brand": "Scalibor",
+    "KnownProductLines": "Tick and flea collar for dogs",
+    "SourceProductIds": "27",
+    "SourceProductVariantIds": "160;161;162",
+    "SourceSkuIds": "338;339;340;2602;2604",
+    "TotalHistoricalRows": 2343,
+    "Method": "llm (high)"
+  },
+  "28": {
+    "Brand": "Guardian",
+    "KnownProductLines": "Chews, injectable, weight-based wormers for dogs",
+    "SourceProductIds": "28",
+    "SourceProductVariantIds": "163",
+    "SourceSkuIds": "443;3343",
+    "TotalHistoricalRows": 164,
+    "Method": "llm (high)"
+  },
+  "29": {
+    "Brand": "Milquantel",
+    "KnownProductLines": "Tablets for dogs and cats",
+    "SourceProductIds": "29",
+    "SourceProductVariantIds": "164;165;166;167",
+    "SourceSkuIds": "575;576;577;578;1229;1230;1231;1232;1233;1334;1335;1336;1337;1338",
+    "TotalHistoricalRows": 683,
+    "Method": "llm (high)"
+  },
+  "30": {
+    "Brand": "Flevox",
+    "KnownProductLines": "Spot-on pipettes for cats and dogs",
+    "SourceProductIds": "30",
+    "SourceProductVariantIds": "168;171;174;176;178;179",
+    "SourceSkuIds": "260;261;262;264;265;267;270",
+    "TotalHistoricalRows": 517,
+    "Method": "llm (high)"
+  },
+  "31": {
+    "Brand": "Dolpac",
+    "KnownProductLines": "Tablets for dogs by weight",
+    "SourceProductIds": "31",
+    "SourceProductVariantIds": "180;181;182",
+    "SourceSkuIds": "373;374;375;2460;2461;2462;3391;3392;3393;3394;3395;3396",
+    "TotalHistoricalRows": 487,
+    "Method": "llm (high)"
+  },
+  "32": {
+    "Brand": "Frontline",
+    "KnownProductLines": "Spray, Spot-On, Combo",
+    "SourceProductIds": "32",
+    "SourceProductVariantIds": "5;184;185;186;187;188;189;190;191;192;193;194;195;196;197;198;199;201;202;456;501;552;553;554;555;556;1902",
+    "SourceSkuIds": "7;218;219;220;221;222;223;224;225;226;227;228;229;230;231;232;233;234;235;236;237;239;240;241;242;243;244;246;247;248;714;967;973;974;975;976;977;1051;1052;1053;1054;1224;1225;1226;1227;1228;2463;2464;2465;2466;2704;2705;2706;2707;2708;3128;3129;3135;3328;3329;3330;3332;3333;3344;3804;3805;3806;3807;3816",
+    "TotalHistoricalRows": 29670,
+    "Method": "llm (high)"
+  },
+  "33": {
+    "Brand": "Certifect",
+    "KnownProductLines": "Spot-On for dogs",
+    "SourceProductIds": "33",
+    "SourceProductVariantIds": "203;204;205;206;207",
+    "SourceSkuIds": "249;250;251;252;253;2467;2468;2469;2470;3743;3744;3745;3746",
+    "TotalHistoricalRows": 1043,
+    "Method": "llm (high)"
+  },
+  "34": {
+    "Brand": "Broadline",
+    "KnownProductLines": "Spot-On for cats",
+    "SourceProductIds": "34",
+    "SourceProductVariantIds": "208;209;457;458",
+    "SourceSkuIds": "254;255;256;711;712;713;2471;2610;2611;3444;3607",
+    "TotalHistoricalRows": 4149,
+    "Method": "llm (high)"
+  },
+  "35": {
+    "Brand": "Nexgard",
+    "KnownProductLines": "Chewable tablets for dogs",
+    "SourceProductIds": "35",
+    "SourceProductVariantIds": "210;481;482;483;484;604;605;606;607;610;1853",
+    "SourceSkuIds": "257;258;259;742;743;745;746;748;749;750;751;752;1021;1022;1023;1024;1025;1026;1027;1028;1029;1030;1031;1032;2634;2635;2636;2637;2751;2752;2753;2754;2886",
+    "TotalHistoricalRows": 9147,
+    "Method": "llm (high)"
+  },
+  "36": {
+    "Brand": "Nexgard Spectra",
+    "KnownProductLines": "Chewable tablets for dogs in weight ranges",
+    "SourceProductIds": "36",
+    "SourceProductVariantIds": "211;212;213;214;215;1754;1854;2078;2079",
+    "SourceSkuIds": "428;429;430;431;432;2472;2473;2474;2475;2476;2918;2919;2920;2921;2922;2946;3429;3430;3431;3432;3433;3715;3716;3723;3727;3728;3781;3782",
+    "TotalHistoricalRows": 10704,
+    "Method": "llm (high)"
+  },
+  "37": {
+    "Brand": "Frontline Plus",
+    "KnownProductLines": "Spot-on for dogs and cats",
+    "SourceProductIds": "37",
+    "SourceProductVariantIds": "186;189;190;191;192;193;194;195;197;198;217;219;221;223;225;491;492;493;494;495;554",
+    "SourceSkuIds": "226;227;228;233;246;433;434;435;436;437;438;439;440;441;442;772;773;775;776;778;779;781;782;784;785;786;789;790;975;1012;1013;1015;1017;1019;2477;2478;2479;2480;2481;2644;2645;2646;2648;3221;3222",
+    "TotalHistoricalRows": 2174,
+    "Method": "llm (high)"
+  },
+  "39": {
+    "Brand": "Veloxa",
+    "KnownProductLines": "Dog chewable wormer tablets (regular & XL)",
+    "SourceProductIds": "39",
+    "SourceProductVariantIds": "226;227;1792",
+    "SourceSkuIds": "585;586;1285;1286;1287;1289;1290;1291;1292",
+    "TotalHistoricalRows": 472,
+    "Method": "llm (high)"
+  },
+  "40": {
+    "Brand": "Effipro",
+    "KnownProductLines": "Spot-on, Spray",
+    "SourceProductIds": "40",
+    "SourceProductVariantIds": "228;229;230;231;232;233;234;452;453;454;685;686",
+    "SourceSkuIds": "205;206;207;208;209;210;213;214;216;217;692;693;694;1236;1237;1238;1239;1240;1241;1242;1268;1269;1270;1271;2482;2483;2484;2485;2486;2606;2607;2608;2827;2828;2931;3142;3143;3144;3145;3147",
+    "TotalHistoricalRows": 5257,
+    "Method": "llm (high)"
+  },
+  "41": {
+    "Brand": "Endogard",
+    "KnownProductLines": "Tablets for dogs and cats, various sizes and formulations",
+    "SourceProductIds": "41",
+    "SourceProductVariantIds": "235;236;237;608;609;658;1980;1981",
+    "SourceSkuIds": "376;377;378;1033;1034;1161;1243;2487;2488;2755;2756;2804;3437;3438;3614;3615;3616",
+    "TotalHistoricalRows": 1013,
+    "Method": "llm (high)"
+  },
+  "42": {
+    "Brand": "Granofen",
+    "KnownProductLines": "Granules in sachets for dogs and cats",
+    "SourceProductIds": "42",
+    "SourceProductVariantIds": "238;239;240;241",
+    "SourceSkuIds": "379;380;381;382;2489;2490;2491",
+    "TotalHistoricalRows": 620,
+    "Method": "llm (high)"
+  },
+  "43": {
+    "Brand": "Indorex",
+    "KnownProductLines": "Household Flea Spray, Fogger, Target Spray",
+    "SourceProductIds": "43",
+    "SourceProductVariantIds": "242;243",
+    "SourceSkuIds": "383;384;1302",
+    "TotalHistoricalRows": 1994,
+    "Method": "llm (high)"
+  },
+  "44": {
+    "Brand": "Milpro",
+    "KnownProductLines": "Tablets for dogs and cats",
+    "SourceProductIds": "44",
+    "SourceProductVariantIds": "244;245;246;448;449;450;451",
+    "SourceSkuIds": "385;386;387;1244;1245;1246;1247;1248;1249;1339;1340;1341;2602;2603;2604;2605;3470;3471;3475;3532;3573;3589;3590",
+    "TotalHistoricalRows": 5169,
+    "Method": "llm (high)"
+  },
+  "45": {
+    "Brand": "Prinovox",
+    "KnownProductLines": "Spot-on for dogs and cats",
+    "SourceProductIds": "45",
+    "SourceProductVariantIds": "247;248;249;250;251;252;253;254",
+    "SourceSkuIds": "389;390;391;392;393;394;395;396;2492;2493;2494;2495;2496;2497;3790;3791;3792;3793;3794;3795",
+    "TotalHistoricalRows": 4347,
+    "Method": "llm (high)"
+  },
+  "46": {
+    "Brand": "Ypozane",
+    "KnownProductLines": "Tablets for dogs",
+    "SourceProductIds": "46",
+    "SourceProductVariantIds": "255",
+    "SourceSkuIds": "2498",
+    "TotalHistoricalRows": 4,
+    "Method": "llm (high)"
+  },
+  "47": {
+    "Brand": "Preventic",
+    "KnownProductLines": "Tick collars, sprays, spot-on",
+    "SourceProductIds": "47",
+    "SourceProductVariantIds": "256;257;2101",
+    "SourceSkuIds": "601;602;3789",
+    "TotalHistoricalRows": 217,
+    "Method": "llm (high)"
+  },
+  "48": null,
+  "49": {
+    "Brand": "Fiprospot",
+    "KnownProductLines": "Spot-On for dogs and cats",
+    "SourceProductIds": "49",
+    "SourceProductVariantIds": "261;262;263;264;265",
+    "SourceSkuIds": "276;277;278;279;281;282;283;284;285;286;2499;2500;2501;2502;2503",
+    "TotalHistoricalRows": 210,
+    "Method": "llm (high)"
+  },
+  "50": {
+    "Brand": "Skoosh",
+    "KnownProductLines": "Household flea spray",
+    "SourceProductIds": "50",
+    "SourceProductVariantIds": "268",
+    "SourceSkuIds": "287;696",
+    "TotalHistoricalRows": 346,
+    "Method": "llm (high)"
+  },
+  "51": {
+    "Brand": "Vectra",
+    "KnownProductLines": "Spot-on pipettes for dogs and cats",
+    "SourceProductIds": "51",
+    "SourceProductVariantIds": "269;270;271;272;273",
+    "SourceSkuIds": "409;410;411;412;413;2505;2506;2507;2508;2509",
+    "TotalHistoricalRows": 80,
+    "Method": "llm (high)"
+  },
+  "52": {
+    "Brand": "Vectra 3D",
+    "KnownProductLines": "Spot-on for dogs by weight",
+    "SourceProductIds": "52",
+    "SourceProductVariantIds": "274;275;276;277;278;279",
+    "SourceSkuIds": "414;415;416;417;418;419;2510;2511;2512;2513;2514;2515",
+    "TotalHistoricalRows": 1639,
+    "Method": "llm (high)"
+  },
+  "53": {
+    "Brand": "Milbactor",
+    "KnownProductLines": "tablets for dogs and cats",
+    "SourceProductIds": "53",
+    "SourceProductVariantIds": "280;281;693;694;1907",
+    "SourceSkuIds": "426;427;1208;1209;1210;1211;1278;1279;1280;1325;1326;1327;1328;2835;2836;3357;3358;3399;3400;3401;3402;3403;3404",
+    "TotalHistoricalRows": 837,
+    "Method": "llm (high)"
+  },
+  "54": {
+    "Brand": "Fipnil",
+    "KnownProductLines": "Spot-on, Plus, and Combo treatments for dogs and cats",
+    "SourceProductIds": "54",
+    "SourceProductVariantIds": "282;283;284;285;286",
+    "SourceSkuIds": "289;290;291;292;293;294;295;296;298;299;2516;2517;2518;2519;2520",
+    "TotalHistoricalRows": 212,
+    "Method": "llm (high)"
+  },
+  "55": {
+    "Brand": "Prazitel",
+    "KnownProductLines": "Flavoured tablets for dogs and cats",
+    "SourceProductIds": "55",
+    "SourceProductVariantIds": "288;289;695;696",
+    "SourceSkuIds": "300;302;1281;1282;1283;1284;2521;2837;2838",
+    "TotalHistoricalRows": 454,
+    "Method": "llm (high)"
+  },
+  "58": {
+    "Brand": "Fiprocat",
+    "KnownProductLines": "Spot-on pipettes for cats",
+    "SourceProductIds": "58",
+    "SourceProductVariantIds": "294",
+    "SourceSkuIds": "303;304;2522",
+    "TotalHistoricalRows": 44,
+    "Method": "llm (high)"
+  },
+  "59": {
+    "Brand": "Fiprodog",
+    "KnownProductLines": "Spot-on for dogs",
+    "SourceProductIds": "59",
+    "SourceProductVariantIds": "296;297;298;299;300",
+    "SourceSkuIds": "306;307;308;309;310;311;312;313;314;2523;2524;2525;2526",
+    "TotalHistoricalRows": 124,
+    "Method": "llm (high)"
+  },
+  "60": {
+    "Brand": "Lapizole",
+    "KnownProductLines": "Oral suspension, 20mg/ml, for rabbits",
+    "SourceProductIds": "60",
+    "SourceProductVariantIds": "301;302",
+    "SourceSkuIds": "315;316",
+    "TotalHistoricalRows": 599,
+    "Method": "llm (high)"
+  },
+  "61": {
+    "Brand": "Xenex",
+    "KnownProductLines": "Spray, Spot-On, Shampoo",
+    "SourceProductIds": "61",
+    "SourceProductVariantIds": "303;304",
+    "SourceSkuIds": "318;319;2527;3422",
+    "TotalHistoricalRows": 1273,
+    "Method": "llm (high)"
+  },
+  "62": {
+    "Brand": "Xeno",
+    "KnownProductLines": "Spot-on and spray for small animals",
+    "SourceProductIds": "62",
+    "SourceProductVariantIds": "305;306;307;308",
+    "SourceSkuIds": "320;321;322;323;2528;2529;3423;3424;3425",
+    "TotalHistoricalRows": 3342,
+    "Method": "llm (high)"
+  },
+  "63": {
+    "Brand": "Rip Fleas",
+    "KnownProductLines": "Environmental flea spray",
+    "SourceProductIds": "63",
+    "SourceProductVariantIds": "309;310;311",
+    "SourceSkuIds": "326;327;328;1255",
+    "TotalHistoricalRows": 1052,
+    "Method": "llm (high)"
+  },
+  "64": {
+    "Brand": "Permaguard",
+    "KnownProductLines": "Household Flea Spray",
+    "SourceProductIds": "64",
+    "SourceProductVariantIds": "313",
+    "SourceSkuIds": "341",
+    "TotalHistoricalRows": 270,
+    "Method": "llm (high)"
+  },
+  "65": {
+    "Brand": "Pestigon",
+    "KnownProductLines": "Spot-On for dogs and cats",
+    "SourceProductIds": "65",
+    "SourceProductVariantIds": "314;315;316;317;318;319;1771;1772;1773;1774;1775;1909",
+    "SourceSkuIds": "343;344;345;347;350;353;354;355;356;357;358;2530;2531;2532;2533;2534;2932;2933;2934;2935;2936;2937;2987;2988;2989;2991;2993;2996;2997;2999;3001;3002;3005;3011;3013;3015;3443",
+    "TotalHistoricalRows": 503,
+    "Method": "llm (high)"
+  },
+  "66": {
+    "Brand": "Wormazole",
+    "KnownProductLines": "Granules and liquid for dogs and cats",
+    "SourceProductIds": "66",
+    "SourceProductVariantIds": "321;322;323;324",
+    "SourceSkuIds": "360;361;362;363;2535;2536;2537;2538",
+    "TotalHistoricalRows": 184,
+    "Method": "llm (high)"
+  },
+  "68": {
+    "Brand": "Stronghold",
+    "KnownProductLines": "Spot-on for dogs and cats",
+    "SourceProductIds": "68",
+    "SourceProductVariantIds": "337;338;339;340;341;342;343;344;345;447;692;1750;1751;1761;1769",
+    "SourceSkuIds": "154;155;156;157;158;159;160;161;162;163;164;165;166;167;168;691;1277;1318;1319;1320;1321;2541;2542;2601;2834;2923;2924;2925;2926;2970;2980;3094;3095;3096",
+    "TotalHistoricalRows": 19650,
+    "Method": "llm (high)"
+  },
+  "69": {
+    "Brand": "Eliminall",
+    "KnownProductLines": "Spot-on and spray for cats and dogs",
+    "SourceProductIds": "69",
+    "SourceProductVariantIds": "346;347;348;349;350;353;355;2087;2088;2089;2090",
+    "SourceSkuIds": "169;171;172;173;175;176;177;178;180;181;182;2543;2544;2545;2546;2547;3345;3346;3347;3348;3747;3760;3761;3762;3763;3764;3765;3766;3767;3768;3796;3797",
+    "TotalHistoricalRows": 1447,
+    "Method": "llm (high)"
+  },
+  "70": {
+    "Brand": "Promeris",
+    "KnownProductLines": "Spot-on for dogs and cats, weight-specific variants",
+    "SourceProductIds": "70",
+    "SourceProductVariantIds": "356;358;359;360;361;362;363",
+    "SourceSkuIds": "184;185;186;187;188;189;190;191;2548;2549;2550;2551;2552;2553;2554;3207;3208;3209;3210;3211;3212;3213",
+    "TotalHistoricalRows": 2377,
+    "Method": "llm (high)"
+  },
+  "71": {
+    "Brand": "Revolution",
+    "KnownProductLines": "Spot-on solution for dogs and cats",
+    "SourceProductIds": "71",
+    "SourceProductVariantIds": "364;365;368;370;372;373;375;485;486;487;488;489;490;613;1855",
+    "SourceSkuIds": "192;193;194;195;196;197;198;199;200;201;202;203;754;755;758;760;761;763;764;766;767;770;1035;1036;1038;1039;1040;1041;1042;1044;1192;2555;2556;2557;2558;2559;2560;2638;2639;2640;2641;2642;2643;2759;3476;3477;3478;3479;3480",
+    "TotalHistoricalRows": 4399,
+    "Method": "llm (high)"
+  },
+  "72": {
+    "Brand": "Cazitel",
+    "KnownProductLines": "Tablets for dogs and cats",
+    "SourceProductIds": "72",
+    "SourceProductVariantIds": "376;377;438;611;612;697;698",
+    "SourceSkuIds": "364;365;689;1293;1294;2561;2757;2758;2839;2840;3130;3131;3390",
+    "TotalHistoricalRows": 684,
+    "Method": "llm (high)"
+  },
+  "73": {
+    "Brand": "Proheart",
+    "KnownProductLines": "Injection and tablets for dogs",
+    "SourceProductIds": "73",
+    "SourceProductVariantIds": "378;379;395;1714;1715;1716;1717;1718;1719",
+    "SourceSkuIds": "424;425;587;2434;2752;2865;2866;2867;2868;2983",
+    "TotalHistoricalRows": 2300,
+    "Method": "llm (high)"
+  },
+  "74": {
+    "Brand": "Simparica",
+    "KnownProductLines": "chewable tablets for dogs",
+    "SourceProductIds": "74",
+    "SourceProductVariantIds": "380;381;382;383;384;545;547;548;549;550;551;1730;1755;1757;1842;2100",
+    "SourceSkuIds": "589;590;591;592;593;885;886;888;889;891;892;894;895;897;898;900;901;2562;2563;2564;2565;2566;2698;2699;2700;2701;2702;2703;2869;2884;2885;2947;2948;2949;2965;3201;3518;3778",
+    "TotalHistoricalRows": 7282,
+    "Method": "llm (high)"
+  },
+  "75": {
+    "Brand": "Vetkem Acclaim",
+    "KnownProductLines": "Household Flea Spray (Acclaim 2000, Plus)",
+    "SourceProductIds": "75",
+    "SourceProductVariantIds": "385;389",
+    "SourceSkuIds": "366;369;1295",
+    "TotalHistoricalRows": 997,
+    "Method": "llm (high)"
+  },
+  "76": {
+    "Brand": "Fenpral",
+    "KnownProductLines": "Allwormer tablets for dogs and cats in various weight variants",
+    "SourceProductIds": "76",
+    "SourceProductVariantIds": "391;392;393;394",
+    "SourceSkuIds": "420;421;422;423",
+    "TotalHistoricalRows": 159,
+    "Method": "llm (high)"
+  },
+  "77": {
+    "Brand": "Prowormer",
+    "KnownProductLines": "Tablets for dogs, paste for horses",
+    "SourceProductIds": "77",
+    "SourceProductVariantIds": "395;396;1930",
+    "SourceSkuIds": "587;588;3504",
+    "TotalHistoricalRows": 18,
+    "Method": "llm (high)"
+  },
+  "78": {
+    "Brand": "Popantel",
+    "KnownProductLines": "Tablets, paste for dogs and cats",
+    "SourceProductIds": "78",
+    "SourceProductVariantIds": "16;397;398;399;464;602;603;620;621;1738;1739;1740",
+    "SourceSkuIds": "596;597;600;1008;1011;1059;1062;1063;1064;2617;2749;2750;2766;2767;2891;2892;2893;3457;3528;3529",
+    "TotalHistoricalRows": 711,
+    "Method": "llm (high)"
+  },
+  "79": {
+    "Brand": "Paratak",
+    "KnownProductLines": "Tablets, pastes, and liquids for dogs, cats, horses, and birds",
+    "SourceProductIds": "79",
+    "SourceProductVariantIds": "400;401;1830;1831;1832;1833;1835;1836;1837",
+    "SourceSkuIds": "624;625;628;2567;2568;3189;3190;3191;3192;3193;3194;3196",
+    "TotalHistoricalRows": 182,
+    "Method": "llm (high)"
+  },
+  "80": {
+    "Brand": "Milprazon",
+    "KnownProductLines": "Oral tablets for dogs and cats",
+    "SourceProductIds": "80",
+    "SourceProductVariantIds": "403;404;405;406;2108;2109;2110;2111",
+    "SourceSkuIds": "575;603;604;605;606;1216;1217;1218;1219;1220;1221;1222;1223;1330;1331;1332;1333;2569;2570;2571;2572;3588;3808;3809;3810;3811;3812;3813;3814;3815",
+    "TotalHistoricalRows": 1880,
+    "Method": "llm (high)"
+  },
+  "81": {
+    "Brand": "Anthelmin",
+    "KnownProductLines": "Tablets for dogs and cats",
+    "SourceProductIds": "81",
+    "SourceProductVariantIds": "407;408;1770;1929",
+    "SourceSkuIds": "612;613;1215;2985;2986;3501;3642",
+    "TotalHistoricalRows": 347,
+    "Method": "llm (high)"
+  },
+  "83": {
+    "Brand": "Mipet",
+    "KnownProductLines": "Tablets for dogs and cats",
+    "SourceProductIds": "83",
+    "SourceProductVariantIds": "416;417;418;419;455",
+    "SourceSkuIds": "631;632;633;634;2609",
+    "TotalHistoricalRows": 226,
+    "Method": "llm (high)"
+  },
+  "84": {
+    "Brand": "Quantex",
+    "KnownProductLines": "Tablets and Spot-On for dogs and cats",
+    "SourceProductIds": "84",
+    "SourceProductVariantIds": "420;421",
+    "SourceSkuIds": "635;636;2580;2581",
+    "TotalHistoricalRows": 74,
+    "Method": "llm (high)"
+  },
+  "85": {
+    "Brand": "Advocate",
+    "KnownProductLines": "Spot-on for cats",
+    "SourceProductIds": "85",
+    "SourceProductVariantIds": "422;1928;1944;1956;1960;1968;2102",
+    "SourceSkuIds": "642;2582;3497;3536;3537;3565;3569;3783",
+    "TotalHistoricalRows": 347,
+    "Method": "llm (high)"
+  },
+  "86": {
+    "Brand": "Drontal",
+    "KnownProductLines": "Tablets for dogs and cats; various schedules",
+    "SourceProductIds": "86",
+    "SourceProductVariantIds": "423;1954;1955;1957;1958;1959",
+    "SourceSkuIds": "643;2583;3538;3563;3566;3567;3568",
+    "TotalHistoricalRows": 122,
+    "Method": "llm (high)"
+  },
+  "87": {
+    "Brand": "Milbemax",
+    "KnownProductLines": "Chewable tablets for dogs",
+    "SourceProductIds": "87",
+    "SourceProductVariantIds": "1760",
+    "SourceSkuIds": "2969",
+    "TotalHistoricalRows": 20,
+    "Method": "llm (medium)"
+  },
+  "88": {
+    "Brand": "Advocate",
+    "KnownProductLines": "Spot-on for dogs and cats",
+    "SourceProductIds": "88",
+    "SourceProductVariantIds": "1759",
+    "SourceSkuIds": "2968",
+    "TotalHistoricalRows": 12,
+    "Method": "llm (high)"
+  },
+  "89": {
+    "Brand": "Bravecto",
+    "KnownProductLines": "Chews for dogs",
+    "SourceProductIds": "89",
+    "SourceProductVariantIds": "1736",
+    "SourceSkuIds": "2881",
+    "TotalHistoricalRows": 229,
+    "Method": "llm (medium)"
+  },
+  "90": {
+    "Brand": "Pentoject",
+    "KnownProductLines": "Injectable solution",
+    "SourceProductIds": "90",
+    "SourceProductVariantIds": "",
+    "SourceSkuIds": "",
+    "TotalHistoricalRows": 1,
+    "Method": "llm (high)"
+  },
+  "91": {
+    "Brand": "Fiproclear",
+    "KnownProductLines": "Combo spot-on for cats and dogs",
+    "SourceProductIds": "91",
+    "SourceProductVariantIds": "1776;1777;1778;1779;1780",
+    "SourceSkuIds": "3018;3023;3028;3085;3089",
+    "TotalHistoricalRows": 6,
+    "Method": "llm (high)"
+  },
+  "92": {
+    "Brand": "Amflee",
+    "KnownProductLines": "Combo spot-on for cats and dogs",
+    "SourceProductIds": "92",
+    "SourceProductVariantIds": "459;460;461;463",
+    "SourceSkuIds": "2612;2613;2614;2616",
+    "TotalHistoricalRows": 5,
+    "Method": "llm (high)"
+  },
+  "93": {
+    "Brand": "Advantage Multi",
+    "KnownProductLines": "Topical solution with weight-specific variants for dogs and cats",
+    "SourceProductIds": "93",
+    "SourceProductVariantIds": "469;470;471;472;473;474;475;476",
+    "SourceSkuIds": "718;720;721;722;723;724;725;727;729;2622;2623;2624;2625;2626;2627;2628;2629",
+    "TotalHistoricalRows": 683,
+    "Method": "llm (high)"
+  },
+  "94": {
+    "Brand": "Frontline Gold",
+    "KnownProductLines": "Spot-On for dogs and cats",
+    "SourceProductIds": "94",
+    "SourceProductVariantIds": "496;500",
+    "SourceSkuIds": "787;788;2649;2653",
+    "TotalHistoricalRows": 7,
+    "Method": "llm (high)"
+  },
+  "97": {
+    "Brand": "Activyl",
+    "KnownProductLines": "Spot-on for dogs, multiple weight ranges",
+    "SourceProductIds": "97",
+    "SourceProductVariantIds": "150;151;152;153;561;562;563;564;565",
+    "SourceSkuIds": "139;141;144;145;146;148;149;153;2450;2451;2455;2456;2457;2458;2713;2715;2716;2717;3426;3769;3770;3772",
+    "TotalHistoricalRows": 156,
+    "Method": "llm (high)"
+  },
+  "98": {
+    "Brand": "Heartgard",
+    "KnownProductLines": "Chewable tablets for dogs and cats, plus combo packs with Nexgard",
+    "SourceProductIds": "98",
+    "SourceProductVariantIds": "581;582;583;584;585",
+    "SourceSkuIds": "924;951;953;955;2733;2734;2735;2736;2737",
+    "TotalHistoricalRows": 95,
+    "Method": "llm (high)"
+  },
+  "99": {
+    "Brand": "Heartgard Plus",
+    "KnownProductLines": "Chewable tablets for dogs (three weight variants)",
+    "SourceProductIds": "99",
+    "SourceProductVariantIds": "566;567;568;614;615;616",
+    "SourceSkuIds": "922;1045;1047;1048;1049;2718;2719;2720;2760;2761;2762",
+    "TotalHistoricalRows": 94,
+    "Method": "llm (high)"
+  },
+  "100": {
+    "Brand": "Interceptor Plus",
+    "KnownProductLines": "Chewable tablets for dogs, various weight ranges",
+    "SourceProductIds": "100",
+    "SourceProductVariantIds": "573;574;575;576",
+    "SourceSkuIds": "935;937;939;941;2725;2726;2727;2728",
+    "TotalHistoricalRows": 372,
+    "Method": "llm (high)"
+  },
+  "101": {
+    "Brand": "\u30a4\u30d9\u30eb\u30e1\u30c3\u30af",
+    "KnownProductLines": "Spot-on solutions for various sizes, including combinations",
+    "SourceProductIds": "101",
+    "SourceProductVariantIds": "577;578;579;580",
+    "SourceSkuIds": "2729;2730;2731;2732",
+    "TotalHistoricalRows": 142,
+    "Method": "llm (high)"
+  },
+  "102": {
+    "Brand": "Canex",
+    "KnownProductLines": "Multi Spectrum All Wormer tablets for dogs",
+    "SourceProductIds": "102",
+    "SourceProductVariantIds": "617;618;619",
+    "SourceSkuIds": "1055;1056;2763;2764;2765",
+    "TotalHistoricalRows": 7,
+    "Method": "llm (high)"
+  },
+  "103": {
+    "Brand": "Interceptor Spectrum",
+    "KnownProductLines": "Chews/tablets for dogs by weight range",
+    "SourceProductIds": "103",
+    "SourceProductVariantIds": "117;118;119;120;622;623;624;625;1753",
+    "SourceSkuIds": "1067;1068;1070;1071;1073;1074;1076;1077;2768;2769;2770;2771;2938;2939;3137",
+    "TotalHistoricalRows": 250,
+    "Method": "llm (high)"
+  },
+  "104": {
+    "Brand": "Virbac",
+    "KnownProductLines": "Tapeworm tablets, chews, collars",
+    "SourceProductIds": "104",
+    "SourceProductVariantIds": "627;2069",
+    "SourceSkuIds": "1079;1083;2773;3693",
+    "TotalHistoricalRows": 21,
+    "Method": "llm (high)"
+  },
+  "105": {
+    "Brand": "Heartgard",
+    "KnownProductLines": "Chewable tablets for dogs",
+    "SourceProductIds": "105",
+    "SourceProductVariantIds": "630;631",
+    "SourceSkuIds": "1093;2776",
+    "TotalHistoricalRows": 3,
+    "Method": "llm (high)"
+  },
+  "115": {
+    "Brand": "Equimax",
+    "KnownProductLines": "Liquid Allwormer for horses",
+    "SourceProductIds": "115",
+    "SourceProductVariantIds": "",
+    "SourceSkuIds": "",
+    "TotalHistoricalRows": 1,
+    "Method": "llm (high)"
+  },
+  "117": {
+    "Brand": "Aristopet",
+    "KnownProductLines": "Allwormer Paste for Cats and Kittens",
+    "SourceProductIds": "117",
+    "SourceProductVariantIds": "668;670;1858",
+    "SourceSkuIds": "1178;2814;2816;3218",
+    "TotalHistoricalRows": 20,
+    "Method": "llm (high)"
+  },
+  "119": {
+    "Brand": "Ranvet",
+    "KnownProductLines": "Allwormer tablets for dogs",
+    "SourceProductIds": "119",
+    "SourceProductVariantIds": "676;677",
+    "SourceSkuIds": "1187;2820;2821",
+    "TotalHistoricalRows": 4,
+    "Method": "llm (high)"
+  },
+  "121": {
+    "Brand": "Vectra Felis",
+    "KnownProductLines": "Spot-on pipettes for cats",
+    "SourceProductIds": "121",
+    "SourceProductVariantIds": "270;679",
+    "SourceSkuIds": "411;1257;2823;3777",
+    "TotalHistoricalRows": 160,
+    "Method": "llm (high)"
+  },
+  "122": {
+    "Brand": "Troy",
+    "KnownProductLines": "Worm Ban Anthelmintic Suspension",
+    "SourceProductIds": "122",
+    "SourceProductVariantIds": "700;701;702;703;704",
+    "SourceSkuIds": "1298;1299;1300;1301;1309",
+    "TotalHistoricalRows": 7,
+    "Method": "llm (high)"
+  },
+  "124": {
+    "Brand": "Dsp",
+    "KnownProductLines": "Spot-on for dogs by weight",
+    "SourceProductIds": "124",
+    "SourceProductVariantIds": "705;706;2093",
+    "SourceSkuIds": "2846;2847;3755",
+    "TotalHistoricalRows": 14,
+    "Method": "llm (high)"
+  },
+  "127": {
+    "Brand": "Vetkem",
+    "KnownProductLines": "Acclaim",
+    "SourceProductIds": "127",
+    "SourceProductVariantIds": "",
+    "SourceSkuIds": "",
+    "TotalHistoricalRows": 1,
+    "Method": "llm (high)"
+  },
+  "128": {
+    "Brand": "Advantix",
+    "KnownProductLines": "Spot-on for dogs",
+    "SourceProductIds": "128",
+    "SourceProductVariantIds": "477;478;479;480",
+    "SourceSkuIds": "730;731;733;734;736;737;738;739;740;2630;2631;2632;2633",
+    "TotalHistoricalRows": 288,
+    "Method": "llm (high)"
+  },
+  "129": {
+    "Brand": "Bimectin",
+    "KnownProductLines": "Oral/pour-on solution, multiple volumes",
+    "SourceProductIds": "129",
+    "SourceProductVariantIds": "1710",
+    "SourceSkuIds": "2342;2343;2345;2346",
+    "TotalHistoricalRows": 7,
+    "Method": "llm (high)"
+  },
+  "130": {
+    "Brand": "Endospec",
+    "KnownProductLines": "Solution for dogs and cats",
+    "SourceProductIds": "130",
+    "SourceProductVariantIds": "1712;1713",
+    "SourceSkuIds": "2349;2350;2351",
+    "TotalHistoricalRows": 3,
+    "Method": "llm (high)"
+  },
+  "131": {
+    "Brand": "Endofluke",
+    "KnownProductLines": "10% oral suspension for cattle and sheep",
+    "SourceProductIds": "131",
+    "SourceProductVariantIds": "1711",
+    "SourceSkuIds": "2347;2348",
+    "TotalHistoricalRows": 2,
+    "Method": "llm (high)"
+  },
+  "132": {
+    "Brand": "Entera",
+    "KnownProductLines": "Allwormer tablets for dogs",
+    "SourceProductIds": "132",
+    "SourceProductVariantIds": "1721;1722;1808;1809",
+    "SourceSkuIds": "2856;2857;3126;3127",
+    "TotalHistoricalRows": 10,
+    "Method": "llm (high)"
+  },
+  "133": {
+    "Brand": "Comfortis Plus",
+    "KnownProductLines": "Chewable tablets for dogs",
+    "SourceProductIds": "133",
+    "SourceProductVariantIds": "523;529;1731;1732;1733;1734;1735;1800;1852",
+    "SourceSkuIds": "58;457;459;623;2393;2437;2439;2870;2871;2872;2873;2874;2875;2876;2877;2878;2879;2880;2950;2951;2952;2960;3098;3099;3109;3136;3203;3204",
+    "TotalHistoricalRows": 389,
+    "Method": "llm (high)"
+  },
+  "134": {
+    "Brand": "Advantage Duo",
+    "KnownProductLines": "Spot-on for dogs, various weight ranges",
+    "SourceProductIds": "134",
+    "SourceProductVariantIds": "35;36;37;38;40;1743;1744;1745;1746",
+    "SourceSkuIds": "595;2378;2622;2905;2906;2907;2908;2909;2940;2941;2942;2943;3473;3474;3519",
+    "TotalHistoricalRows": 205,
+    "Method": "llm (high)"
+  },
+  "135": {
+    "Brand": "Felex",
+    "KnownProductLines": "Allwormer Paste",
+    "SourceProductIds": "135",
+    "SourceProductVariantIds": "1752",
+    "SourceSkuIds": "2928",
+    "TotalHistoricalRows": 8,
+    "Method": "llm (high)"
+  },
+  "136": {
+    "Brand": "Ilium",
+    "KnownProductLines": "Allwormer tablets for dogs",
+    "SourceProductIds": "136",
+    "SourceProductVariantIds": "1756",
+    "SourceSkuIds": "2953",
+    "TotalHistoricalRows": 5,
+    "Method": "llm (high)"
+  },
+  "137": null,
+  "138": {
+    "Brand": "Felex",
+    "KnownProductLines": "Oral paste for cats and kittens",
+    "SourceProductIds": "138",
+    "SourceProductVariantIds": "1766;1767",
+    "SourceSkuIds": "2610;2975;2976;3527",
+    "TotalHistoricalRows": 19,
+    "Method": "llm (medium)"
+  },
+  "139": {
+    "Brand": "Paragard",
+    "KnownProductLines": "Tablets for dogs and cats, various weight ranges",
+    "SourceProductIds": "139",
+    "SourceProductVariantIds": "400;1768;1896;1897;1898;1899",
+    "SourceSkuIds": "2977;2978;2979;3017;3318;3319;3320;3323;3500;3502",
+    "TotalHistoricalRows": 59,
+    "Method": "llm (high)"
+  },
+  "141": {
+    "Brand": "Credelio",
+    "KnownProductLines": "Chewable tablets for dogs and cats",
+    "SourceProductIds": "141",
+    "SourceProductVariantIds": "1787;1788;1789;1790;1791;1908;1921;2046;2047;2048;2049;2050",
+    "SourceSkuIds": "3058;3059;3060;3061;3062;3063;3064;3065;3066;3067;3068;3069;3070;3071;3072;3442;3445;3461;3534;3535;3647;3648;3649;3650;3651;3652;3653;3654;3655;3656;3657;3658;3659;3660;3661;3691;3692;3738;3739;3740;3741;3742",
+    "TotalHistoricalRows": 3752,
+    "Method": "llm (high)"
+  },
+  "142": {
+    "Brand": "Dronspot",
+    "KnownProductLines": "Spot-On for cats",
+    "SourceProductIds": "142",
+    "SourceProductVariantIds": "1802;1803;1804",
+    "SourceSkuIds": "3112;3113;3114;3115;3116;3117",
+    "TotalHistoricalRows": 10,
+    "Method": "llm (high)"
+  },
+  "146": {
+    "Brand": "Cytopoint",
+    "KnownProductLines": "Injection for dogs",
+    "SourceProductIds": "146",
+    "SourceProductVariantIds": "1811;1812;1813;1814",
+    "SourceSkuIds": "3138;3139;3140;3141;3465;3466;3467;3468",
+    "TotalHistoricalRows": 14,
+    "Method": "llm (high)"
+  },
+  "149": {
+    "Brand": "Canex",
+    "KnownProductLines": "Multispectrum and Allwormer tablets for dogs",
+    "SourceProductIds": "149",
+    "SourceProductVariantIds": "1838;1839;1840;1841",
+    "SourceSkuIds": "3197;3198;3199;3200",
+    "TotalHistoricalRows": 19,
+    "Method": "llm (high)"
+  },
+  "154": {
+    "Brand": "Frontera",
+    "KnownProductLines": "Spray (various volumes)",
+    "SourceProductIds": "154",
+    "SourceProductVariantIds": "1860",
+    "SourceSkuIds": "3223;3224;3225",
+    "TotalHistoricalRows": 3,
+    "Method": "llm (high)"
+  },
+  "156": {
+    "Brand": "Easecto",
+    "KnownProductLines": "Tablets for dogs by weight ranges",
+    "SourceProductIds": "156",
+    "SourceProductVariantIds": "1866;1867;1868;1869;1870;1905",
+    "SourceSkuIds": "3252;3253;3254;3255;3256;3354",
+    "TotalHistoricalRows": 18,
+    "Method": "llm (high)"
+  },
+  "161": {
+    "Brand": "Fiproclear",
+    "KnownProductLines": "Spray",
+    "SourceProductIds": "161",
+    "SourceProductVariantIds": "",
+    "SourceSkuIds": "",
+    "TotalHistoricalRows": 1,
+    "Method": "llm (high)"
+  },
+  "162": {
+    "Brand": "Fleascreen",
+    "KnownProductLines": "Spot-on treatment for dogs and cats",
+    "SourceProductIds": "162",
+    "SourceProductVariantIds": "1882;1883;1885;1886",
+    "SourceSkuIds": "3273;3276;3282;3285",
+    "TotalHistoricalRows": 5,
+    "Method": "llm (high)"
+  },
+  "163": {
+    "Brand": "Moxiclear",
+    "KnownProductLines": "Spot-on for cats and dogs",
+    "SourceProductIds": "163",
+    "SourceProductVariantIds": "1887;1888;1889;1890;1891;1892",
+    "SourceSkuIds": "3288;3289;3290;3291;3292;3293;3294;3295;3296;3297;3298;3299;3300;3301;3302;3303;3304;3305;3306;3307;3308;3309;3310;3311;3312;3313;3314;3315;3316;3317",
+    "TotalHistoricalRows": 854,
+    "Method": "llm (high)"
+  },
+  "165": {
+    "Brand": "Bravecto Plus",
+    "KnownProductLines": "Spot-On for cats, weight variants",
+    "SourceProductIds": "165",
+    "SourceProductVariantIds": "1893;1894;1895",
+    "SourceSkuIds": "3246;3247;3248;3249;3250;3251",
+    "TotalHistoricalRows": 2217,
+    "Method": "llm (high)"
+  },
+  "170": null,
+  "175": {
+    "Brand": "Selehold",
+    "KnownProductLines": "Spot-on for dogs and cats",
+    "SourceProductIds": "175",
+    "SourceProductVariantIds": "1961;2103;2105;2106",
+    "SourceSkuIds": "3570;3785;3786;3787",
+    "TotalHistoricalRows": 11,
+    "Method": "llm (high)"
+  },
+  "177": {
+    "Brand": "Big 5",
+    "KnownProductLines": "Protection Pack for dogs",
+    "SourceProductIds": "177",
+    "SourceProductVariantIds": "1910;1911;1912;1913",
+    "SourceSkuIds": "3446;3447;3448;3449",
+    "TotalHistoricalRows": 5,
+    "Method": "llm (high)"
+  },
+  "178": {
+    "Brand": "Easecto",
+    "KnownProductLines": "Tablets for dogs by weight",
+    "SourceProductIds": "178",
+    "SourceProductVariantIds": "1915;1916;1917;1918;1919;1920",
+    "SourceSkuIds": "3717;3718;3719;3720;3721;3722",
+    "TotalHistoricalRows": 29,
+    "Method": "llm (high)"
+  },
+  "179": {
+    "Brand": "Panacur",
+    "KnownProductLines": "Suspension, Paste, Granules, Tablets for dogs and cats",
+    "SourceProductIds": "179",
+    "SourceProductVariantIds": "1923",
+    "SourceSkuIds": "3472;3706",
+    "TotalHistoricalRows": 184,
+    "Method": "llm (high)"
+  },
+  "180": {
+    "Brand": "Prascend",
+    "KnownProductLines": "Tablets for equine/canine use",
+    "SourceProductIds": "180",
+    "SourceProductVariantIds": "",
+    "SourceSkuIds": "",
+    "TotalHistoricalRows": 2,
+    "Method": "llm (low)"
+  },
+  "181": {
+    "Brand": "Revolution Plus",
+    "KnownProductLines": "Topical solution for cats, weight-based dosing",
+    "SourceProductIds": "181",
+    "SourceProductVariantIds": "368;1924;1925;1926;1982;1983;1984",
+    "SourceSkuIds": "2556;3481;3482;3483;3484;3485;3486;3487;3488;3489;3490;3491;3492;3493;3494;3495;3617;3618;3619;3620;3621;3622;3689;3690",
+    "TotalHistoricalRows": 744,
+    "Method": "llm (high)"
+  },
+  "182": {
+    "Brand": "Frontline",
+    "KnownProductLines": "Spot-On, Combo, Kitten/Puppy Packs",
+    "SourceProductIds": "182",
+    "SourceProductVariantIds": "1927",
+    "SourceSkuIds": "3496",
+    "TotalHistoricalRows": 270,
+    "Method": "llm (high)"
+  },
+  "183": {
+    "Brand": "Evicto",
+    "KnownProductLines": "Spot-on for dogs and cats by weight range",
+    "SourceProductIds": "183",
+    "SourceProductVariantIds": "1994;1995;1996;1997;1998;1999",
+    "SourceSkuIds": "3714;3748;3749;3750;3751;3752",
+    "TotalHistoricalRows": 20,
+    "Method": "llm (high)"
+  },
+  "184": {
+    "Brand": "Promectin Plus",
+    "KnownProductLines": "Horse allwormer paste and liquid",
+    "SourceProductIds": "184",
+    "SourceProductVariantIds": "1931",
+    "SourceSkuIds": "3503",
+    "TotalHistoricalRows": 6,
+    "Method": "llm (high)"
+  },
+  "185": {
+    "Brand": "Ammo",
+    "KnownProductLines": "Allwormer Paste for horses",
+    "SourceProductIds": "185",
+    "SourceProductVariantIds": "1932",
+    "SourceSkuIds": "3505",
+    "TotalHistoricalRows": 6,
+    "Method": "llm (high)"
+  },
+  "187": {
+    "Brand": "Ambex",
+    "KnownProductLines": "Wormer tablets",
+    "SourceProductIds": "187",
+    "SourceProductVariantIds": "1937",
+    "SourceSkuIds": "3509",
+    "TotalHistoricalRows": 1,
+    "Method": "llm (high)"
+  },
+  "188": {
+    "Brand": "Felisecto",
+    "KnownProductLines": "Spot-on pipettes for cats, with weight-specific variants",
+    "SourceProductIds": "188",
+    "SourceProductVariantIds": "1939;1940;1941",
+    "SourceSkuIds": "3514;3515;3516",
+    "TotalHistoricalRows": 91,
+    "Method": "llm (high)"
+  },
+  "189": null,
+  "190": {
+    "Brand": "Feliway",
+    "KnownProductLines": "Spray, Diffuser, Refill",
+    "SourceProductIds": "190",
+    "SourceProductVariantIds": "1946",
+    "SourceSkuIds": "3542",
+    "TotalHistoricalRows": 11,
+    "Method": "llm (high)"
+  },
+  "191": {
+    "Brand": "Adaptil",
+    "KnownProductLines": "Diffusers, refills, spray, collars",
+    "SourceProductIds": "191",
+    "SourceProductVariantIds": "1945",
+    "SourceSkuIds": "3539;3540",
+    "TotalHistoricalRows": 15,
+    "Method": "llm (high)"
+  },
+  "192": {
+    "Brand": "Apoquel",
+    "KnownProductLines": "Tablets for dogs",
+    "SourceProductIds": "192",
+    "SourceProductVariantIds": "",
+    "SourceSkuIds": "",
+    "TotalHistoricalRows": 2,
+    "Method": "llm (high)"
+  },
+  "193": {
+    "Brand": "Atopica",
+    "KnownProductLines": "Capsules for dogs and cats",
+    "SourceProductIds": "193",
+    "SourceProductVariantIds": "",
+    "SourceSkuIds": "",
+    "TotalHistoricalRows": 2,
+    "Method": "llm (high)"
+  },
+  "199": {
+    "Brand": "Simparica Trio",
+    "KnownProductLines": "chewable tablets for dogs, multiple weight ranges and pack sizes",
+    "SourceProductIds": "199",
+    "SourceProductVariantIds": "381;1948;1949;1950;1951;1952;1953",
+    "SourceSkuIds": "591;3545;3546;3547;3548;3549;3550;3551;3552;3553;3554;3555;3556;3557;3558;3559;3560;3561;3562",
+    "TotalHistoricalRows": 3639,
+    "Method": "llm (high)"
+  },
+  "200": null,
+  "202": {
+    "Brand": "Fortreon",
+    "KnownProductLines": "Spot-on for dogs and cats (sizes S, M, L, 2L, 3L)",
+    "SourceProductIds": "202",
+    "SourceProductVariantIds": "1962;1963;1964",
+    "SourceSkuIds": "3574;3575;3576",
+    "TotalHistoricalRows": 11,
+    "Method": "llm (high)"
+  },
+  "203": {
+    "Brand": "Prinocate",
+    "KnownProductLines": "Spot-on parasiticide for dogs and cats",
+    "SourceProductIds": "203",
+    "SourceProductVariantIds": "1971;1972;1973;1974;1975;1976",
+    "SourceSkuIds": "3595;3596;3597;3598;3599;3600;3601;3602;3603;3604;3605;3606;3671;3672;3707;3708;3709;3710",
+    "TotalHistoricalRows": 88,
+    "Method": "llm (high)"
+  },
+  "205": {
+    "Brand": "Solensia",
+    "KnownProductLines": "Injection (vial)",
+    "SourceProductIds": "205",
+    "SourceProductVariantIds": "",
+    "SourceSkuIds": "",
+    "TotalHistoricalRows": 1,
+    "Method": "llm (high)"
+  },
+  "206": {
+    "Brand": "Librela",
+    "KnownProductLines": "Injection for dogs",
+    "SourceProductIds": "206",
+    "SourceProductVariantIds": "",
+    "SourceSkuIds": "",
+    "TotalHistoricalRows": 5,
+    "Method": "llm (high)"
+  },
+  "207": {
+    "Brand": "F10",
+    "KnownProductLines": "Wound Spray + Insecticide",
+    "SourceProductIds": "207",
+    "SourceProductVariantIds": "1979",
+    "SourceSkuIds": "3613",
+    "TotalHistoricalRows": 2,
+    "Method": "llm (high)"
+  },
+  "209": {
+    "Brand": "Vitrecto",
+    "KnownProductLines": "Topical solution for cats by weight (Blue, Violet, Lime)",
+    "SourceProductIds": "209",
+    "SourceProductVariantIds": "1991;1992;1993",
+    "SourceSkuIds": "3674",
+    "TotalHistoricalRows": 114,
+    "Method": "llm (high)"
+  },
+  "211": {
+    "Brand": "Milbemax",
+    "KnownProductLines": "Tablets for dogs and cats",
+    "SourceProductIds": "211",
+    "SourceProductVariantIds": "2042;2043;2044;2045;2057",
+    "SourceSkuIds": "3643;3644;3645;3646;3677",
+    "TotalHistoricalRows": 3019,
+    "Method": "llm (high)"
+  },
+  "215": {
+    "Brand": "Carprieve",
+    "KnownProductLines": "Tablets",
+    "SourceProductIds": "215",
+    "SourceProductVariantIds": "2020",
+    "SourceSkuIds": "",
+    "TotalHistoricalRows": 1,
+    "Method": "llm (high)"
+  },
+  "216": null,
+  "218": {
+    "Brand": "Nexgard",
+    "KnownProductLines": "Spot-on for cats (small and large)",
+    "SourceProductIds": "218",
+    "SourceProductVariantIds": "2034;2035",
+    "SourceSkuIds": "3640;3641;3662;3663",
+    "TotalHistoricalRows": 1322,
+    "Method": "llm (high)"
+  },
+  "219": {
+    "Brand": "Wagg & Purr",
+    "KnownProductLines": "Spot-on flea and worm treatments for cats and dogs",
+    "SourceProductIds": "219",
+    "SourceProductVariantIds": "2036;2037;2038;2039;2040;2041",
+    "SourceSkuIds": "3627;3628;3629;3630;3631;3633;3634;3635;3636;3637;3638",
+    "TotalHistoricalRows": 240,
+    "Method": "llm (high)"
+  },
+  "222": {
+    "Brand": "Wagg & Purr",
+    "KnownProductLines": "Selamectin and combo spot-on for dogs and cats",
+    "SourceProductIds": "222",
+    "SourceProductVariantIds": "2051;2052;2053;2054;2055;2056",
+    "SourceSkuIds": "3664;3665;3666;3667;3668;3669;3670;3676",
+    "TotalHistoricalRows": 142,
+    "Method": "llm (high)"
+  },
+  "224": {
+    "Brand": "Wagg & Purr",
+    "KnownProductLines": "Tablets for dogs",
+    "SourceProductIds": "224",
+    "SourceProductVariantIds": "2059",
+    "SourceSkuIds": "3675",
+    "TotalHistoricalRows": 9,
+    "Method": "llm (high)"
+  },
+  "225": {
+    "Brand": "Drontal Plus",
+    "KnownProductLines": "Tablets for dogs (flavored, bone-shaped, XL)",
+    "SourceProductIds": "225",
+    "SourceProductVariantIds": "23;24;25;26;27",
+    "SourceSkuIds": "29;32;34;36;37;38;39;42;44;45;574;2368;2369;3353;3362;3363;3364;3385;3386;3678;3679;3802",
+    "TotalHistoricalRows": 495,
+    "Method": "llm (high)"
+  },
+  "226": {
+    "Brand": "Mox",
+    "KnownProductLines": "Injectable parasiticide for dogs by weight range",
+    "SourceProductIds": "226",
+    "SourceProductVariantIds": "2061",
+    "SourceSkuIds": "3681",
+    "TotalHistoricalRows": 5,
+    "Method": "llm (high)"
+  },
+  "227": {
+    "Brand": "\u30d1\u30ca\u30e1\u30af\u30c1\u30f3",
+    "KnownProductLines": "Tablets, chewables, and powder for heartworm prevention",
+    "SourceProductIds": "227",
+    "SourceProductVariantIds": "2062",
+    "SourceSkuIds": "3682",
+    "TotalHistoricalRows": 99,
+    "Method": "llm (high)"
+  },
+  "228": null,
+  "229": {
+    "Brand": "\u30de\u30a4\u30d5\u30ea\u30fc\u30ac\u30fc\u30c9",
+    "KnownProductLines": "Flea and tick spot-on for cats and dogs",
+    "SourceProductIds": "229",
+    "SourceProductVariantIds": "2064;2065;2066;2067;2068",
+    "SourceSkuIds": "3684;3685;3686;3687;3688",
+    "TotalHistoricalRows": 38,
+    "Method": "llm (high)"
+  },
+  "230": {
+    "Brand": "\u30e2\u30ad\u30b7\u30cf\u30fc\u30c8 (Moxiheart)",
+    "KnownProductLines": "Chewable tablets for dogs and cats, various strengths (7.5, 15, 30, 60, 136 mg)",
+    "SourceProductIds": "230",
+    "SourceProductVariantIds": "2060",
+    "SourceSkuIds": "3680",
+    "TotalHistoricalRows": 114,
+    "Method": "llm (high)"
+  },
+  "231": {
+    "Brand": "Felpreva",
+    "KnownProductLines": "Spot-On for cats",
+    "SourceProductIds": "231",
+    "SourceProductVariantIds": "2070;2071;2072",
+    "SourceSkuIds": "3695;3696;3697;3698;3699;3700;3711;3712;3713;3803",
+    "TotalHistoricalRows": 706,
+    "Method": "llm (high)"
+  },
+  "235": {
+    "Brand": "Preventic",
+    "KnownProductLines": "Spot-On",
+    "SourceProductIds": "235",
+    "SourceProductVariantIds": "2080;2081",
+    "SourceSkuIds": "3729;3730;3731;3732",
+    "TotalHistoricalRows": 44,
+    "Method": "llm (high)"
+  },
+  "236": {
+    "Brand": "Cestex",
+    "KnownProductLines": "Tablets for dogs and cats",
+    "SourceProductIds": "236",
+    "SourceProductVariantIds": "2091;2092",
+    "SourceSkuIds": "3753;3754",
+    "TotalHistoricalRows": 2,
+    "Method": "llm (high)"
+  },
+  "242": {
+    "Brand": "Irecall",
+    "KnownProductLines": "Parasiticide for all groups",
+    "SourceProductIds": "242",
+    "SourceProductVariantIds": "2097",
+    "SourceSkuIds": "3756",
+    "TotalHistoricalRows": 3,
+    "Method": "llm (high)"
+  },
+  "243": null,
+  "244": null,
+  "248": {
+    "Brand": "Bravecto Quantum",
+    "KnownProductLines": "Annual injectable for cats",
+    "SourceProductIds": "248",
+    "SourceProductVariantIds": "2112",
+    "SourceSkuIds": "3819",
+    "TotalHistoricalRows": 3,
+    "Method": "llm (high)"
+  },
+  "249": {
+    "Brand": "Wagg & Purr",
+    "KnownProductLines": "Tapeworm Tablets",
+    "SourceProductIds": "249",
+    "SourceProductVariantIds": "2113",
+    "SourceSkuIds": "3820",
+    "TotalHistoricalRows": 1,
+    "Method": "llm (high)"
+  },
+  "250": {
+    "Brand": "Selapro",
+    "KnownProductLines": "Spot-On for small cats and dogs",
+    "SourceProductIds": "250",
+    "SourceProductVariantIds": "2114",
+    "SourceSkuIds": "3821",
+    "TotalHistoricalRows": 2,
+    "Method": "llm (medium)"
+  },
+  "251": {
+    "Brand": "Imoxat",
+    "KnownProductLines": "Spot-on for cats and dogs by weight",
+    "SourceProductIds": "251",
+    "SourceProductVariantIds": "2115;2116;2117;2118;2119;2120",
+    "SourceSkuIds": "3824;3825;3826;3827;3828;3829",
+    "TotalHistoricalRows": 6,
+    "Method": "llm (high)"
+  }
+}
