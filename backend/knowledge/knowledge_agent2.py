@@ -1,6 +1,7 @@
 import json
 import re
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -61,6 +62,13 @@ CHECKPOINT_FILE = BACKEND_ROOT / "data" / "generated" / "knowledge_research_chec
 # quota, so put the model you'd rather use first.
 GEMINI_MODELS = ["gemini-2.5-flash", "gemini-3.5-flash"]
 
+# Transient 5xx errors (e.g. "model currently experiencing high demand")
+# aren't a quota problem — a different key won't help, but the same combo
+# often succeeds seconds later. Retry with backoff before treating it as
+# exhausted and rotating to a different model.
+MAX_TRANSIENT_RETRIES = 4
+TRANSIENT_RETRY_BACKOFF_SECONDS = 5
+
 # Pet-pharmacy retailers by region, used as source hints for the live
 # search — brands aren't necessarily UK-only, so the prompt is told to
 # pick whichever region(s) actually apply to the brand being researched.
@@ -101,9 +109,10 @@ TRUSTED_RETAILERS = {
 # SETUP — Gemini (live search), ChromaDB, Embedding Model
 # ─────────────────────────────────────────────────────────────
 
-class GeminiKeysExhaustedError(Exception):
+class GeminiUnavailableError(Exception):
     """Raised when every available (model, API key) combination has hit
-    its quota."""
+    its quota, or kept failing with transient server errors after
+    exhausting the retry budget on each combination."""
 
 
 # Every (model, key) combination worth trying, in order: all keys against
@@ -117,17 +126,26 @@ GEMINI_MODEL, _current_gemini_key = _GEMINI_COMBOS[_combo_index]
 client_gemini = genai.Client(api_key=_current_gemini_key)
 
 
-def _is_quota_error(error: errors.APIError) -> bool:
-    """True for rate-limit/quota-exhaustion errors that a different key or
-    model can plausibly get past (429 RESOURCE_EXHAUSTED) — as opposed to
-    errors that would fail identically on any combination (bad request,
-    invalid model, etc.), which should still surface immediately rather
-    than be masked by silently cycling combinations."""
-    status = str(getattr(error, "status", "") or "")
-    return getattr(error, "code", None) == 429 or "RESOURCE_EXHAUSTED" in status.upper()
+def _is_rotation_worthy_error(error: errors.APIError) -> bool:
+    """True for errors where a different key or model can plausibly get
+    past the problem: quota exhaustion (429 RESOURCE_EXHAUSTED), billing/
+    permission issues tied to a specific key (403 PERMISSION_DENIED), or a
+    model that's unavailable to this particular key/project — e.g. "this
+    model is no longer available to new users" (404 NOT_FOUND). As opposed
+    to errors that would fail identically on any combination (a malformed
+    request, etc.), which should still surface immediately rather than be
+    masked by silently cycling combinations."""
+    status = str(getattr(error, "status", "") or "").upper()
+    code = getattr(error, "code", None)
+    return (
+        code in (429, 403, 404)
+        or "RESOURCE_EXHAUSTED" in status
+        or "PERMISSION_DENIED" in status
+        or "NOT_FOUND" in status
+    )
 
 
-def _rotate_gemini_combo() -> bool:
+def _rotate_gemini_combo(reason: str = "quota hit") -> bool:
     """Switches client_gemini/GEMINI_MODEL to the next (model, key) combo.
     Returns False if every combination has already been tried this run."""
     global _combo_index, GEMINI_MODEL, _current_gemini_key, client_gemini
@@ -142,11 +160,11 @@ def _rotate_gemini_combo() -> bool:
 
     if GEMINI_MODEL != previous_model:
         print(
-            f"Quota exhausted on '{previous_model}' for all its key(s) — "
+            f"{reason} on '{previous_model}' for all its key(s) — "
             f"switching to model '{GEMINI_MODEL}'."
         )
     else:
-        print(f"Quota hit — switching to the next API key for '{GEMINI_MODEL}'.")
+        print(f"{reason} — switching to the next API key for '{GEMINI_MODEL}'.")
 
     print(f"({_combo_index + 1}/{len(_GEMINI_COMBOS)} combination(s) tried this run.)")
     return True
@@ -431,6 +449,8 @@ def research_brand_with_gemini(brand: str, known_product_lines: str = "") -> dic
         .replace("__RETAILERS__", format_retailer_block())
     )
 
+    transient_retries = 0
+
     while True:
         try:
             response = client_gemini.models.generate_content(
@@ -441,15 +461,38 @@ def research_brand_with_gemini(brand: str, known_product_lines: str = "") -> dic
                 ),
             )
             break
-        except errors.ClientError as e:
-            if not _is_quota_error(e):
-                raise
-            if _rotate_gemini_combo():
+        except errors.ServerError as e:
+            # Transient overload (e.g. 503 "high demand") — not a quota
+            # problem, so a different key won't help, but the same combo
+            # often succeeds on retry. Only rotate combos once the retry
+            # budget for this one is spent.
+            transient_retries += 1
+            if transient_retries <= MAX_TRANSIENT_RETRIES:
+                wait = TRANSIENT_RETRY_BACKOFF_SECONDS * (2 ** (transient_retries - 1))
+                print(
+                    f"Gemini server error on '{GEMINI_MODEL}' "
+                    f"(attempt {transient_retries}/{MAX_TRANSIENT_RETRIES}) — "
+                    f"retrying in {wait}s: {e}"
+                )
+                time.sleep(wait)
                 continue
-            raise GeminiKeysExhaustedError(
+            transient_retries = 0
+            if _rotate_gemini_combo(reason="Repeated server errors"):
+                continue
+            raise GeminiUnavailableError(
+                f"Gemini kept returning server errors after exhausting all "
+                f"{len(_GEMINI_COMBOS)} (model, key) combination(s): {e}"
+            ) from e
+        except errors.ClientError as e:
+            if not _is_rotation_worthy_error(e):
+                raise
+            if _rotate_gemini_combo(reason=f"{e.status or e.code} error"):
+                continue
+            raise GeminiUnavailableError(
                 f"All {len(_GEMINI_COMBOS)} (model, key) combination(s) "
                 f"across {len(GEMINI_MODELS)} model(s) and {len(GEMINI_API_KEYS)} "
-                "key(s) have run out of quota."
+                f"key(s) failed with quota/permission/availability errors "
+                f"(last: {e})."
             ) from e
 
     data = extract_json(response.text or "")
@@ -640,12 +683,13 @@ if __name__ == "__main__":
 
         try:
             data = research_brand_with_gemini(brand, known_lines)
-        except GeminiKeysExhaustedError as e:
+        except GeminiUnavailableError as e:
             print(f"\n{e}")
             print(
                 f"Stopping — {len(checkpoint)} brand(s) already researched are "
                 "saved in the checkpoint. Add another key to APIKeys.env or wait "
-                "for quota to reset, then re-run to resume where this left off."
+                "for quota/availability to recover, then re-run to resume where "
+                "this left off."
             )
             break
 

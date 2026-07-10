@@ -118,36 +118,22 @@ def build_sku_examples():
         if brand_df.empty:
             continue
 
-        sku_ids = sorted(brand_df["SkuId"].dropna().unique())
+        def store_examples(group_df: pd.DataFrame, sku_id: int, variant_id, id_prefix: str):
+            """Stores up to EXAMPLES_PER_SKU representative Notes for one
+            (brand, sku_id-or-variant) group. Shared by both the main
+            SkuId-grouped pass and the missing-SkuId fallback pass below."""
+            nonlocal total_stored, total_skipped
 
-        if not sku_ids:
-            continue
-
-        print(f"{brand}: {len(sku_ids)} historical SKU(s)")
-
-        for sku_id in sku_ids:
-
-            sku_id = int(sku_id)
-            sku_df = brand_df[brand_df["SkuId"] == sku_id]
-
-            variant_id = (
-                int(sku_df["ProductVariantId"].dropna().iloc[0])
-                if sku_df["ProductVariantId"].notna().any() else None
-            )
-
-            examples = get_representative_notes(sku_df)
-
-            if not examples:
-                continue
+            examples = get_representative_notes(group_df)
 
             for i, note in enumerate(examples):
 
                 # SkuId is NOT globally unique in Labelled.csv — 84 SkuIds
                 # (e.g. 7, which is both Advocate's and Frontline's) are
                 # reused across different ProductIds/brands. Namespacing
-                # by brand as well as sku_id avoids cross-brand id
+                # by brand as well as sku_id/variant avoids cross-brand id
                 # collisions silently overwriting or skipping real examples.
-                entry_id = f"example__{slugify(brand)}__sku_{sku_id}__{i}"
+                entry_id = f"example__{slugify(brand)}__{id_prefix}__{i}"
 
                 if entry_id in existing_ids:
                     total_skipped += 1
@@ -161,7 +147,7 @@ def build_sku_examples():
                     ids=[entry_id],
                     metadatas=[{
                         "brand": brand,
-                        "product_id": int(sku_df["ProductId"].iloc[0]),
+                        "product_id": int(group_df["ProductId"].iloc[0]),
                         "sku_id": sku_id,
                         "product_variant_id": variant_id if variant_id is not None else 0,
                     }]
@@ -169,6 +155,46 @@ def build_sku_examples():
 
                 existing_ids.add(entry_id)
                 total_stored += 1
+
+        sku_ids = sorted(brand_df["SkuId"].dropna().unique())
+
+        if sku_ids:
+            print(f"{brand}: {len(sku_ids)} historical SKU(s)")
+
+        reached_variant_ids = set()
+
+        for sku_id in sku_ids:
+
+            sku_id = int(sku_id)
+            sku_df = brand_df[brand_df["SkuId"] == sku_id]
+
+            variant_id = (
+                int(sku_df["ProductVariantId"].dropna().iloc[0])
+                if sku_df["ProductVariantId"].notna().any() else None
+            )
+
+            if variant_id is not None:
+                reached_variant_ids.add(variant_id)
+
+            store_examples(sku_df, sku_id, variant_id, id_prefix=f"sku_{sku_id}")
+
+        # Some ProductVariantIds have NO row with a SkuId recorded at all —
+        # the SkuId-driven loop above never sees them, since it only groups
+        # rows that have a non-null SkuId. Without this pass those variants
+        # would be silently invisible to Phase 2's real-phrasing lookup and
+        # id-validation set, even though they're real, valid variants.
+        # sku_id is stored as 0 (the same "not available" sentinel already
+        # used for a missing product_variant_id) since no historical SkuId
+        # exists to attach.
+        all_variant_ids = set(int(v) for v in brand_df["ProductVariantId"].dropna().unique())
+        missing_variant_ids = sorted(all_variant_ids - reached_variant_ids)
+
+        if missing_variant_ids:
+            print(f"{brand}: {len(missing_variant_ids)} variant(s) with no recorded SkuId — adding fallback example(s)")
+
+        for variant_id in missing_variant_ids:
+            variant_df = brand_df[brand_df["ProductVariantId"] == variant_id]
+            store_examples(variant_df, sku_id=0, variant_id=variant_id, id_prefix=f"variant_{variant_id}")
 
     print("\n" + "=" * 60)
     print(f"Done! {total_stored} example(s) stored, {total_skipped} already present and skipped.")
