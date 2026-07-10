@@ -77,6 +77,7 @@ function App() {
   }
 
   async function handleBatchSubmit(file: File, enableLiveFallback: boolean) {
+    stopBatchPolling();
     setMode("batch");
     setLoading(true);
     setBatchStatus(null);
