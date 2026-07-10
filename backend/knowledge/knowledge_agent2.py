@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 from google import genai
-from google.genai import types
+from google.genai import errors, types
 import os
 
 # knowledge_agent2.py lives in backend/knowledge/ but chromadb_client.py
@@ -31,16 +31,35 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 env_path = BACKEND_ROOT / "APIKeys.env"
 load_dotenv(dotenv_path=env_path)
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY_2")
 
-if not GEMINI_API_KEY:
-    raise ValueError(f"Missing GEMINI_API_KEY_2 in {env_path}")
+def load_gemini_api_keys() -> list:
+    """Collects every GEMINI_API_KEY* value from APIKeys.env (any casing,
+    any numeric suffix), sorted by variable name. Lets the research loop
+    rotate to the next key when one runs out of quota instead of dying
+    partway through a run."""
+    matches = [
+        (name, value)
+        for name, value in os.environ.items()
+        if re.match(r"^gemini_api_key(_\d+)?$", name, re.IGNORECASE) and value
+    ]
+    matches.sort(key=lambda pair: pair[0].lower())
+    return [value for _, value in matches]
+
+
+GEMINI_API_KEYS = load_gemini_api_keys()
+
+if not GEMINI_API_KEYS:
+    raise ValueError(f"No GEMINI_API_KEY* values found in {env_path}")
 
 BRAND_SEED_CSV = BACKEND_ROOT / "data" / "generated" / "brand_seed_list.csv"
 EXPORT_CSV = BACKEND_ROOT / "data" / "generated" / "brands_products_export.csv"
 CHECKPOINT_FILE = BACKEND_ROOT / "data" / "generated" / "knowledge_research_checkpoint.json"
 
-GEMINI_MODEL = "gemini-2.5-flash"
+# Every model here must support Google Search grounding. Listed in
+# preference order — the research loop works through every API key on the
+# first model before falling back to the next model's separate free-tier
+# quota, so put the model you'd rather use first.
+GEMINI_MODELS = ["gemini-2.5-flash", "gemini-3.5-flash"]
 
 # Pet-pharmacy retailers by region, used as source hints for the live
 # search — brands aren't necessarily UK-only, so the prompt is told to
@@ -82,7 +101,56 @@ TRUSTED_RETAILERS = {
 # SETUP — Gemini (live search), ChromaDB, Embedding Model
 # ─────────────────────────────────────────────────────────────
 
-client_gemini = genai.Client(api_key=GEMINI_API_KEY)
+class GeminiKeysExhaustedError(Exception):
+    """Raised when every available (model, API key) combination has hit
+    its quota."""
+
+
+# Every (model, key) combination worth trying, in order: all keys against
+# the first model (each key's quota against that model is independent),
+# then all keys again against the fallback model. A 146-brand run against
+# 2 models x 3 keys gets 6 separate free-tier quotas before giving up.
+_GEMINI_COMBOS = [(model, key) for model in GEMINI_MODELS for key in GEMINI_API_KEYS]
+
+_combo_index = 0
+GEMINI_MODEL, _current_gemini_key = _GEMINI_COMBOS[_combo_index]
+client_gemini = genai.Client(api_key=_current_gemini_key)
+
+
+def _is_quota_error(error: errors.APIError) -> bool:
+    """True for rate-limit/quota-exhaustion errors that a different key or
+    model can plausibly get past (429 RESOURCE_EXHAUSTED) — as opposed to
+    errors that would fail identically on any combination (bad request,
+    invalid model, etc.), which should still surface immediately rather
+    than be masked by silently cycling combinations."""
+    status = str(getattr(error, "status", "") or "")
+    return getattr(error, "code", None) == 429 or "RESOURCE_EXHAUSTED" in status.upper()
+
+
+def _rotate_gemini_combo() -> bool:
+    """Switches client_gemini/GEMINI_MODEL to the next (model, key) combo.
+    Returns False if every combination has already been tried this run."""
+    global _combo_index, GEMINI_MODEL, _current_gemini_key, client_gemini
+
+    if _combo_index + 1 >= len(_GEMINI_COMBOS):
+        return False
+
+    _combo_index += 1
+    previous_model = GEMINI_MODEL
+    GEMINI_MODEL, _current_gemini_key = _GEMINI_COMBOS[_combo_index]
+    client_gemini = genai.Client(api_key=_current_gemini_key)
+
+    if GEMINI_MODEL != previous_model:
+        print(
+            f"Quota exhausted on '{previous_model}' for all its key(s) — "
+            f"switching to model '{GEMINI_MODEL}'."
+        )
+    else:
+        print(f"Quota hit — switching to the next API key for '{GEMINI_MODEL}'.")
+
+    print(f"({_combo_index + 1}/{len(_GEMINI_COMBOS)} combination(s) tried this run.)")
+    return True
+
 
 embedding_model = get_embedding_model()
 
@@ -363,13 +431,26 @@ def research_brand_with_gemini(brand: str, known_product_lines: str = "") -> dic
         .replace("__RETAILERS__", format_retailer_block())
     )
 
-    response = client_gemini.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            tools=[types.Tool(google_search=types.GoogleSearch())],
-        ),
-    )
+    while True:
+        try:
+            response = client_gemini.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    tools=[types.Tool(google_search=types.GoogleSearch())],
+                ),
+            )
+            break
+        except errors.ClientError as e:
+            if not _is_quota_error(e):
+                raise
+            if _rotate_gemini_combo():
+                continue
+            raise GeminiKeysExhaustedError(
+                f"All {len(_GEMINI_COMBOS)} (model, key) combination(s) "
+                f"across {len(GEMINI_MODELS)} model(s) and {len(GEMINI_API_KEYS)} "
+                "key(s) have run out of quota."
+            ) from e
 
     data = extract_json(response.text or "")
 
@@ -557,7 +638,16 @@ if __name__ == "__main__":
 
         known_lines = str(row.get("KnownProductLines", "") or "")
 
-        data = research_brand_with_gemini(brand, known_lines)
+        try:
+            data = research_brand_with_gemini(brand, known_lines)
+        except GeminiKeysExhaustedError as e:
+            print(f"\n{e}")
+            print(
+                f"Stopping — {len(checkpoint)} brand(s) already researched are "
+                "saved in the checkpoint. Add another key to APIKeys.env or wait "
+                "for quota to reset, then re-run to resume where this left off."
+            )
+            break
 
         variants = data.get("variants", [])
         updated = sum(store_variant_in_chromadb(brand, v, existing_docs) for v in variants)
