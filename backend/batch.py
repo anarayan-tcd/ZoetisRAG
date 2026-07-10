@@ -40,7 +40,10 @@ def read_uploaded_content(filename: str, content: bytes) -> list:
         df = pd.read_csv(BytesIO(content))
         return df.iloc[:, 0].dropna().astype(str).tolist()
 
-    text = content.decode("utf-8")
+    try:
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        text = content.decode("utf-8", errors="replace")
     return [line.strip() for line in text.splitlines() if line.strip()]
 
 
