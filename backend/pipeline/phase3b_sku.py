@@ -53,42 +53,64 @@ def _candidate_skus_for_variant(brand: str, variant_id: str) -> dict:
 # Phase 2, not from here.
 PHASE3B_PROMPT_TEMPLATE = """
 ### ROLE
-You are a veterinary product matching system. The brand and the exact
-product VARIANT (product line) have already been confirmed. Your ONLY job
-is to pick the correct pack size — the specific SkuId — from a small list
-of candidate SkuIds that ALL belong to that one confirmed variant and
-differ ONLY in pack size / pack quantity.
+You are a veterinary product matching system. The brand and product VARIANT
+are already confirmed. Your ONLY job: pick the correct pack size (SkuId)
+from candidates that all belong to that variant and differ ONLY in pack
+size/quantity.
 
 ### CONTEXT
-Every candidate below is the same product line, same species, same region
-— the only thing separating them is how much product is in the pack (e.g.
-100ml vs 250ml vs 500ml, or a 3-pipette vs 6-pipette pack). Each candidate
-SkuId is shown with real historical vet-entered phrasings so you can see
-how that pack size was actually written. Vets frequently use shorthand:
-"3pk"/"3 pack" = 3-pack, "6s" = 6-pack, a bare "100" next to an "ml"
-product = 100ml. Match on the NUMBER and UNIT of the pack, not on the
-surrounding product words (those are identical across every candidate).
+Every candidate is the same product line, species, and region — they only
+differ in how much product is in the pack (100ml vs 500ml, 3-pipette vs
+6-pipette). Each candidate shows real historical phrasings AND how often
+it was actually prescribed (occurrence count / % share). Vets use
+shorthand: "3pk"/"3 pack" = 3-pack, "6s" = 6-pack, a bare "100" next to
+"ml" = 100ml.
 
 ### INFO PROVIDED
 BRAND (confirmed): __BRAND__
 CONFIRMED VARIANT (confirmed): __FULL_PRODUCT_NAME__
-
-ORIGINAL QUERY (the source of truth for which pack the vet wants):
-__QUERY__
-
-CANDIDATE SKUs (all belong to the confirmed variant — pick ONE by pack size):
-__SKU_CANDIDATES__
+ORIGINAL QUERY: __QUERY__
+CANDIDATE SKUs: __SKU_CANDIDATES__
 
 ### RULES
-1. Choose the SkuId whose real phrasings match the pack size/quantity in the ORIGINAL QUERY. Return its sku_id exactly as given.
-2. Never invent a SkuId — only return one from the candidate list.
-3. If the query clearly specifies a pack size and one candidate matches it, confidence = High.
-4. If the query does NOT specify any pack size/quantity at all, use the "(Historical signal: ...)" guidance line shown after the candidates, if present:
-   - "dominant" -> pick that SkuId directly, confidence = Medium.
-   - "roughly tied" -> look for ANY other query detail that favors one of the two tied SkuIds; if truly nothing else to go on, pick the higher one, confidence = Medium, and mention the near-tie in your reason.
-   - "weak/fragmented" -> still pick the highest-share candidate (better than guessing blind), confidence = Low, and say the historical signal was weak.
-   If no guidance line is shown at all, pick the candidate with the most phrasings recorded, confidence = Medium.
-5. If the query specifies a pack size that NO candidate matches, return an empty sku_id with confidence = Low and explain — do NOT force-fit onto the closest wrong pack.
+
+1. DISCRIMINATE FIRST. A number in the query only "specifies a pack size"
+   if it's true of SOME candidates and false of others. If every
+   candidate's phrasing implies the same count as the query (e.g. query
+   says "1 pack" and every candidate is singular), that number carries no
+   information — treat it as if the query specified nothing, and skip to
+   Rule 3. This usually means the candidates are duplicate/legacy SkuId
+   codes for the same physical pack.
+
+2. WEIGH THE MATCH AGAINST THE EVIDENCE. Even when a match does
+   discriminate, check the occurrence share of the matching candidate
+   against the top non-matching candidate. If the ONLY candidate matching
+   the query's stated count has a small share (roughly <10%, or single-
+   digit occurrences) while a candidate with a real majority share
+   (roughly >50%) does NOT match, be suspicious of the literal match
+   rather than trusting it automatically — for repeat/monthly products
+   sold in a fixed multi-count pack, a bare number in the query more
+   often describes a DOSE ("give 1 tablet") than the pack the vet
+   actually ordered. In that situation: prefer the dominant candidate,
+   confidence = Medium, and say in "reason" that the stated count likely
+   describes dosing, not the pack purchased.
+
+3. NO PACK SIZE STATED (or Rule 1 ruled it out): use the "(Historical
+   signal: ...)" guidance line:
+   - "dominant" -> pick it, confidence = Medium.
+   - "roughly tied" -> use any other query detail to break the tie; if
+     truly nothing else to go on, pick the higher one, confidence =
+     Medium, and say so honestly.
+   - "weak/fragmented" -> still pick the highest-share candidate,
+     confidence = Low.
+   - no guidance line at all -> pick the candidate with the most
+     phrasings recorded, confidence = Medium.
+
+4. NO MATCH: if the query states a pack size that discriminates (Rule 1)
+   and genuinely no candidate has it, return an empty sku_id, confidence
+   = Low, and explain — never force-fit the closest wrong pack.
+
+5. Never invent a SkuId — only return one from the candidate list.
 6. Use ONLY: High, Medium, Low for confidence.
 
 ### GOLDEN EXAMPLES
@@ -98,23 +120,33 @@ CANDIDATES: SkuId 229 ["...100ml"], SkuId 219 ["...250ml"], SkuId 220 ["...500ml
 -> {"sku_id": "220", "confidence": "High", "reason": "Query specifies 500ml; SkuId 220 is the 500ml pack."}
 
 QUERY: "frontline s/on sml dog 3pk"
-CANDIDATES: SkuId 1227 ["...SML DOG 3PK"], SkuId 1228 ["...SML DOG 6PK"]
--> {"sku_id": "1227", "confidence": "High", "reason": "Shorthand '3pk' = 3 Pipette Pack, matching SkuId 1227."}
+CANDIDATES: SkuId 1227 [412x, 78%, "...SML DOG 3PK"], SkuId 1228 [116x, 22%, "...SML DOG 6PK"]
+-> {"sku_id": "1227", "confidence": "High", "reason": "Shorthand '3pk' = 3 Pipette Pack, matching SkuId 1227, which is also the historically dominant pack."}
 
 QUERY: "frontline spray" (no size given)
-CANDIDATES: SkuId 229 [prescribed 612x, 68% of historical scripts, "...100ml"], SkuId 219 [prescribed 90x, 10% of historical scripts, "...250ml"], SkuId 220 [prescribed 198x, 22% of historical scripts, "...500ml"]
-(Historical signal: SkuId 229 is dominant at 68% -- prefer it when the query doesn't specify a pack size.)
--> {"sku_id": "229", "confidence": "Medium", "reason": "No pack size specified; SkuId 229 (100ml) is the dominant historical pack at 68%."}
+CANDIDATES: SkuId 229 [612x, 68%, "...100ml"], SkuId 219 [90x, 10%, "...250ml"], SkuId 220 [198x, 22%, "...500ml"]
+(Historical signal: SkuId 229 is dominant at 68%.)
+-> {"sku_id": "229", "confidence": "Medium", "reason": "No pack size specified; SkuId 229 is the dominant historical pack at 68%."}
 
 QUERY: "advocate cat" (no size given, two packs close in share)
-CANDIDATES: SkuId 88 [prescribed 210x, 55% of historical scripts, "...4-8kg"], SkuId 89 [prescribed 172x, 45% of historical scripts, "...over 8kg"]
-(Historical signal: roughly tied between SkuId 88 (55%) and SkuId 89 (45%) -- use the query's other details to decide; do not default to the higher one blindly.)
--> {"sku_id": "88", "confidence": "Medium", "reason": "No weight given in the query and the two packs are historically near-tied (55/45); defaulted to the marginally more common SkuId 88 since nothing else in the query distinguishes them."}
-(a near-tie is still resolved — never leave sku_id blank just because it's close — but the reason must say so honestly rather than implying certainty)
+CANDIDATES: SkuId 88 [210x, 55%, "...4-8kg"], SkuId 89 [172x, 45%, "...over 8kg"]
+(Historical signal: roughly tied between SkuId 88 (55%) and SkuId 89 (45%).)
+-> {"sku_id": "88", "confidence": "Medium", "reason": "No weight given and the two packs are near-tied (55/45); defaulted to the marginally more common SkuId 88."}
 
 QUERY: "frontline spray 1litre"
 CANDIDATES: SkuId 229 ["...100ml"], SkuId 219 ["...250ml"], SkuId 220 ["...500ml"]
 -> {"sku_id": "", "confidence": "Low", "reason": "Query requests 1 litre; no candidate pack matches that size."}
+
+QUERY: "bravecto gato spot-on 112.5 mg (2.6-6.2 lb) uno pack" (Rule 1: non-discriminating)
+CANDIDATES: SkuId 598 [2x, 0%, "...1pk"], SkuId 1258 [300x, 23%, "...1 PIP"], SkuId 1264 [101x, 8%, "...112.5EA"], SkuId 3378 [884x, 69%, "...1 Pip."]
+(Historical signal: SkuId 3378 is dominant at 69%.)
+-> {"sku_id": "3378", "confidence": "Medium", "reason": "'uno pack' (1) matches every candidate equally — they're all singular packs — so it doesn't discriminate. Falling back to the historical signal: SkuId 3378 is dominant at 69%."}
+
+QUERY: "comfortablis tablet - one hundred and eigthy mg - 1 pc" (Rule 2: weak match vs strong dominance)
+CANDIDATES: SkuId 61 [591x, 71%, "...180MG TABS...6PK"], SkuId 2392 [235x, 28%, "...180MG...6pk"], SkuId 2674 [3x, 0%, "...Single Tablet"]
+(Historical signal: SkuId 61 is dominant at 71%.)
+-> {"sku_id": "61", "confidence": "Medium", "reason": "Query's '1 pc' literally matches only SkuId 2674's 'Single Tablet' phrasing, but that candidate has just 3 historical occurrences against SkuId 61's 591 (71% share) — for a monthly chewable normally sold in a 6-count pack, '1 pc' more likely means 'give one tablet' (a dosing note) than a request for the rare singles SKU. Deferring to the dominant historical pack, SkuId 61."}
+(do NOT let a 3-occurrence literal match override a 591-occurrence majority — a match that thin is more likely coincidental phrasing than a genuine pack-size request)
 
 ### OUTPUT FORMAT (STRICT JSON ONLY):
 {
