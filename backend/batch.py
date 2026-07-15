@@ -9,30 +9,10 @@ from io import BytesIO
 
 import pandas as pd
 
-import query_agent
+from pipeline import query_agent
+from export import FIELD_ORDER, COLUMN_LABELS
 
 _jobs = {}
-
-# Pretty, unambiguous export column names — used for both the primary match
-# (no prefix) and alternatives (prefixed "Alternative N "). Keeps CSV/Excel
-# headers from colliding with each other (e.g. "Brand" vs "Products") the
-# way the old generic "variant"/"exact_variant" names used to.
-COLUMN_LABELS = {
-    "brand": "Brand",
-    "products": "Products",
-    "full_product_name": "Full_Product_Name",
-    "product_id": "Product ID",
-    "sku_id": "SKU ID",
-    "product_variant_id": "Product Variant ID",
-    "region": "Region",
-    "species": "Species",
-    "animal_size": "Animal Size",
-    "pack_size": "Pack Size",
-    "pack_quantity": "Pack Quantity",
-    "animal_age": "Animal Age",
-    "confidence": "Confidence",
-    "reason": "Reason",
-}
 
 
 def read_uploaded_content(filename: str, content: bytes) -> list:
@@ -57,6 +37,7 @@ def create_job(total_rows: int) -> str:
         "rows": None,
         "stats": None,
         "error": None,
+        "cancel_requested": False,
     }
     return job_id
 
@@ -65,26 +46,46 @@ def get_job(job_id: str):
     return _jobs.get(job_id)
 
 
+def cancel_job(job_id: str) -> bool:
+    """Requests cancellation of a pending/running job. Already-running
+    DeepSeek calls (bounded by MAX_WORKERS) still finish, but no further
+    calls are started. Returns False if the job doesn't exist or has
+    already finished."""
+    job = _jobs.get(job_id)
+
+    if not job or job["status"] not in ("pending", "running"):
+        return False
+
+    job["cancel_requested"] = True
+    return True
+
+
 def _flatten_result(query: str, result: dict) -> dict:
     """
     Primary match columns keep their plain names (Brand, Products, ...) with
     no prefix — they're the main result. Alternatives get an "Alternative N "
     prefix so they don't collide with the primary columns in the exported
-    table.
+    table. Columns are always built in export.FIELD_ORDER (not whatever
+    order the LLM/pipeline happened to construct the match dict in), so
+    CSV/JSON/Excel all get the same deterministic, logically-grouped
+    column layout.
     """
     primary = result.get("primary_match", {})
     alternatives = result.get("alternative_matches", [])
 
     row = {"Input": query}
-    row.update({COLUMN_LABELS.get(k, k): v for k, v in primary.items()})
+
+    for field in FIELD_ORDER:
+        row[COLUMN_LABELS[field]] = primary.get(field, "")
 
     for i, alt in enumerate(alternatives[:2], start=1):
-        row.update({f"Alternative {i} {COLUMN_LABELS.get(k, k)}": v for k, v in alt.items()})
+        for field in FIELD_ORDER:
+            row[f"Alternative {i} {COLUMN_LABELS[field]}"] = alt.get(field, "")
 
     return row
 
 
-def run_batch_job(job_id: str, queries: list, enable_live_fallback: bool):
+def run_batch_job(job_id: str, queries: list, enable_live_fallback: bool, enable_llm_judge: bool = False):
 
     job = _jobs[job_id]
     job["status"] = "running"
@@ -99,7 +100,9 @@ def run_batch_job(job_id: str, queries: list, enable_live_fallback: bool):
         raw_results, stats = query_agent.identify_products_batch(
             queries,
             progress_callback=on_progress,
-            enable_live_fallback=enable_live_fallback
+            enable_live_fallback=enable_live_fallback,
+            enable_llm_judge=enable_llm_judge,
+            cancel_check=lambda: job.get("cancel_requested", False)
         )
 
         job["rows"] = [
@@ -107,7 +110,7 @@ def run_batch_job(job_id: str, queries: list, enable_live_fallback: bool):
             for query, result in zip(queries, raw_results)
         ]
         job["stats"] = {**stats, "elapsed": round(time.time() - start, 2)}
-        job["status"] = "done"
+        job["status"] = "cancelled" if job.get("cancel_requested") else "done"
 
     except Exception as e:
         job["status"] = "error"

@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 
 import batch
 import export as exporters
-import query_agent
+from pipeline import query_agent
 from schemas import QueryRequest, QueryResponse
 
 app = FastAPI(title="Veterinary Product Matching API")
@@ -35,7 +35,8 @@ def query_product(request: QueryRequest):
 
     result = query_agent.identify_product(
         request.query,
-        enable_live_fallback=request.enable_live_fallback
+        enable_live_fallback=request.enable_live_fallback,
+        enable_llm_judge=request.enable_llm_judge
     )
 
     if "error" in result:
@@ -53,6 +54,7 @@ async def upload_batch(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     enable_live_fallback: bool = False,
+    enable_llm_judge: bool = False,
 ):
     content = await file.read()
     queries = batch.read_uploaded_content(file.filename, content)
@@ -61,7 +63,7 @@ async def upload_batch(
         raise HTTPException(status_code=400, detail="No readable rows found in the uploaded file.")
 
     job_id = batch.create_job(total_rows=len(queries))
-    background_tasks.add_task(batch.run_batch_job, job_id, queries, enable_live_fallback)
+    background_tasks.add_task(batch.run_batch_job, job_id, queries, enable_live_fallback, enable_llm_judge)
 
     return {"job_id": job_id, "total_rows": len(queries)}
 
@@ -76,6 +78,14 @@ def batch_status(job_id: str):
     return job
 
 
+@app.post("/api/batch/{job_id}/cancel")
+def cancel_batch(job_id: str):
+    if not batch.cancel_job(job_id):
+        raise HTTPException(status_code=404, detail="Job not found or already finished")
+
+    return {"cancelled": True}
+
+
 @app.get("/api/batch/{job_id}/download")
 def batch_download(job_id: str, format: str = "csv"):
     job = batch.get_job(job_id)
@@ -83,7 +93,7 @@ def batch_download(job_id: str, format: str = "csv"):
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")
 
-    if job["status"] != "done":
+    if job["status"] not in ("done", "cancelled"):
         raise HTTPException(status_code=400, detail=f"Job is not finished (status: {job['status']})")
 
     exporters_by_format = {

@@ -8,6 +8,7 @@ from pydantic import BaseModel
 class QueryRequest(BaseModel):
     query: str
     enable_live_fallback: bool = False
+    enable_llm_judge: bool = False
 
 
 class ProductMatch(BaseModel):

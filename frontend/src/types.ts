@@ -31,7 +31,7 @@ export interface BatchStats {
 }
 
 export interface BatchJobStatus {
-  status: "pending" | "running" | "done" | "error";
+  status: "pending" | "running" | "done" | "error" | "cancelled";
   completed: number;
   total: number;
   total_rows: number;
