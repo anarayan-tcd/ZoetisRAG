@@ -15,10 +15,36 @@ from export import FIELD_ORDER, COLUMN_LABELS
 _jobs = {}
 
 
+# Common names test files have used for the free-text query column across
+# this project's various challenge/eval spreadsheets — checked before
+# falling back to a heuristic, since column position isn't reliable (some
+# files lead with a "Row" index column instead).
+_NOTES_COLUMN_NAMES = ("Notes", "Test_Name", "Query", "Text", "Description")
+
+
+def _pick_notes_column(df: pd.DataFrame) -> str:
+    for name in _NOTES_COLUMN_NAMES:
+        if name in df.columns:
+            return name
+
+    text_columns = [c for c in df.columns if df[c].dtype == object]
+    if not text_columns:
+        return df.columns[0]
+
+    # No recognized name — assume it's whichever text column holds the
+    # longest strings on average (an index/id column stays short and
+    # numeric-like; free-text prescription notes run much longer).
+    return max(text_columns, key=lambda c: df[c].dropna().astype(str).str.len().mean())
+
+
 def read_uploaded_content(filename: str, content: bytes) -> list:
     if filename.lower().endswith(".csv"):
         df = pd.read_csv(BytesIO(content))
-        return df.iloc[:, 0].dropna().astype(str).tolist()
+        return df[_pick_notes_column(df)].dropna().astype(str).tolist()
+
+    if filename.lower().endswith((".xlsx", ".xls")):
+        df = pd.read_excel(BytesIO(content))
+        return df[_pick_notes_column(df)].dropna().astype(str).tolist()
 
     try:
         text = content.decode("utf-8")

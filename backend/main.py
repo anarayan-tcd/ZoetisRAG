@@ -11,11 +11,14 @@ from schemas import QueryRequest, QueryResponse
 
 app = FastAPI(title="Veterinary Product Matching API")
 
-# Vite's default dev server port, plus the common alternate — this app
-# runs locally only, so no other origins are ever needed.
+# Vite's default dev server ports for local dev, plus every
+# *.azurestaticapps.net origin — Azure Static Web Apps serves the
+# production build from one such domain and spins up a distinct one per
+# branch/PR preview environment, so a fixed origin list would break those.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origin_regex=r"https://.*\.azurestaticapps\.net",
     allow_methods=["*"],
     allow_headers=["*"],
 )

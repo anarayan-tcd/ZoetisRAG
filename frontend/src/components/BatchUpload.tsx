@@ -22,12 +22,12 @@ export default function BatchUpload({ onSubmit, onStop, disabled }: BatchUploadP
 
       <div className="field">
         <label className="field-label" htmlFor="batch-file-input">
-          CSV or TXT File
+          CSV, Excel, or TXT File
         </label>
         <input
           id="batch-file-input"
           type="file"
-          accept=".csv,.txt"
+          accept=".csv,.txt,.xlsx,.xls"
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           disabled={disabled}
         />

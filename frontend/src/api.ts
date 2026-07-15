@@ -1,9 +1,11 @@
-// api.ts — plain fetch calls against the local FastAPI backend.
-// This app runs locally only, so the base URL is just hardcoded.
+// api.ts — plain fetch calls against the FastAPI backend.
+// Base URL comes from VITE_API_BASE at build time (set it in Azure Static
+// Web Apps' GitHub Actions workflow env, or a local .env.local for dev),
+// falling back to localhost so `npm run dev` keeps working unconfigured.
 
 import type { BatchJobStatus, QueryResponse } from "./types";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 
 async function unwrap<T>(response: Response): Promise<T> {
   if (!response.ok) {
