@@ -13,7 +13,17 @@ from sentence_transformers import SentenceTransformer
 
 CHROMA_PATH = str(Path(__file__).resolve().parent / "data" / "chroma_db")
 VET_PRODUCTS_COLLECTION = "vet_products"
+
+# Base name — kept stable so knowledge/sku_examples_builder.py's own
+# "<base>_v2" derivation (its rebuild target) never chases whatever the
+# pipeline is currently pointed at.
 SKU_EXAMPLES_COLLECTION = "sku_examples"
+
+# What the query-time pipeline actually reads (resources.py). Separate
+# from SKU_EXAMPLES_COLLECTION so flipping this to a new build is a
+# one-line change here, with the previous collection left untouched as
+# an instant rollback (just point this back at "sku_examples").
+ACTIVE_SKU_EXAMPLES_COLLECTION = SKU_EXAMPLES_COLLECTION + "_v2"
 
 _embedding_model = None
 _chroma_client = None

@@ -298,6 +298,13 @@ __RETAILERS__
    regions, list them comma-separated (e.g. "UK/IE, EU").
 6. If you cannot find reliable information for this brand at all, return
    an empty "variants" list rather than guessing.
+7. Record the pack/box COLOR in "pack_color" whenever the product's
+   packaging has a recognized color identity (e.g. Frontline Plus dog
+   sizes are Orange/Blue/Purple/Red boxes; Bravecto weight bands are
+   color-coded) — vets frequently refer to products by box color alone
+   ("the purple one"). Use a simple color word or two ("Purple",
+   "Orange"). Leave it "" if no clear color identity is found — never
+   guess one.
 
 ### GOLDEN EXAMPLES
 
@@ -350,10 +357,13 @@ Brand: "Frontline", region: US
   "other_names": "Frontline Plus Orange",
   "manufacturer": "Boehringer Ingelheim",
   "official_brand_url": "https://www.frontline.com/plus-for-dogs",
-  "region": "US"
+  "region": "US",
+  "pack_color": "Orange"
 }
 (same brand as above, different region AND different product name —
-Plus, not Spot On — demonstrating regional naming divergence.)
+Plus, not Spot On — demonstrating regional naming divergence. Note the
+box color captured in "pack_color": this size tier is identified by its
+orange box, and vets often reference exactly that.)
 
 Brand: "Frontline", multi-region
 {
@@ -388,7 +398,8 @@ Brand: "Bravecto", region: US
   "other_names": "Bravecto 1000mg, Bravecto Blue",
   "manufacturer": "MSD Animal Health",
   "official_brand_url": "https://www.bravecto.com/dogs",
-  "region": "US"
+  "region": "US",
+  "pack_color": "Blue"
 }
 (weight-band + tablet-count sizing instead of ml/pipettes — a different
 application method entirely.)
@@ -422,7 +433,7 @@ Brand: "Seresto", region: Australia/NZ
       "parasites_treated": "", "application_method": "", "pack_size": "",
       "pack_quantity": "", "dosage": "", "protection_duration": "",
       "other_names": "", "manufacturer": "", "official_brand_url": "",
-      "region": ""
+      "region": "", "pack_color": ""
     }
   ]
 }
@@ -523,6 +534,7 @@ def build_variant_description(brand: str, variant: dict) -> str:
         f"Parasites treated: {variant.get('parasites_treated', '')}",
         f"Application method: {variant.get('application_method', '')}",
         f"Pack size: {variant.get('pack_size', '')}",
+        f"Pack color: {variant.get('pack_color', '')}",
         f"Pack quantity: {variant.get('pack_quantity', '')}",
         f"Dosage: {variant.get('dosage', '')}",
         f"Protection duration: {variant.get('protection_duration', '')}",
@@ -570,6 +582,7 @@ def store_variant_in_chromadb(brand: str, variant: dict, existing_docs: dict) ->
             "active_ingredients": str(variant.get("active_ingredients", "")),
             "species": str(variant.get("species", "")),
             "pack_size": str(variant.get("pack_size", "")),
+            "pack_color": str(variant.get("pack_color", "")),
             "pack_quantity": str(variant.get("pack_quantity", "")),
             "official_brand_url": str(variant.get("official_brand_url", "")),
             "last_updated": datetime.now(timezone.utc).isoformat(),

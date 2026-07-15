@@ -15,12 +15,19 @@ async function unwrap<T>(response: Response): Promise<T> {
 
 export async function queryProduct(
   query: string,
-  enableLiveFallback: boolean
+  enableLiveFallback: boolean,
+  enableLlmJudge: boolean,
+  signal?: AbortSignal
 ): Promise<QueryResponse> {
   const response = await fetch(`${API_BASE}/api/query`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query, enable_live_fallback: enableLiveFallback }),
+    body: JSON.stringify({
+      query,
+      enable_live_fallback: enableLiveFallback,
+      enable_llm_judge: enableLlmJudge,
+    }),
+    signal,
   });
 
   return unwrap<QueryResponse>(response);
@@ -28,13 +35,14 @@ export async function queryProduct(
 
 export async function uploadBatch(
   file: File,
-  enableLiveFallback: boolean
+  enableLiveFallback: boolean,
+  enableLlmJudge: boolean
 ): Promise<{ job_id: string; total_rows: number }> {
   const formData = new FormData();
   formData.append("file", file);
 
   const response = await fetch(
-    `${API_BASE}/api/batch/upload?enable_live_fallback=${enableLiveFallback}`,
+    `${API_BASE}/api/batch/upload?enable_live_fallback=${enableLiveFallback}&enable_llm_judge=${enableLlmJudge}`,
     { method: "POST", body: formData }
   );
 
@@ -48,6 +56,11 @@ export async function getBatchStatus(jobId: string): Promise<BatchJobStatus> {
 
 export function batchDownloadUrl(jobId: string, format: "csv" | "xlsx" | "json"): string {
   return `${API_BASE}/api/batch/${jobId}/download?format=${format}`;
+}
+
+export async function cancelBatch(jobId: string): Promise<{ cancelled: boolean }> {
+  const response = await fetch(`${API_BASE}/api/batch/${jobId}/cancel`, { method: "POST" });
+  return unwrap(response);
 }
 
 export async function resetCache(): Promise<{ cleared: number }> {
