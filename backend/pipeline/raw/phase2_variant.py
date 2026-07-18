@@ -2,7 +2,7 @@
 # within the brand Phase 1 already confirmed, identify WHICH VARIANT
 # (pack size, species, region-specific naming) the query refers to, and
 # assign product_id/product_variant_id at the product-LINE level using
-# real historical examples (Rule 8). Exact pack size (sku_id) is then
+# real historical examples (Rule 5). Exact pack size (sku_id) is then
 # resolved by phase3b_sku.py's resolve_sku, called from ask_deepseek_phase2
 # below — kept in this file because id-assembly and final validation of
 # the full triplet naturally belong with the function that owns the
@@ -10,13 +10,14 @@
 
 from collections import defaultdict
 
-from .resources import (
+from ..shared.resources import (
     collection, sku_examples_collection, embedding_model,
     MAX_VARIANT_CANDIDATES, MAX_EXAMPLE_HINTS, BRAND_PRODUCT_IDS,
     deepseek_json, brand_fallback_product_id, detect_language_hints,
     detect_species_for_widening, classify_probability_tier, id_str,
 )
 from .phase3b_sku import resolve_sku
+from ..shared.query_utils import append_color_if_missing
 
 
 def _pack_quantity_sort_key(candidate: dict):
@@ -364,7 +365,7 @@ def build_examples_block(examples: list) -> str:
 def build_known_product_id_block(brand: str) -> str:
     """Renders this brand's known ProductId(s) from BRAND_PRODUCT_IDS for
     the Phase 2 prompt — the guaranteed brand-level fallback, restored
-    alongside Rule 8."""
+    alongside Rule 5."""
 
     info = BRAND_PRODUCT_IDS.get(brand)
 
@@ -401,7 +402,7 @@ attach its ProductId/ProductVariantId. Each CANDIDATE VARIANT below comes
 with its own "HISTORICAL IDS" line — the id-triplet(s) real historical
 prescribing data actually linked to THAT exact variant, precomputed with
 how often each occurred, so you don't have to correlate ids from a
-separate list yourself (see Rule 8). These ids form a hierarchy: ProductId
+separate list yourself (see Rule 5). These ids form a hierarchy: ProductId
 is the BRAND-level id (one per brand, occasionally a couple across catalog
 eras — always known); ProductVariantId identifies a specific product LINE
 within the brand (e.g. "Spray" vs "Combo Cat") — match at THIS level,
@@ -433,13 +434,11 @@ REAL HISTORICAL PHRASING EXAMPLES FOR THIS BRAND:
 __EXAMPLES__
 
 ### RULES
-1. Identify the BEST matching product variant from the candidates
-2. Also identify TWO additional plausible alternatives from the candidates
-3. Rank them by likelihood: primary = highest confidence, alternatives = lower or equal
-4. All 3 must be different variants if possible; if only 1 real match exists, repeat it as alternatives with LOWER confidence
-5. Use ONLY the provided candidate data — never invent variants or sizes
-6. "animal_age" is not available in this data — always return it as an empty string, never guess a value for it
-7. "products" and "full_product_name" are DIFFERENT fields and must NEVER contain the same text:
+1. Identify the BEST matching product variant from the candidates, and
+   return exactly ONE. Do not produce alternative candidates.
+2. Use ONLY the provided candidate data — never invent variants or sizes
+3. "animal_age" is not available in this data — always return it as an empty string, never guess a value for it
+4. "products" and "full_product_name" are DIFFERENT fields and must NEVER contain the same text:
    - "products" is the SHORT product line name only — 1-3 words, no size, no
      species, no pack count. Examples: "Spot On", "Combo", "Spray", "Plus", "Gold".
    - "full_product_name" is the COMPLETE variant name exactly as it appears in
@@ -448,7 +447,7 @@ __EXAMPLES__
    - If you find yourself about to write the same string into both fields,
      you have the wrong value for "products" — go back and extract just the
      product line portion of the name.
-8. Assign product_id/product_variant_id using the CHOSEN candidate's own
+5. Assign product_id/product_variant_id using the CHOSEN candidate's own
    "HISTORICAL IDS" line (never a different candidate's):
    - If it names ONE id pair as "dominant", copy that ProductId AND
      ProductVariantId exactly — this is the well-established historical
@@ -469,11 +468,24 @@ __EXAMPLES__
    product_id must NEVER be left blank once a brand has been confirmed —
    every brand has at least one known real ProductId. Never invent or
    guess an id number.
-9. "animal_size" should include tags like S, M, L, XL if known, plus the weight range if present, eg: 2-10kg, 10-20kg
-10. "region" must be copied exactly from the candidate's REGION field — never invent or guess a region
-11. Use ONLY: High, Medium, Low, Very Low for confidence — no numbers or percentages
-12. Do NOT output a sku_id field — pack size is resolved by a later stage.
-13. If the MULTILINGUAL TERM HINT is given, treat each hinted meaning
+   IMPORTANT — this dominant/tied signal must also drive WHICH CANDIDATE
+   you pick in the first place, not just which ids you copy afterward:
+   when two or more candidates plausibly describe the same real
+   strength/species/weight band, don't let one candidate's fuller or more
+   keyword-matching description (e.g. it spells out an exact decimal like
+   "11.4mg" while another candidate's text only says "11mg") win just
+   because it reads more specifically — a terser description means less
+   research text was attached to that candidate, not that it's the wrong
+   product. Prefer whichever of the plausible candidates has the
+   strongest HISTORICAL IDS signal (dominant beats a richer-sounding
+   minority candidate) unless the query states a detail that genuinely
+   rules the dominant one out (an actually different species, weight
+   band, or strength — not just a more literal text match).
+6. "animal_size" should include tags like S, M, L, XL if known, plus the weight range if present, eg: 2-10kg, 10-20kg
+7. "region" must be copied exactly from the candidate's REGION field — never invent or guess a region
+8. Use ONLY: High, Medium, Low, Very Low for confidence — no numbers or percentages
+9. Do NOT output a sku_id field — pack size is resolved by a later stage.
+10. If the MULTILINGUAL TERM HINT is given, treat each hinted meaning
     exactly like the equivalent explicit English word in the query — vets
     often mix other languages into a note ("perro" = dog, "chat" = cat,
     "caja 3" = pack of 3, "comprimes" = tablets, "pipeta" = pipette).
@@ -482,15 +494,15 @@ __EXAMPLES__
     Hinted form words (tablet, pipette, pack count, bottle...) count as the
     query specifying that formulation/packaging. If the hint says
     "(none detected)", ignore this rule.
-14. Pack/box COLOR (shown on some candidates, e.g. "(Purple)") is
+11. Pack/box COLOR (shown on some candidates, e.g. "(Purple)") is
     supporting evidence only: use it to CONFIRM a match when the query
     mentions a color, but colors change over time — NEVER use color alone to
     pick between (or reject) variants whose dosage, species, weight band,
     and pack count all match; those primary characteristics always outrank
     color.
-15. If the query states an explicit pack count/quantity (a number next to
+12. If the query states an explicit pack count/quantity (a number next to
     "pack", "chews", "pipettes", "tablets", "x", "pk", "count", or a
-    hinted form word from Rule 13), and a candidate exists with that EXACT
+    hinted form word from Rule 10), and a candidate exists with that EXACT
     pack_quantity for the same product line/species/weight-band you've
     otherwise matched, you MUST pick that exact-count candidate — do not
     settle for a different pack count of the same line just because it
@@ -511,7 +523,7 @@ CANDIDATES include: "Frontline Spot On Small Dog (2-10kg) 3 Pipette Pack" [regio
 
 QUERY: "frontline spot on small dog" (no pack count given)
 CANDIDATES include both the 3-pack and 6-pack Small Dog variants
--> pick the more commonly-prescribed pack size as primary with MEDIUM confidence (query didn't specify), list the other pack size as an alternative. product_id/product_variant_id are unaffected by this ambiguity — they're decided by product line, not pack size.
+-> pick the more commonly-prescribed pack size with MEDIUM confidence (the query didn't specify). product_id/product_variant_id are unaffected by this ambiguity — they're decided by product line, not pack size.
 
 QUERY: "advocate dog ex lge >25kg pk6"
 CANDIDATES include: "Advocate Spot-On for Extra Large Dogs (over 25kg) 6 Pack" [region: UK/IE, HISTORICAL IDS: ProductId 1, ProductVariantId 7 -- dominant, 88% of this variant's historical triplets.]
@@ -535,7 +547,7 @@ CANDIDATES include: "Seresto Flea & Tick Collar for Large Dogs (over 8kg)" [regi
 
 QUERY: "milbemax chewy dog" (no size/strength given)
 CANDIDATES include the Small Dog and the Large Dog chewable variants
--> pick the more commonly-prescribed size as primary with MEDIUM confidence — the same ambiguity rule as pack size, applied to species/weight. Use whichever candidate you pick's OWN "HISTORICAL IDS" line for the id assignment.
+-> pick the more commonly-prescribed size with MEDIUM confidence — the same ambiguity rule as pack size, applied to species/weight. Use whichever candidate you pick's OWN "HISTORICAL IDS" line for the id assignment.
 
 QUERY: "bravecto chew large dog"
 CANDIDATES include: "Bravecto Chews for Dogs 20-40kg (44-88 lbs) (Blue) 1 Tablet" [HISTORICAL IDS: (no historical id-triplet recorded for this variant)]
@@ -547,7 +559,7 @@ CANDIDATES only include UK/IE Spot On and Combo variants (no US "Gold" line foun
 -> primary_match: confidence "Very Low", reason: "Query references a 'Gold' product line not present in the candidate list for this brand."
 (never force-fit a query onto a wrong-region candidate just because it shares a brand — if nothing plausibly matches, say so honestly)
 
-### OUTPUT FORMAT (STRICT JSON ONLY, no sku_id field):
+### OUTPUT FORMAT (STRICT JSON ONLY — one match, no alternatives, no sku_id field):
 
 {
   "primary_match": {
@@ -564,39 +576,7 @@ CANDIDATES only include UK/IE Spot On and Combo variants (no US "Gold" line foun
     "animal_age": "",
     "confidence": "",
     "reason": ""
-  },
-  "alternative_matches": [
-    {
-        "brand": "__BRAND__",
-        "products": "",
-        "full_product_name": "",
-        "product_id": "",
-        "product_variant_id": "",
-        "region": "",
-        "species": "",
-        "animal_size": "",
-        "pack_size": "",
-        "pack_quantity": "",
-        "animal_age": "",
-        "confidence": "",
-        "reason": ""
-    },
-    {
-        "brand": "__BRAND__",
-        "products": "",
-        "full_product_name": "",
-        "product_id": "",
-        "product_variant_id": "",
-        "region": "",
-        "species": "",
-        "animal_size": "",
-        "pack_size": "",
-        "pack_quantity": "",
-        "animal_age": "",
-        "confidence": "",
-        "reason": ""
-    }
-  ]
+  }
 }
 """
 
@@ -625,7 +605,7 @@ def _get_valid_variant_pairs_for_brand(brand: str) -> set:
 
 def _validate_and_correct_variant_pair(match: dict, valid_pairs: set, query: str) -> dict:
     """
-    Deterministic (non-LLM) safety net for Phase 2's Rule 8: if DeepSeek
+    Deterministic (non-LLM) safety net for Phase 2's Rule 5: if DeepSeek
     claimed a product_id/product_variant_id pair that doesn't match any
     real record for this brand, clear product_variant_id (product_id is
     backstopped separately via the brand-level fallback, so it's left
@@ -703,7 +683,7 @@ def _validate_and_correct_ids(match: dict, valid_triplets: set, query: str) -> d
 def _finalize_match_ids(query: str, brand: str, match: dict, valid_pairs: set, run_pack_llm: bool) -> dict:
     """
     Full id-resolution pipeline for one match, run after Phase 2's LLM has
-    already picked product_id/product_variant_id (Rule 8):
+    already picked product_id/product_variant_id (Rule 5):
       1. Validate the (product_id, product_variant_id) pair against real
          sku_examples records for this brand — clears product_variant_id
          if DeepSeek claimed a pair that doesn't actually exist.
@@ -717,14 +697,78 @@ def _finalize_match_ids(query: str, brand: str, match: dict, valid_pairs: set, r
     return match
 
 
+def _apply_pack_color(match: dict, candidates: list) -> None:
+    """Guarantees pack color shows up in the OUTPUT full_product_name
+    whenever the matched candidate's researched data has it — deterministic,
+    not dependent on whether the LLM happened to echo it back. Most
+    researched variant_names already bake color into the text (Rule 11's
+    soft-hint hasn't needed this before now), so this is usually a no-op;
+    append_color_if_missing skips names that already mention it."""
+    name = match.get("full_product_name", "")
+
+    color = next((c["pack_color"] for c in candidates if c.get("variant_name") == name and c.get("pack_color")), "")
+    if not color:
+        # Fall back to a loose match in case the LLM paraphrased slightly.
+        color = next(
+            (c["pack_color"] for c in candidates
+             if c.get("pack_color") and name and (c["variant_name"].lower() in name.lower() or name.lower() in c["variant_name"].lower())),
+            "",
+        )
+
+    match["full_product_name"] = append_color_if_missing(name, color)
+
+
+def _to_output_shape(match: dict) -> dict:
+    """Splits the LLM's flat match into the app's two-part output: the
+    product itself (no ids), and the id combination(s) it corresponds to.
+
+    The raw pipeline always yields exactly ONE combination — unlike the
+    structured pipeline, it has no authoritative catalog to enumerate
+    duplicate/legacy listings from, so it can only report the single
+    triplet it inferred from historical records. The shape is shared so
+    both pipelines stay directly comparable and the API/export/frontend
+    only ever handle one contract."""
+    product = {k: match.get(k, "") for k in (
+        "brand", "products", "full_product_name", "region", "species",
+        "animal_size", "pack_size", "pack_quantity", "animal_age",
+        "confidence", "reason",
+    )}
+
+    pid = match.get("product_id") or ""
+    vid = match.get("product_variant_id") or ""
+    sid = match.get("sku_id") or ""
+
+    if not pid and not vid and not sid:
+        return {"product_match": product, "id_combinations": [], "id_combinations_reason": ""}
+
+    return {
+        "product_match": product,
+        "id_combinations": [{
+            "product_id": str(pid),
+            "product_variant_id": str(vid),
+            "sku_id": str(sid),
+            "variant_description": match.get("full_product_name", ""),
+            "catalog_description": "Inferred from historical prescribing records (no authoritative catalog in raw mode).",
+            "pack_units": 0,
+            "ml_volume": 0,
+            "occurrences": 0,
+        }],
+        "id_combinations_reason": (
+            "Raw mode infers one id triplet by correlating researched product text against "
+            "historical records, so it reports a single combination rather than enumerating "
+            "every catalog listing of this product."
+        ),
+    }
+
+
 def ask_deepseek_phase2(query: str, brand: str, candidates: list, real_examples: list) -> dict:
     """
     Phase 2: the LLM picks the variant/characteristics AND product_id /
-    product_variant_id (Rule 8, matched at the product-line level, real
+    product_variant_id (Rule 5, matched at the product-line level, real
     historical examples as the source of truth) in one call. Exact pack
     size (sku_id) is then resolved separately in _finalize_match_ids —
     directly if the variant has only one real SkuId, otherwise via
-    Phase 3b (a small, focused LLM call, primary match only).
+    Phase 3b (a small, focused LLM call).
     """
     context = build_context_phase2(candidates, brand)
     examples_block = build_examples_block(real_examples)
@@ -741,26 +785,13 @@ def ask_deepseek_phase2(query: str, brand: str, candidates: list, real_examples:
     )
 
     result = deepseek_json(prompt)
+    match = result.get("primary_match") or {}
 
     valid_pairs = _get_valid_variant_pairs_for_brand(brand)
-
-    if "primary_match" in result:
-        result["primary_match"] = _finalize_match_ids(query, brand, result["primary_match"], valid_pairs, run_pack_llm=True)
-
-    result["alternative_matches"] = [
-        _finalize_match_ids(query, brand, alt, valid_pairs, run_pack_llm=False)
-        for alt in result.get("alternative_matches", [])
-    ]
+    match = _finalize_match_ids(query, brand, match, valid_pairs, run_pack_llm=True)
+    _apply_pack_color(match, candidates)
 
     # Final deterministic backstop against a hallucinated sku_id specifically.
-    valid_triplets = _get_valid_id_triplets_for_brand(brand)
+    match = _validate_and_correct_ids(match, _get_valid_id_triplets_for_brand(brand), query)
 
-    if "primary_match" in result:
-        result["primary_match"] = _validate_and_correct_ids(result["primary_match"], valid_triplets, query)
-
-    result["alternative_matches"] = [
-        _validate_and_correct_ids(alt, valid_triplets, query)
-        for alt in result["alternative_matches"]
-    ]
-
-    return result
+    return _to_output_shape(match)

@@ -9,8 +9,11 @@ from io import BytesIO
 
 import pandas as pd
 
-from pipeline import query_agent
-from export import FIELD_ORDER, COLUMN_LABELS
+from pipeline.raw import query_agent
+from .export import (
+    FIELD_ORDER, COLUMN_LABELS, ID_COUNT_COLUMN, POSSIBLE_IDS_COLUMN,
+    ID_REASON_COLUMN, format_combination,
+)
 
 _jobs = {}
 
@@ -88,30 +91,35 @@ def cancel_job(job_id: str) -> bool:
 
 def _flatten_result(query: str, result: dict) -> dict:
     """
-    Primary match columns keep their plain names (Brand, Products, ...) with
-    no prefix — they're the main result. Alternatives get an "Alternative N "
-    prefix so they don't collide with the primary columns in the exported
-    table. Columns are always built in export.FIELD_ORDER (not whatever
-    order the LLM/pipeline happened to construct the match dict in), so
-    CSV/JSON/Excel all get the same deterministic, logically-grouped
-    column layout.
+    One flat row per query: the product's own fields (always built in
+    export.FIELD_ORDER, not whatever order the LLM/pipeline happened to
+    construct the dict in, so CSV/JSON/Excel share one deterministic
+    layout), plus a summary of the id combinations.
+
+    The combinations themselves are carried under the private
+    "_id_combinations" key rather than flattened into columns: their count
+    varies per row (one product can map to five duplicate catalog
+    listings), so the exporters expand them into their own sheet/array
+    instead. export._public_row strips this before writing the flat sheet.
     """
-    primary = result.get("primary_match", {})
-    alternatives = result.get("alternative_matches", [])
+    match = result.get("product_match", {})
+    combinations = result.get("id_combinations", []) or []
 
     row = {"Input": query}
 
     for field in FIELD_ORDER:
-        row[COLUMN_LABELS[field]] = primary.get(field, "")
+        row[COLUMN_LABELS[field]] = match.get(field, "")
 
-    for i, alt in enumerate(alternatives[:2], start=1):
-        for field in FIELD_ORDER:
-            row[f"Alternative {i} {COLUMN_LABELS[field]}"] = alt.get(field, "")
+    row[ID_COUNT_COLUMN] = len(combinations)
+    row[POSSIBLE_IDS_COLUMN] = "; ".join(format_combination(c) for c in combinations)
+    row[ID_REASON_COLUMN] = result.get("id_combinations_reason", "")
+    row["_id_combinations"] = combinations
 
     return row
 
 
-def run_batch_job(job_id: str, queries: list, enable_live_fallback: bool, enable_llm_judge: bool = False):
+def run_batch_job(job_id: str, queries: list, enable_live_fallback: bool,
+                  enable_llm_judge: bool = False, mode: str = "raw"):
 
     job = _jobs[job_id]
     job["status"] = "running"
@@ -120,10 +128,18 @@ def run_batch_job(job_id: str, queries: list, enable_live_fallback: bool, enable
         job["completed"] = done
         job["total"] = total
 
+    # "structured" routes to the catalog-backed pipeline (which accepts and
+    # ignores the two enable_* flags — they patch raw-pipeline knowledge
+    # gaps the authoritative catalog doesn't have). Anything else is "raw".
+    if mode == "structured":
+        from pipeline.structured import query_agent_structured as engine
+    else:
+        engine = query_agent
+
     try:
         start = time.time()
 
-        raw_results, stats = query_agent.identify_products_batch(
+        raw_results, stats = engine.identify_products_batch(
             queries,
             progress_callback=on_progress,
             enable_live_fallback=enable_live_fallback,
@@ -135,7 +151,19 @@ def run_batch_job(job_id: str, queries: list, enable_live_fallback: bool, enable
             _flatten_result(query, result)
             for query, result in zip(queries, raw_results)
         ]
-        job["stats"] = {**stats, "elapsed": round(time.time() - start, 2)}
+
+        elapsed = round(time.time() - start, 2)
+
+        job["stats"] = {
+            **stats,
+            "elapsed": elapsed,
+            # Only rows actually reasoned over by DeepSeek this run (not
+            # cache hits) count toward the per-row rate — cache hits are
+            # ~free and would otherwise water down the figure.
+            "avg_seconds_per_resolved_row": (
+                round(elapsed / stats["llm_calls"], 3) if stats.get("llm_calls") else 0.0
+            ),
+        }
         job["status"] = "cancelled" if job.get("cancel_requested") else "done"
 
     except Exception as e:

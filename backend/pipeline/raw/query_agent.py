@@ -6,46 +6,19 @@
 # setup in resources.py.
 
 import json
-import re
-import unicodedata
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from knowledge.extract_brands import guess_brand_token
-from .resources import MAX_WORKERS, DEFAULT_ENABLE_LIVE_FALLBACK, DEFAULT_ENABLE_LLM_JUDGE
-from .phase1_brand import search_brands, search_brands_batch, ask_deepseek_phase1, augment_with_fuzzy_brand
+from ..shared.resources import (
+    MAX_WORKERS, DEFAULT_ENABLE_LIVE_FALLBACK, DEFAULT_ENABLE_LLM_JUDGE,
+    reset_usage_tracking, get_usage_totals, snapshot_global_usage, estimate_cost_usd, usage_delta,
+)
+from ..shared.phase1_brand import search_brands, search_brands_batch, ask_deepseek_phase1, augment_with_fuzzy_brand
+from ..shared.query_utils import clean_query, unknown_result as _unknown_result
 from .phase2_variant import search_variants_for_brand, search_real_examples, ask_deepseek_phase2
 from .llm_judge import apply_llm_judge
 from .live_fallback import live_research_fallback
-
-
-# ─────────────────────────────────────────────────────────────
-# STEP 0 — INPUT CLEANING
-# ─────────────────────────────────────────────────────────────
-
-_WHITESPACE_RE = re.compile(r"\s+")
-_DISALLOWED_CHARS_RE = re.compile(r"[^a-zA-Z0-9\s.\-/%(),'&+]")
-
-
-def clean_query(text: str) -> str:
-    """
-    Normalizes a raw prescription string before it is embedded or
-    reasoned over: strips stray unicode (curly quotes, accents),
-    drops characters that aren't meaningful for product matching,
-    and collapses repeated whitespace.
-    """
-
-    if not text:
-        return ""
-
-    text = unicodedata.normalize("NFKD", text)
-    text = text.encode("ascii", "ignore").decode("ascii")
-
-    text = _DISALLOWED_CHARS_RE.sub(" ", text)
-    text = _WHITESPACE_RE.sub(" ", text)
-
-    # Lowercased so differently-cased duplicates (common across vet
-    # practice exports) share one cache entry and one DeepSeek call.
-    return text.strip().lower()
 
 
 # ─────────────────────────────────────────────────────────────
@@ -67,11 +40,11 @@ def clear_cache() -> None:
 
 
 def _is_low_confidence_result(result: dict) -> bool:
-    primary = result.get("primary_match", {})
+    match = result.get("product_match", {})
     return (
-        not primary.get("brand")
-        or primary.get("brand") == "Unknown"
-        or primary.get("confidence") in ("Low", "Very Low")
+        not match.get("brand")
+        or match.get("brand") == "Unknown"
+        or match.get("confidence") in ("Low", "Very Low")
     )
 
 
@@ -102,16 +75,6 @@ def _cache_usable(cleaned_query: str, enable_live_fallback: bool, enable_llm_jud
         return False
 
     return True
-
-
-def _unknown_result(reason: str, brand: str = "Unknown", confidence: str = "Low") -> dict:
-    empty = {
-        "brand": brand, "products": "", "full_product_name": "",
-        "product_id": "", "sku_id": "", "product_variant_id": "", "region": "",
-        "species": "", "animal_size": "", "pack_size": "", "pack_quantity": "",
-        "animal_age": "", "confidence": confidence, "reason": reason,
-    }
-    return {"primary_match": empty, "alternative_matches": []}
 
 
 def _resolve_with_brand_candidates(
@@ -180,8 +143,8 @@ def _resolve_with_brand_candidates(
     # of whether apply_llm_judge found anything to flag — lets
     # _cache_usable tell "already judged" apart from "never asked to be".
     # Stripped automatically from API responses (not part of ProductMatch/
-    # QueryResponse), and harmless in batch export (only primary_match /
-    # alternative_matches keys are read there).
+    # QueryResponse), and harmless in batch export (only product_match /
+    # id_combinations keys are read there).
     result["_judged"] = enable_llm_judge
 
     return result
@@ -206,16 +169,33 @@ def identify_product(
     if not cleaned:
         return {"error": "Empty query after cleaning"}
 
+    start = time.time()
+    reset_usage_tracking()
+
     if use_cache and _cache_usable(cleaned, enable_live_fallback, enable_llm_judge):
-        return _result_cache[cleaned]
+        result = _result_cache[cleaned]
+    else:
+        brand_candidates = search_brands(cleaned)
+        result = _resolve_with_brand_candidates(cleaned, brand_candidates, enable_live_fallback, enable_llm_judge)
 
-    brand_candidates = search_brands(cleaned)
-    result = _resolve_with_brand_candidates(cleaned, brand_candidates, enable_live_fallback, enable_llm_judge)
+        if use_cache:
+            _result_cache[cleaned] = result
 
-    if use_cache:
-        _result_cache[cleaned] = result
-
-    return result
+    # Computed fresh every call (not cached alongside the match itself) so
+    # a cache hit honestly reports ~0s / $0 rather than the original
+    # resolution's cost.
+    usage = get_usage_totals()
+    return {
+        **result,
+        "usage": {
+            "elapsed_seconds": round(time.time() - start, 3),
+            "llm_calls": usage["llm_calls"],
+            "prompt_tokens": usage["prompt_tokens"],
+            "completion_tokens": usage["completion_tokens"],
+            "total_tokens": usage["total_tokens"],
+            "estimated_cost_usd": round(estimate_cost_usd(usage["prompt_tokens"], usage["completion_tokens"]), 6),
+        },
+    }
 
 
 # ─────────────────────────────────────────────────────────────
@@ -256,6 +236,8 @@ def identify_products_batch(
 
     total = len(queries)
     cleaned = [clean_query(q) for q in queries]
+
+    usage_start = snapshot_global_usage()
 
     unique_all = list(dict.fromkeys(c for c in cleaned if c))
     unique_pending = [c for c in unique_all if not _cache_usable(c, enable_live_fallback, enable_llm_judge)]
@@ -321,6 +303,7 @@ def identify_products_batch(
         "llm_calls": len(unique_pending),
         "cache_hits": len(unique_all) - len(unique_pending),
         "failed": failed_count,
+        **usage_delta(usage_start, snapshot_global_usage()),
     }
 
     return results, stats

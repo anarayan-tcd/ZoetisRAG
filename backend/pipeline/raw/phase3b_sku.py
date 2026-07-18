@@ -6,7 +6,7 @@
 # needed. Phase 3b only fires when there's genuine ambiguity (more than
 # one real SkuId), and only for the primary match.
 
-from .resources import sku_examples_collection, deepseek_json, id_str, classify_probability_tier
+from ..shared.resources import sku_examples_collection, deepseek_json, id_str, classify_probability_tier
 
 
 def _candidate_skus_for_variant(brand: str, variant_id: str) -> dict:
@@ -82,20 +82,36 @@ CANDIDATE SKUs: __SKU_CANDIDATES__
    Rule 3. This usually means the candidates are duplicate/legacy SkuId
    codes for the same physical pack.
 
-2. WEIGH THE MATCH AGAINST THE EVIDENCE. Even when a match does
-   discriminate, check the occurrence share of the matching candidate
-   against the top non-matching candidate. If the ONLY candidate matching
-   the query's stated count has a small share (roughly <10%, or single-
-   digit occurrences) while a candidate with a real majority share
-   (roughly >50%) does NOT match, be suspicious of the literal match
-   rather than trusting it automatically — for repeat/monthly products
-   sold in a fixed multi-count pack, a bare number in the query more
-   often describes a DOSE ("give 1 tablet") than the pack the vet
-   actually ordered. In that situation: prefer the dominant candidate,
-   confidence = Medium, and say in "reason" that the stated count likely
-   describes dosing, not the pack purchased.
+2. UNAMBIGUOUS PACK WORDING ALWAYS WINS, EVEN AT LOW/ZERO HISTORY. If the
+   query attaches an explicit PACK-SIZE WORD to the number — "pack",
+   "count"/"ct", "box", "carton", "PK", "x" between two numbers like "3x"
+   — that is a direct statement of the pack the vet is ordering, never a
+   dose. Match it to the discriminating candidate and use it with High
+   confidence, REGARDLESS of that candidate's historical share — a real
+   SkuId with few or zero recorded prescriptions is still the correct one
+   when the query names its pack size directly; low history only means
+   it's rarely prescribed, not that it's wrong. Do not let another
+   candidate's higher share override an unambiguous pack-word match.
 
-3. NO PACK SIZE STATED (or Rule 1 ruled it out): use the "(Historical
+3. AMBIGUOUS BARE NUMBERS DEFER TO A DOMINANT SIGNAL. Only when the
+   stated count has NO pack-word attached — a bare "1 pc", "1 tablet",
+   "2 each" with nothing else (note: "tablets"/"chews" alone, with no
+   "pack"/"box"/"count" alongside, still counts as ambiguous — it as
+   easily means a dose as a pack) — treat it as potentially a DOSING
+   instruction instead of a pack request. In that specific case: if the
+   "(Historical signal: ...)" line marks a DIFFERENT candidate as
+   dominant, prefer that dominant candidate instead of the literal match,
+   confidence = Medium, and say in "reason" that the stated count likely
+   describes dosing, not the pack purchased. This applies REGARDLESS of
+   how large the literal match's own share is (28% is not "small" in
+   isolation, but it still isn't dominant) — "dominant" already means
+   most vets order that standard pack, and one ambiguous number in one
+   query shouldn't override that. Only let the bare number decide when
+   there's no dominant signal (tied or weak) or when it already matches
+   the dominant candidate. This rule does NOT apply when Rule 2's
+   pack-word test is met.
+
+4. NO PACK SIZE STATED (or Rule 1 ruled it out): use the "(Historical
    signal: ...)" guidance line:
    - "dominant" -> pick it, confidence = Medium.
    - "roughly tied" -> use any other query detail to break the tie; if
@@ -106,12 +122,12 @@ CANDIDATE SKUs: __SKU_CANDIDATES__
    - no guidance line at all -> pick the candidate with the most
      phrasings recorded, confidence = Medium.
 
-4. NO MATCH: if the query states a pack size that discriminates (Rule 1)
+5. NO MATCH: if the query states a pack size that discriminates (Rule 1)
    and genuinely no candidate has it, return an empty sku_id, confidence
    = Low, and explain — never force-fit the closest wrong pack.
 
-5. Never invent a SkuId — only return one from the candidate list.
-6. Use ONLY: High, Medium, Low for confidence.
+6. Never invent a SkuId — only return one from the candidate list.
+7. Use ONLY: High, Medium, Low for confidence.
 
 ### GOLDEN EXAMPLES
 
@@ -121,7 +137,12 @@ CANDIDATES: SkuId 229 ["...100ml"], SkuId 219 ["...250ml"], SkuId 220 ["...500ml
 
 QUERY: "frontline s/on sml dog 3pk"
 CANDIDATES: SkuId 1227 [412x, 78%, "...SML DOG 3PK"], SkuId 1228 [116x, 22%, "...SML DOG 6PK"]
--> {"sku_id": "1227", "confidence": "High", "reason": "Shorthand '3pk' = 3 Pipette Pack, matching SkuId 1227, which is also the historically dominant pack."}
+-> {"sku_id": "1227", "confidence": "High", "reason": "Shorthand '3pk' = 3 Pipette Pack (Rule 2, unambiguous pack wording), matching SkuId 1227, which is also the historically dominant pack."}
+
+QUERY: "seresto cat collar 6 pack"
+CANDIDATES: SkuId 100 [1230x, 77%, "SERESTO CAT COLLAR"], SkuId 620 [360x, 23%, "SERESTO FOR CATS"], SkuId 102 [0x, 0%, "SERESTO CAT COLLAR (DISP PK)"]
+-> {"sku_id": "102", "confidence": "High", "reason": "Query explicitly says '6 pack' (Rule 2) — SkuId 102 is the only 6-count candidate. Its 0 recorded prescriptions don't matter here: the query names this exact pack directly, unlike the two 1-count candidates that dominate history."}
+(do NOT default to SkuId 100 just because it's historically dominant — "6 pack" is not a dosing phrase, so Rule 3's evidence-skepticism never applies to it)
 
 QUERY: "frontline spray" (no size given)
 CANDIDATES: SkuId 229 [612x, 68%, "...100ml"], SkuId 219 [90x, 10%, "...250ml"], SkuId 220 [198x, 22%, "...500ml"]
@@ -142,7 +163,7 @@ CANDIDATES: SkuId 598 [2x, 0%, "...1pk"], SkuId 1258 [300x, 23%, "...1 PIP"], Sk
 (Historical signal: SkuId 3378 is dominant at 69%.)
 -> {"sku_id": "3378", "confidence": "Medium", "reason": "'uno pack' (1) matches every candidate equally — they're all singular packs — so it doesn't discriminate. Falling back to the historical signal: SkuId 3378 is dominant at 69%."}
 
-QUERY: "comfortablis tablet - one hundred and eigthy mg - 1 pc" (Rule 2: weak match vs strong dominance)
+QUERY: "comfortablis tablet - one hundred and eigthy mg - 1 pc" (Rule 3: ambiguous bare number vs strong dominance)
 CANDIDATES: SkuId 61 [591x, 71%, "...180MG TABS...6PK"], SkuId 2392 [235x, 28%, "...180MG...6pk"], SkuId 2674 [3x, 0%, "...Single Tablet"]
 (Historical signal: SkuId 61 is dominant at 71%.)
 -> {"sku_id": "61", "confidence": "Medium", "reason": "Query's '1 pc' literally matches only SkuId 2674's 'Single Tablet' phrasing, but that candidate has just 3 historical occurrences against SkuId 61's 591 (71% share) — for a monthly chewable normally sold in a 6-count pack, '1 pc' more likely means 'give one tablet' (a dosing note) than a request for the rare singles SKU. Deferring to the dominant historical pack, SkuId 61."}
@@ -217,7 +238,7 @@ def resolve_sku(query: str, brand: str, match: dict, run_pack_llm: bool) -> dict
     """
     Resolves sku_id (exact pack size) for a match whose product_id /
     product_variant_id have ALREADY been assigned by Phase 2's LLM
-    (Rule 8, matched at the product-line level) and pair-validated:
+    (Rule 5, matched at the product-line level) and pair-validated:
       - No product_variant_id known -> nothing to resolve, sku_id blank.
       - Exactly one real SkuId under this (brand, variant) -> take it
         directly, no LLM call needed. (Phase 3a.)

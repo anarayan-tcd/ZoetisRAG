@@ -6,6 +6,7 @@
 
 import json
 import re
+import threading
 from pathlib import Path
 import os
 
@@ -20,7 +21,7 @@ from chromadb_client import get_embedding_model, get_collection, ACTIVE_SKU_EXAM
 # ENV SETUP
 # ─────────────────────────────────────────────────────────────
 
-env_path = Path(__file__).resolve().parent.parent / "APIKeys.env"
+env_path = Path(__file__).resolve().parent.parent.parent / "APIKeys.env"
 load_dotenv(dotenv_path=env_path)
 
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
@@ -65,8 +66,8 @@ sku_examples_collection = get_collection(ACTIVE_SKU_EXAMPLES_COLLECTION)
 # catalog eras/groupings, e.g. Frontline -> [32, 182]). For those, the id
 # used by the most historical rows is picked as the default.
 
-BRAND_SEED_CSV = Path(__file__).resolve().parent.parent / "data" / "generated" / "brand_seed_list.csv"
-LABELLED_CSV = Path(__file__).resolve().parent.parent / "data" / "raw" / "Labelled.csv"
+BRAND_SEED_CSV = Path(__file__).resolve().parent.parent.parent / "data" / "generated" / "brand_seed_list.csv"
+LABELLED_CSV = Path(__file__).resolve().parent.parent.parent / "data" / "raw" / "Labelled.csv"
 
 
 def _load_brand_product_ids() -> dict:
@@ -122,12 +123,32 @@ def _build_known_brand_words(brand_product_ids: dict) -> dict:
     to that brand. First brand seen for a given word wins on collision —
     rare in practice, and this is only ever an ADDITIONAL candidate
     alongside real vector-search results, never a replacement, so a rare
-    wrong pick here just gives DeepSeek one extra (ignorable) option."""
+    wrong pick here just gives DeepSeek one extra (ignorable) option.
+
+    A hyphenated/compound brand ("Prac-Tic") can have EVERY individual
+    fragment fall under the length floor ("prac"=4, "tic"=3) even though
+    the brand read as one word ("practic") is plenty long and specific —
+    and that's exactly how a vet is likely to type it once punctuation is
+    dropped, which is also exactly what clean_query does to the query
+    side before matching. Confirmed on a real miss: "Practic Spot On..."
+    fell through fuzzy recovery entirely and got matched to Frontline
+    instead, because Prac-Tic contributed zero index words at all. Only
+    added when NO individual fragment already qualified, so a genuinely
+    short, generic-sounding brand ("Xeno", "Troy") isn't given an
+    artificial boost the original length floor was there to avoid."""
     words = {}
     for brand in brand_product_ids:
-        for word in re.findall(r"[a-zA-Z]+", brand.lower()):
-            if len(word) >= _BRAND_WORD_MIN_LEN:
-                words.setdefault(word, brand)
+        brand_words = re.findall(r"[a-zA-Z]+", brand.lower())
+        qualified = [w for w in brand_words if len(w) >= _BRAND_WORD_MIN_LEN]
+
+        for word in qualified:
+            words.setdefault(word, brand)
+
+        if not qualified:
+            concatenated = "".join(brand_words)
+            if len(concatenated) >= _BRAND_WORD_MIN_LEN:
+                words.setdefault(concatenated, brand)
+
     return words
 
 
@@ -368,6 +389,108 @@ DEFAULT_ENABLE_LLM_JUDGE = False
 
 
 # ─────────────────────────────────────────────────────────────
+# USAGE / COST TRACKING
+# ─────────────────────────────────────────────────────────────
+# deepseek_json is the single choke point every DeepSeek call passes
+# through (both pipelines, every phase), so it's the one place usage needs
+# to be captured. Two accumulators are kept per call:
+#   - thread-local: for a single query, request handling runs start-to-
+#     finish on one worker thread (FastAPI runs sync path operations in a
+#     threadpool, one thread per request), so resetting/reading a
+#     thread-local around identify_product cleanly isolates one request's
+#     usage from concurrent ones.
+#   - a global, lock-protected running total: a batch job fans work out
+#     across MAX_WORKERS threads, so no single thread-local sees the whole
+#     job's usage. identify_products_batch instead snapshots this global
+#     counter before and after the job and diffs the two. This app is a
+#     local single-user demo (see api/batch.py), so one global counter is
+#     fine — it doesn't try to isolate two concurrent jobs from each other.
+#
+# Pricing is DeepSeek's published deepseek-reasoner rate, USD per 1M
+# tokens, at STANDARD (cache-miss) pricing — DeepSeek's own prompt-cache
+# can lower the real bill further for repeated prefixes, which this can't
+# see from the API response, so treat estimated_cost_usd as a conservative
+# upper bound, not an exact invoice figure.
+DEEPSEEK_INPUT_COST_PER_1M = 0.55
+DEEPSEEK_OUTPUT_COST_PER_1M = 2.19
+
+
+def estimate_cost_usd(prompt_tokens: int, completion_tokens: int) -> float:
+    return (
+        prompt_tokens / 1_000_000 * DEEPSEEK_INPUT_COST_PER_1M
+        + completion_tokens / 1_000_000 * DEEPSEEK_OUTPUT_COST_PER_1M
+    )
+
+
+_usage_local = threading.local()
+_global_usage_lock = threading.Lock()
+_global_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "calls": 0}
+
+
+def reset_usage_tracking() -> None:
+    """Call at the start of a single query's resolution."""
+    _usage_local.prompt_tokens = 0
+    _usage_local.completion_tokens = 0
+    _usage_local.total_tokens = 0
+    _usage_local.calls = 0
+
+
+def get_usage_totals() -> dict:
+    """This thread's accumulated usage since the last reset_usage_tracking()."""
+    return {
+        "prompt_tokens": getattr(_usage_local, "prompt_tokens", 0),
+        "completion_tokens": getattr(_usage_local, "completion_tokens", 0),
+        "total_tokens": getattr(_usage_local, "total_tokens", 0),
+        "llm_calls": getattr(_usage_local, "calls", 0),
+    }
+
+
+def snapshot_global_usage() -> dict:
+    with _global_usage_lock:
+        return dict(_global_usage)
+
+
+def usage_delta(before: dict, after: dict) -> dict:
+    """Diffs two snapshot_global_usage() calls into a batch job's token/cost
+    stats — the delta a job actually spent, isolated from whatever usage
+    the process had already accumulated before it started."""
+    prompt_tokens = after["prompt_tokens"] - before["prompt_tokens"]
+    completion_tokens = after["completion_tokens"] - before["completion_tokens"]
+    return {
+        "prompt_tokens": prompt_tokens,
+        "completion_tokens": completion_tokens,
+        "total_tokens": after["total_tokens"] - before["total_tokens"],
+        "billed_llm_calls": after["calls"] - before["calls"],
+        "estimated_cost_usd": round(estimate_cost_usd(prompt_tokens, completion_tokens), 4),
+    }
+
+
+def _record_usage(usage) -> None:
+    """usage: the `usage` object on a DeepSeek chat-completion response
+    (prompt_tokens/completion_tokens/total_tokens), or None. Recorded for
+    EVERY attempt inside deepseek_json, including ones that come back
+    empty/malformed — DeepSeek still bills the tokens it generated even
+    when the content didn't parse as valid JSON."""
+    if usage is None:
+        return
+
+    p = getattr(usage, "prompt_tokens", 0) or 0
+    c = getattr(usage, "completion_tokens", 0) or 0
+    t = getattr(usage, "total_tokens", 0) or (p + c)
+
+    _usage_local.prompt_tokens = getattr(_usage_local, "prompt_tokens", 0) + p
+    _usage_local.completion_tokens = getattr(_usage_local, "completion_tokens", 0) + c
+    _usage_local.total_tokens = getattr(_usage_local, "total_tokens", 0) + t
+    _usage_local.calls = getattr(_usage_local, "calls", 0) + 1
+
+    with _global_usage_lock:
+        _global_usage["prompt_tokens"] += p
+        _global_usage["completion_tokens"] += c
+        _global_usage["total_tokens"] += t
+        _global_usage["calls"] += 1
+
+
+# ─────────────────────────────────────────────────────────────
 # SHARED DEEPSEEK CALL HELPER
 # ─────────────────────────────────────────────────────────────
 
@@ -389,6 +512,8 @@ def deepseek_json(prompt: str, attempts: int = 3) -> dict:
             temperature=0,
             response_format={"type": "json_object"}
         )
+
+        _record_usage(getattr(response, "usage", None))
 
         raw = (response.choices[0].message.content or "").strip()
 

@@ -15,10 +15,13 @@ async function unwrap<T>(response: Response): Promise<T> {
   return response.json();
 }
 
+export type PipelineMode = "raw" | "structured";
+
 export async function queryProduct(
   query: string,
   enableLiveFallback: boolean,
   enableLlmJudge: boolean,
+  pipelineMode: PipelineMode,
   signal?: AbortSignal
 ): Promise<QueryResponse> {
   const response = await fetch(`${API_BASE}/api/query`, {
@@ -28,6 +31,7 @@ export async function queryProduct(
       query,
       enable_live_fallback: enableLiveFallback,
       enable_llm_judge: enableLlmJudge,
+      mode: pipelineMode,
     }),
     signal,
   });
@@ -38,13 +42,14 @@ export async function queryProduct(
 export async function uploadBatch(
   file: File,
   enableLiveFallback: boolean,
-  enableLlmJudge: boolean
+  enableLlmJudge: boolean,
+  pipelineMode: PipelineMode
 ): Promise<{ job_id: string; total_rows: number }> {
   const formData = new FormData();
   formData.append("file", file);
 
   const response = await fetch(
-    `${API_BASE}/api/batch/upload?enable_live_fallback=${enableLiveFallback}&enable_llm_judge=${enableLlmJudge}`,
+    `${API_BASE}/api/batch/upload?enable_live_fallback=${enableLiveFallback}&enable_llm_judge=${enableLlmJudge}&mode=${pipelineMode}`,
     { method: "POST", body: formData }
   );
 

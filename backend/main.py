@@ -4,10 +4,10 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-import batch
-import export as exporters
-from pipeline import query_agent
-from schemas import QueryRequest, QueryResponse
+from api import batch
+from api import export as exporters
+from api.schemas import QueryRequest, QueryResponse
+from pipeline.raw import query_agent
 
 app = FastAPI(title="Veterinary Product Matching API")
 
@@ -36,7 +36,12 @@ def health_check():
 @app.post("/api/query", response_model=QueryResponse)
 def query_product(request: QueryRequest):
 
-    result = query_agent.identify_product(
+    if request.mode == "structured":
+        from pipeline.structured import query_agent_structured as engine
+    else:
+        engine = query_agent
+
+    result = engine.identify_product(
         request.query,
         enable_live_fallback=request.enable_live_fallback,
         enable_llm_judge=request.enable_llm_judge
@@ -58,6 +63,7 @@ async def upload_batch(
     file: UploadFile = File(...),
     enable_live_fallback: bool = False,
     enable_llm_judge: bool = False,
+    mode: str = "raw",
 ):
     content = await file.read()
     queries = batch.read_uploaded_content(file.filename, content)
@@ -66,7 +72,7 @@ async def upload_batch(
         raise HTTPException(status_code=400, detail="No readable rows found in the uploaded file.")
 
     job_id = batch.create_job(total_rows=len(queries))
-    background_tasks.add_task(batch.run_batch_job, job_id, queries, enable_live_fallback, enable_llm_judge)
+    background_tasks.add_task(batch.run_batch_job, job_id, queries, enable_live_fallback, enable_llm_judge, mode)
 
     return {"job_id": job_id, "total_rows": len(queries)}
 
@@ -120,11 +126,16 @@ def batch_download(job_id: str, format: str = "csv"):
 
 @app.post("/api/cache/reset")
 def reset_cache():
-    size = query_agent.cache_size()
+    from pipeline.structured import query_agent_structured
+
+    size = query_agent.cache_size() + query_agent_structured.cache_size()
     query_agent.clear_cache()
+    query_agent_structured.clear_cache()
     return {"cleared": size}
 
 
 @app.get("/api/cache/size")
 def get_cache_size():
-    return {"size": query_agent.cache_size()}
+    from pipeline.structured import query_agent_structured
+
+    return {"size": query_agent.cache_size() + query_agent_structured.cache_size()}
