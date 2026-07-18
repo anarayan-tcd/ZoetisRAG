@@ -1,4 +1,6 @@
 import MatchCard from "./MatchCard";
+import IdCombinationsCard from "./IdCombinationsCard";
+import { BatchUsageSummary, QueryUsageSummary } from "./UsageSummary";
 import { batchDownloadUrl } from "../api";
 import type { BatchJobStatus, QueryResponse } from "../types";
 
@@ -25,10 +27,12 @@ export default function ResultsPanel({ mode, queryResult, batchStatus, batchJobI
 
     return (
       <div className="results">
-        <MatchCard title="Primary Match" match={queryResult.primary_match} />
-        {queryResult.alternative_matches.map((alt, i) => (
-          <MatchCard key={i} title={`Alternative ${i + 1}`} match={alt} />
-        ))}
+        <QueryUsageSummary usage={queryResult.usage} />
+        <MatchCard match={queryResult.product_match} />
+        <IdCombinationsCard
+          combinations={queryResult.id_combinations}
+          reason={queryResult.id_combinations_reason}
+        />
       </div>
     );
   }
@@ -40,17 +44,26 @@ export default function ResultsPanel({ mode, queryResult, batchStatus, batchJobI
     return <p className="error-banner">⚠️ {batchStatus.error}</p>;
   }
 
-  if (batchStatus.status !== "done" || !batchStatus.stats || !batchJobId) {
+  const isFinished = batchStatus.status === "done" || batchStatus.status === "cancelled";
+
+  if (!isFinished || !batchStatus.stats || !batchJobId) {
     return null;
   }
 
   return (
     <div className="batch-summary">
       <p>
-        <strong>Done</strong> — {batchStatus.stats.total_rows} row(s),{" "}
-        {batchStatus.stats.unique_queries} unique, {batchStatus.stats.cache_hits} served from
-        cache, {batchStatus.stats.llm_calls} reasoned by DeepSeek — {batchStatus.stats.elapsed}s
+        <strong>{batchStatus.status === "cancelled" ? "Cancelled" : "Done"}</strong> —{" "}
+        {batchStatus.stats.total_rows} row(s), {batchStatus.stats.unique_queries} unique,{" "}
+        {batchStatus.stats.cache_hits} served from cache, {batchStatus.stats.llm_calls} reasoned
+        by DeepSeek — {batchStatus.stats.elapsed}s
       </p>
+      <BatchUsageSummary
+        elapsed={batchStatus.stats.elapsed}
+        avgSecondsPerRow={batchStatus.stats.avg_seconds_per_resolved_row}
+        totalTokens={batchStatus.stats.total_tokens}
+        estimatedCostUsd={batchStatus.stats.estimated_cost_usd}
+      />
       <div className="download-buttons">
         <a href={batchDownloadUrl(batchJobId, "csv")}>Download CSV</a>
         <a href={batchDownloadUrl(batchJobId, "xlsx")}>Download Excel</a>

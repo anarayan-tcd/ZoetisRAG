@@ -4,15 +4,15 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-import batch
-import export as exporters
-import query_agent
-from schemas import QueryRequest, QueryResponse
+from api import batch
+from api import export as exporters
+from api.schemas import QueryRequest, QueryResponse
+from pipeline.raw import query_agent
 
 app = FastAPI(title="Veterinary Product Matching API")
 
-# Vite's default dev server port, plus the common alternate — this app
-# runs locally only, so no other origins are ever needed.
+# Vite's default dev server ports for local dev. This app runs locally
+# only for now — add a production origin here if/when it's deployed again.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:3000"],
@@ -33,9 +33,15 @@ def health_check():
 @app.post("/api/query", response_model=QueryResponse)
 def query_product(request: QueryRequest):
 
-    result = query_agent.identify_product(
+    if request.mode == "structured":
+        from pipeline.structured import query_agent_structured as engine
+    else:
+        engine = query_agent
+
+    result = engine.identify_product(
         request.query,
-        enable_live_fallback=request.enable_live_fallback
+        enable_live_fallback=request.enable_live_fallback,
+        enable_llm_judge=request.enable_llm_judge
     )
 
     if "error" in result:
@@ -53,6 +59,8 @@ async def upload_batch(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     enable_live_fallback: bool = False,
+    enable_llm_judge: bool = False,
+    mode: str = "raw",
 ):
     content = await file.read()
     queries = batch.read_uploaded_content(file.filename, content)
@@ -61,7 +69,7 @@ async def upload_batch(
         raise HTTPException(status_code=400, detail="No readable rows found in the uploaded file.")
 
     job_id = batch.create_job(total_rows=len(queries))
-    background_tasks.add_task(batch.run_batch_job, job_id, queries, enable_live_fallback)
+    background_tasks.add_task(batch.run_batch_job, job_id, queries, enable_live_fallback, enable_llm_judge, mode)
 
     return {"job_id": job_id, "total_rows": len(queries)}
 
@@ -76,6 +84,14 @@ def batch_status(job_id: str):
     return job
 
 
+@app.post("/api/batch/{job_id}/cancel")
+def cancel_batch(job_id: str):
+    if not batch.cancel_job(job_id):
+        raise HTTPException(status_code=404, detail="Job not found or already finished")
+
+    return {"cancelled": True}
+
+
 @app.get("/api/batch/{job_id}/download")
 def batch_download(job_id: str, format: str = "csv"):
     job = batch.get_job(job_id)
@@ -83,7 +99,7 @@ def batch_download(job_id: str, format: str = "csv"):
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")
 
-    if job["status"] != "done":
+    if job["status"] not in ("done", "cancelled"):
         raise HTTPException(status_code=400, detail=f"Job is not finished (status: {job['status']})")
 
     exporters_by_format = {
@@ -107,11 +123,16 @@ def batch_download(job_id: str, format: str = "csv"):
 
 @app.post("/api/cache/reset")
 def reset_cache():
-    size = query_agent.cache_size()
+    from pipeline.structured import query_agent_structured
+
+    size = query_agent.cache_size() + query_agent_structured.cache_size()
     query_agent.clear_cache()
+    query_agent_structured.clear_cache()
     return {"cleared": size}
 
 
 @app.get("/api/cache/size")
 def get_cache_size():
-    return {"size": query_agent.cache_size()}
+    from pipeline.structured import query_agent_structured
+
+    return {"size": query_agent.cache_size() + query_agent_structured.cache_size()}

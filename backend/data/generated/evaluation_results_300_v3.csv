@@ -1,0 +1,301 @@
+Notes,GT_Brand,GT_ProductId,GT_ProductVariantId,GT_SkuId,Pred_Brand,Pred_ProductId,Pred_ProductVariantId,Pred_SkuId,Pred_Confidence,Match_Brand(Tier1),Match_Variant(Tier2),Match_SKU(Tier3)
+Frontline Spray 100ml,Frontline,32,201,229,Frontline,32,201,229,High,TRUE,TRUE,TRUE
+Frontline Spray 250ml,Frontline,32,201,219,Frontline,32,201,219,High,TRUE,TRUE,TRUE
+FRONTLINE SPRAY 500ML,Frontline,32,201,220,Frontline,32,201,220,High,TRUE,TRUE,TRUE
+Frontline Combo Cat 6 pack,Frontline,32,186,236,Frontline,32,186,236,High,TRUE,TRUE,TRUE
+FRONTLINE COMBO CAT 3 PACK,Frontline,32,186,246,Frontline,32,186,246,High,TRUE,TRUE,TRUE
+ADVOCATE LGE CAT 80 4-8KG 3PIP,Advocate,1,2,21,Advocate,1,2,21,High,TRUE,TRUE,TRUE
+Advocate sml cat 40 <4kg 3pip,Advocate,1,1,9,Advocate,1,1,9,High,TRUE,TRUE,TRUE
+ADVOCATE LGE CAT 80 4-8KG 6PIP,Advocate,1,2,11,Advocate,1,2,11,High,TRUE,TRUE,TRUE
+Advocate Dog 10-25kg,Advocate,1,8,4,Advocate,1,5,2356,High,TRUE,FALSE,FALSE
+Advocate Sml Cat 40 <4kg 6pip,Advocate,1,1,8,Advocate,1,6,3108,High,TRUE,FALSE,FALSE
+Bravecto 1000 mg (20-40 kg),Bravecto,22,129,610,Bravecto,22,129,610,High,TRUE,TRUE,TRUE
+"Bravecto spot on 250 mg (2,8-6,25 kg)",Bravecto,22,1815,3148,Bravecto,22,,,Very Low,TRUE,FALSE,FALSE
+Bravecto 1000 mg 20-40 kg 1x2Tabl.,Bravecto,22,129,610,Bravecto,22,129,610,High,TRUE,TRUE,TRUE
+Bravecto Spot On Med Cat 250mg,Bravecto,22,128,3381,Bravecto,22,128,598,High,TRUE,TRUE,FALSE
+Bravecto Sml Dog Tab 250mg Ea,Bravecto,22,132,608,Bravecto,22,132,608,High,TRUE,TRUE,TRUE
+STRONGHOLD 240MG LARGE DOG,Stronghold,68,340,166,Stronghold,68,340,162,High,TRUE,TRUE,FALSE
+Stronghold 120mg Medium Dog,Stronghold,68,338,154,Stronghold,68,338,2541,High,TRUE,TRUE,FALSE
+STRONGHOLD CAT 45MG 6 PIP,Stronghold,68,342,156,Stronghold,68,342,156,High,TRUE,TRUE,TRUE
+Stronghold Cat 45mg 6x0.75ml,Stronghold,68,342,156,Stronghold,68,342,156,High,TRUE,TRUE,TRUE
+Stronghold 45Mg Cat,Stronghold,68,342,157,Stronghold,68,342,1319,Medium,TRUE,TRUE,FALSE
+Advantage 100 MEDIUM DOGS 4-10k,Advantage,5,34,91,Advantage,5,34,91,High,TRUE,TRUE,TRUE
+ADVANTAGE 250 LARGE DOGS 10-25K,Advantage,5,35,93,Advantage,5,35,93,High,TRUE,TRUE,TRUE
+ADVANTAGE 80 LGE CAT/RAB(NFA-V,Advantage,5,38,94,Advantage,5,38,94,High,TRUE,TRUE,TRUE
+ADVANTAGE 40 CAT/DOG/RAB(NFA-V,Advantage,5,36,92,Advantage,5,36,92,High,TRUE,TRUE,TRUE
+Advantage Sml Cat/dog/pet Rab,Advantage,5,36,92,Advantage,5,36,92,High,TRUE,TRUE,TRUE
+Milbemax Dog,Milbemax,13,89,118,Milbemax,13,,,Medium,TRUE,FALSE,FALSE
+Milbemax Cat,Milbemax,13,94,116,Milbemax,13,93,121,High,TRUE,FALSE,FALSE
+Milbemax Tasty Cat,Milbemax,13,94,116,Milbemax,13,94,116,High,TRUE,TRUE,TRUE
+Milbemax Chewy Dog 12.5/125mg,Milbemax,13,86,111,Milbemax,13,86,1310,Medium,TRUE,TRUE,FALSE
+MILBEMAX CHEWY PUPPY 2.5/25MG,Milbemax,13,87,119,Milbemax,13,87,119,High,TRUE,TRUE,TRUE
+Panacur Paste Syr Rabbit 5g,Panacur,23,141,81,Panacur,23,141,81,High,TRUE,TRUE,TRUE
+Panacur Grans 22% 4.5g Cat/dog,Panacur,23,139,82,Panacur,23,139,82,High,TRUE,TRUE,TRUE
+Panacur Grans 22% 1.8G Cat/Dog,Panacur,23,138,83,Panacur,23,138,83,High,TRUE,TRUE,TRUE
+PANACUR PASTE SYR CAT/DOG,Panacur,23,140,79,Panacur,23,140,79,Medium,TRUE,TRUE,TRUE
+PANACUR PASTE SYR CAT/DOG 5G,Panacur,23,140,79,Panacur,23,140,79,High,TRUE,TRUE,TRUE
+Drontal Puppy Suspension 50ml,Drontal,3,28,46,Drontal,3,28,46,High,TRUE,TRUE,TRUE
+Drontal Puppy Suspension 100Ml,Drontal,3,28,41,Drontal,3,28,41,Medium,TRUE,TRUE,TRUE
+DRONTAL CAT TABS,Drontal,3,21,30,Drontal,3,21,2366,High,TRUE,TRUE,FALSE
+DRONTAL PLUS FLAVOUR TABS,Drontal,3,26,32,Drontal,3,26,32,Medium,TRUE,TRUE,TRUE
+Drontal Cat tablets,Drontal,3,21,30,Drontal,3,21,30,Medium,TRUE,TRUE,TRUE
+Program 80 Inj,Program,12,76,66,Unknown,,,,Low,FALSE,FALSE,FALSE
+PROGRAM 40 INJ,Program,12,75,69,Unknown,,,,Low,FALSE,FALSE,FALSE
+Program Cat Amps 133mg Orange,Program,12,77,73,Program,12,77,73,High,TRUE,TRUE,TRUE
+PROGRAM CAT AMPS 266MG TEAL,Program,12,78,68,Program,12,78,68,High,TRUE,TRUE,TRUE
+PROGRAM DOG TABS 409.8MG GREY,Program,12,81,65,Program,12,,,Medium,TRUE,FALSE,FALSE
+NEXGARD SPECTRA 30-60KG,Nexgard Spectra,36,214,428,Nexgard Spectra,36,214,3433,Medium,TRUE,TRUE,FALSE
+NEXGARD SPECTRA TAB MED DOG (>7.5-15KG) 8-38MG PK 3,Nexgard Spectra,36,212,431,Nexgard Spectra,36,212,431,High,TRUE,TRUE,TRUE
+NEXGARD SPECTRA TAB XLGE DOG (>30-60KG) 30-150MG PK 3 sub product,Nexgard Spectra,36,214,428,Nexgard Spectra,36,214,428,High,TRUE,TRUE,TRUE
+NEXGARD SPECTRA TAB XSML DOG (2-3.5KG) 2-9MG PK 3,Nexgard Spectra,36,215,430,Nexgard Spectra,36,215,430,High,TRUE,TRUE,TRUE
+NEXGARD SPECTRA TAB LGE DOG (>15-30KG) 15-75MG PK 3,Nexgard Spectra,36,211,432,Nexgard Spectra,36,211,432,High,TRUE,TRUE,TRUE
+Nexgard Xl Dog 25-50kg 3 Pack,Nexgard,35,210,257,Nexgard,35,,,Medium,TRUE,FALSE,FALSE
+Nexgard Xl Dog 25-50kg 6 Pack,Nexgard,35,210,258,Nexgard,35,210,1031,High,TRUE,TRUE,FALSE
+NEXGARD LARGE DOG 10-25KG 3 PACK,Nexgard,35,210,257,Nexgard,35,210,257,High,TRUE,TRUE,TRUE
+Nexgard Small Dog 2-4kg 6 Pack,Nexgard,35,210,258,Nexgard,35,604,1022,High,TRUE,FALSE,FALSE
+Nexgard Kautablette Hund 25-50 kg,Nexgard,35,607,1030,Nexgard,35,607,1030,High,TRUE,TRUE,TRUE
+Comfortis 270mg Tabs C+D 6pk,Comfortis,10,65,56,Comfortis,10,65,56,High,TRUE,TRUE,TRUE
+COMFORTIS 180MG TABS C+D 6PK,Comfortis,10,64,61,Comfortis,10,,,Medium,TRUE,FALSE,FALSE
+Comfortis Tabs  270mg,Comfortis,10,65,2393,Comfortis,10,65,56,High,TRUE,TRUE,FALSE
+Comfortis 425mg Tabs C+d 6pk,Comfortis,10,66,53,Comfortis,10,,,Low,TRUE,FALSE,FALSE
+Comfortis 140mg Tabs C+d 6pk,Comfortis,10,62,60,Comfortis,10,62,60,High,TRUE,TRUE,TRUE
+Advantix 100 mg Hund 4-10 kg 4Pip.,Advantix,2,9,22,Advantix,2,9,22,High,TRUE,TRUE,TRUE
+Advantix 250 mg Hund 10-25 kg 4Pip.,Advantix,2,10,25,Advantix,2,10,25,High,TRUE,TRUE,TRUE
+ADVANTIX 250 DOG 10 - 25KG 4PK,Advantix,2,10,25,Advantix,2,10,2359,High,TRUE,TRUE,FALSE
+Advantix 250 (lge Dog) 10-25kg,Advantix,2,10,25,Advantix,2,10,2359,Medium,TRUE,TRUE,FALSE
+Advantix 400 (ex.lge Dog)>25kg,Advantix,2,12,23,Advantix,2,12,23,High,TRUE,TRUE,TRUE
+Profender Cat Spot On - Med,Profender,7,53,107,Profender,7,53,2381,Medium,TRUE,TRUE,FALSE
+Profender Cat Spot On - Lge,Profender,7,52,109,Profender,7,52,1202,Medium,TRUE,TRUE,FALSE
+Profender Cat Spot On - Sml,Profender,7,54,103,Profender,7,54,1204,High,TRUE,TRUE,FALSE
+PROFENDER SPOT ON MED 2.5-5K 2PK,Profender,7,53,107,Profender,7,53,107,High,TRUE,TRUE,TRUE
+PROFENDER SPOT ON CAT MED 2PIP,Profender,7,53,107,Profender,7,53,107,High,TRUE,TRUE,TRUE
+Simparica 80mg 20-40kg,Simparica,74,384,2566,Simparica,74,384,2885,High,TRUE,TRUE,FALSE
+Simparica 80 mg für Hunde >20-40 kg 3Tab.,Simparica,74,384,593,Simparica,74,384,593,High,TRUE,TRUE,TRUE
+Simparica 20mg 5-10kg,Simparica,74,381,2563,Simparica,74,381,591,High,TRUE,TRUE,FALSE
+SIMPARICA 40MG 10-20KG,Simparica,74,382,2564,Simparica,74,382,592,Medium,TRUE,TRUE,FALSE
+"Simparica 10mg 2,5-5kg",Simparica,74,380,590,Simparica,74,,,Low,TRUE,FALSE,FALSE
+Effipro Spray 100ml,Effipro,40,233,205,Effipro,40,233,205,High,TRUE,TRUE,TRUE
+Effipro Spray 250ml,Effipro,40,233,209,Effipro,40,233,209,High,TRUE,TRUE,TRUE
+Effipro Spray 500ml,Effipro,40,233,216,Effipro,40,233,216,High,TRUE,TRUE,TRUE
+Effipro Spot On Cat 50mg,Effipro,40,685,2827,Effipro,40,228,217,High,TRUE,FALSE,FALSE
+Effipro Spot On Med Dog 1.34mg,Effipro,40,229,2483,Effipro,40,230,207,High,TRUE,FALSE,FALSE
+Seresto Cat Collar,Seresto,6,45,100,Seresto,6,45,100,High,TRUE,TRUE,TRUE
+Seresto Flea & Tick Collar Cat,Seresto,6,45,100,Seresto,6,45,100,Medium,TRUE,TRUE,TRUE
+Seresto Large Dog Collar,Seresto,6,47,99,Seresto,6,47,99,High,TRUE,TRUE,TRUE
+Seresto Small Dog Collar,Seresto,6,49,101,Seresto,6,49,101,Medium,TRUE,TRUE,TRUE
+Seresto Collar Cat Single,Seresto,6,45,100,Seresto,6,45,2474,High,TRUE,TRUE,FALSE
+Milpro tabs cat 16/40mg,Milpro,44,244,385,Milpro,44,244,385,High,TRUE,TRUE,TRUE
+Milpro Tabs Dog 12.5/125mg,Milpro,44,244,385,Milpro,44,244,2605,Medium,TRUE,TRUE,FALSE
+Milpro For Sml Cats & Kittens,Milpro,44,244,385,Milpro,44,448,2602,High,TRUE,FALSE,FALSE
+Milpro Sml Dog & Pup 2.5mg/25m,Milpro,44,244,385,Milpro,44,450,2604,Medium,TRUE,FALSE,FALSE
+Milpro Tabs Pupp/sml Dog 2.5/2,Milpro,44,244,385,Milpro,44,450,2604,High,TRUE,FALSE,FALSE
+Revolution for Cats (2.6 - 7kg) - Blue (3 Pack),Revolution,71,373,193,Revolution,71,373,193,High,TRUE,TRUE,TRUE
+Revolution for Cats (2.6 - 7kg) - Blue (6 Pack),Revolution,71,373,201,Revolution,71,368,196,High,TRUE,FALSE,FALSE
+Revolution for Puppies & Kittens (<= 2.5kg) - Pink (3 Pack),Revolution,71,375,203,Revolution,71,375,203,High,TRUE,TRUE,TRUE
+Revolution,Revolution,71,375,203,Unknown,,,,Low,FALSE,FALSE,FALSE
+Revolution Cat 6 Pack,Revolution,71,373,201,Revolution,71,373,201,High,TRUE,TRUE,TRUE
+PRINOVOX DOG 100 MED (4-10KG) PK 4 sub product,Prinovox,45,251,392,Prinovox,45,251,392,High,TRUE,TRUE,TRUE
+PRINOVOX CAT/FERRET 40 SML (<4KG) PK 4 sub product,Prinovox,45,252,394,Prinovox,45,252,394,High,TRUE,TRUE,TRUE
+PRINOVOX CAT 80 LGE (4-8KG) PK 4 sub product,Prinovox,45,250,395,Prinovox,45,250,395,High,TRUE,TRUE,TRUE
+PRINOVOX DOG 400 XLGE (>25KG) PK 4 sub product,Prinovox,45,254,389,Prinovox,45,254,389,High,TRUE,TRUE,TRUE
+PRINOVOX DOG 250 LGE (10-25KG) PK 4 sub product,Prinovox,45,249,390,Prinovox,45,249,390,High,TRUE,TRUE,TRUE
+Droncit Tabs 50mg,Droncit,4,32,50,Droncit,4,32,50,High,TRUE,TRUE,TRUE
+Droncit Spot On 0.5ml,Droncit,4,31,48,Droncit,4,31,48,High,TRUE,TRUE,TRUE
+Droncit inj,Droncit,4,30,49,Unknown,,,,Low,FALSE,FALSE,FALSE
+Droncit Tablets,Droncit,4,32,50,Droncit,4,,,Medium,TRUE,FALSE,FALSE
+Droncit Tabs,Droncit,4,32,2372,Droncit,4,32,50,Medium,TRUE,TRUE,FALSE
+BROADLINE LARGE CAT 3 PIP,Broadline,34,208,254,Broadline,34,457,711,High,TRUE,FALSE,FALSE
+"Broadline Katze 2,5 kg-7,5kg",Broadline,34,457,711,Unknown,,,,Low,FALSE,FALSE,FALSE
+BROADLINE SPOT ON LGE CAT 2.5-7.5KG PK 6,Broadline,34,457,712,Broadline,34,208,255,High,TRUE,FALSE,FALSE
+BROADLINE SMALL CAT 3 PIP,Broadline,34,208,254,Broadline,34,458,713,High,TRUE,FALSE,FALSE
+BROADLINE SPOT ON SML CAT <2.5KG PK 3,Broadline,34,208,254,Broadline,34,458,713,High,TRUE,FALSE,FALSE
+Prac-Tic S/On Dog 4.5-11kg (3 pack),Prac-Tic,14,100,132,Prac-Tic,14,100,132,High,TRUE,TRUE,TRUE
+Prac-Tic S/On Dog 11-22kg (3 pack),Prac-Tic,14,99,129,Prac-Tic,14,99,129,High,TRUE,TRUE,TRUE
+Prac-Tic S/On Dog 2-4.5kg (3 pack),Prac-Tic,14,101,131,Prac-Tic,14,101,131,High,TRUE,TRUE,TRUE
+Prac-Tic S/On Dog 22-50kg (3 pack),Prac-Tic,14,98,125,Prac-Tic,14,98,125,High,TRUE,TRUE,TRUE
+Prac-tic Spot-on Large Dog 3 Pip,Prac-Tic,14,98,125,Prac-Tic,14,98,125,High,TRUE,TRUE,TRUE
+Activyl Spot On Cat 200mg,Activyl,24,144,140,Activyl,24,144,2449,High,TRUE,TRUE,FALSE
+Activyl S/O Dog Sml 150mg (4 pack),Activyl,24,148,148,Activyl,24,148,148,Medium,TRUE,TRUE,TRUE
+Activyl Tick Plus Dog Lrg 600mg (4 pack),Activyl,97,150,146,Activyl,24,145,144,Medium,FALSE,FALSE,FALSE
+Activyl Spot On S/cat 100mg,Activyl,24,147,151,Activyl,24,144,2452,High,TRUE,FALSE,FALSE
+Activyl Tick Plus Dog Med 300g (4 pack),Activyl,24,151,139,Activyl,24,151,139,Medium,TRUE,TRUE,TRUE
+Credelio Cat Tablets 48mg 6pk,Credelio,141,1908,3445,Credelio,141,1908,3445,High,TRUE,TRUE,TRUE
+Credelio Tabs For Cats 48mg X 6,Credelio,141,1908,3442,Credelio,141,1908,3442,High,TRUE,TRUE,TRUE
+Credelio Chew Tabs Cat 48mg Pk 6,Credelio,141,1908,3534,Credelio,141,1908,3442,High,TRUE,TRUE,FALSE
+Credelio 48mg/2-8Kg,Credelio,141,1908,3692,Credelio,141,,,Low,TRUE,FALSE,FALSE
+CREDELIO CHEW TABS CAT 48MG PK 6 sub product,Credelio,141,1908,3534,Credelio,141,1908,3534,High,TRUE,TRUE,TRUE
+Simparica Trio 5.1-10kg Orange (3 Pack),Simparica Trio,199,1950,3561,Simparica Trio,199,1950,3561,High,TRUE,TRUE,TRUE
+Simparica Trio 10.1-20kg Blue (3 Pack),Simparica Trio,199,1951,3549,Simparica Trio,199,1951,3549,Medium,TRUE,TRUE,TRUE
+Simparica Trio 40.1-60kg Red (3 Pack),Simparica Trio,199,1953,3558,Simparica Trio,199,1953,3558,Medium,TRUE,TRUE,TRUE
+Simparica Trio 40.1-60kg Red (6 Pack),Simparica Trio,199,1953,3559,Simparica Trio,199,1953,3559,High,TRUE,TRUE,TRUE
+Simparica Trio 1.25-2.5kg Yellow (3 Pack),Simparica Trio,199,1948,3546,Simparica Trio,199,1948,3546,Medium,TRUE,TRUE,TRUE
+Xeno 200 spray 50ml,Xeno,62,306,320,Xeno,62,306,320,High,TRUE,TRUE,TRUE
+Xeno 200 Spray,Xeno,62,306,320,Xeno,62,306,320,High,TRUE,TRUE,TRUE
+Xeno 450 Spot On Tube,Xeno,62,307,322,Xeno,62,307,322,High,TRUE,TRUE,TRUE
+XENO  50 MINI SPOT ON TUBE,Xeno,62,308,321,Xeno,62,308,321,High,TRUE,TRUE,TRUE
+Xeno 450 Spot On,Xeno,62,307,322,Xeno,62,307,322,High,TRUE,TRUE,TRUE
+Capstar Tabs 11mg,Capstar,15,102,134,Capstar,15,102,134,High,TRUE,TRUE,TRUE
+CAPSTAR TABS 57MG,Capstar,15,103,136,Capstar,15,103,136,Medium,TRUE,TRUE,TRUE
+CAPSTAR TABS 6X57MG,Capstar,15,103,136,Capstar,15,103,136,High,TRUE,TRUE,TRUE
+Capstar 57mg,Capstar,15,103,136,Capstar,15,103,136,Medium,TRUE,TRUE,TRUE
+CAPSTAR TABS 6X11MG,Capstar,15,102,134,Capstar,15,102,134,High,TRUE,TRUE,TRUE
+Promeris Duo Small Dog,Promeris,70,361,184,Promeris,70,361,184,High,TRUE,TRUE,TRUE
+Promeris Duo Medium Dog,Promeris,70,360,190,Promeris,70,360,190,High,TRUE,TRUE,TRUE
+Promeris Duo Large Dog,Promeris,70,358,186,Promeris,70,358,186,High,TRUE,TRUE,TRUE
+Promeris Duo Med/Lge Dog,Promeris,70,359,185,Promeris,70,359,2550,Medium,TRUE,TRUE,FALSE
+Promeris Duo Med/lge Dog 3pip,Promeris,70,359,2550,Promeris,70,359,185,High,TRUE,TRUE,FALSE
+Scalibor Collar Lge,Scalibor,27,161,339,Scalibor,27,161,339,High,TRUE,TRUE,TRUE
+Scalibor collar large 65cm,Scalibor,27,161,339,Scalibor,27,161,339,High,TRUE,TRUE,TRUE
+scalibor collar large,Scalibor,27,161,339,Scalibor,27,161,339,High,TRUE,TRUE,TRUE
+Scalibor Collar 48cm Sml,Scalibor,27,162,340,Scalibor,27,162,340,High,TRUE,TRUE,TRUE
+Scalibor Collar Sml/med,Scalibor,27,162,340,Scalibor,27,160,338,High,TRUE,FALSE,FALSE
+Proheart Injection,Proheart,73,378,424,Proheart,73,378,424,Medium,TRUE,TRUE,TRUE
+Proheart SR-12 Injection,Proheart,73,378,424,Proheart,73,378,424,High,TRUE,TRUE,TRUE
+**Proheart SR-12 Injection (50 mL),Proheart,73,378,424,Proheart,73,378,424,High,TRUE,TRUE,TRUE
+Proheart SR-12 injection (40 mL),Proheart,73,378,424,Proheart,73,378,424,High,TRUE,TRUE,TRUE
+Proheart Red 23-45kg,Proheart,73,1714,2865,Unknown,,,,Low,FALSE,FALSE,FALSE
+BRAVECTO PLUS CAT 250MG 1X1D [1D],Bravecto Plus,165,1894,3248,Bravecto Plus,165,1894,3248,High,TRUE,TRUE,TRUE
+BRAVECTO PLUS CAT 500MG 1X1D [1D],Bravecto Plus,165,1895,3249,Bravecto Plus,165,1895,3249,High,TRUE,TRUE,TRUE
+BRAVECTO PLUS CAT 112.5MG 1X1D [1D],Bravecto Plus,165,1893,3246,Bravecto Plus,165,1893,3246,High,TRUE,TRUE,TRUE
+"Bravecto Plus Spot-On, Medium Cats, 2.8-6.25kg (2 Pack)",Bravecto Plus,165,1894,3250,Bravecto Plus,165,1894,3250,High,TRUE,TRUE,TRUE
+"Bravecto Plus Spot-On, Large Cats, 6.25-12.5kg (2 Pack)",Bravecto Plus,165,1895,3251,Bravecto Plus,165,1895,3251,High,TRUE,TRUE,TRUE
+Frontline Plus Dog XL Over 40kg (6 pack),Frontline Plus,37,225,439,Frontline Plus,37,198,439,High,TRUE,FALSE,FALSE
+Frontline Plus Cat 3 Pack,Frontline Plus,37,495,784,Frontline Plus,37,193,434,High,TRUE,FALSE,FALSE
+Frontline Plus Small Dog up to 10kg (6 Pack),Frontline Plus,37,219,433,Frontline Plus,37,,,High,TRUE,FALSE,FALSE
+Frontline Plus Dog XL Over 40kg (3 pack),Frontline Plus,37,225,442,Frontline Plus,37,198,442,High,TRUE,FALSE,FALSE
+Frontline Plus Dog L 20-40kg (6 pack),Frontline Plus,37,223,436,Frontline Plus,37,194,436,High,TRUE,FALSE,FALSE
+Indorex Household Spray 500ml,Indorex,43,242,384,Rip Fleas,63,311,,Medium,FALSE,FALSE,FALSE
+Indorex Flea Spray 500ml,Indorex,43,242,384,Rip Fleas,63,311,,High,FALSE,FALSE,FALSE
+INDOREX HOUSEHOLD FLEA SPRAY,Indorex,43,242,384,Rip Fleas,63,309,328,High,FALSE,FALSE,FALSE
+Indorex Household Spray,Indorex,43,242,384,Rip Fleas,63,309,328,High,FALSE,FALSE,FALSE
+Indorex Defence Household Flea,Indorex,43,242,384,Rip Fleas,63,309,328,High,FALSE,FALSE,FALSE
+Milprazon Dog 125mg Large (48) (per tab),Milprazon,80,404,2570,Milprazon,80,404,2570,High,TRUE,TRUE,TRUE
+Milprazon Cat 4-8kg (4) (per tab),Milprazon,80,406,2572,Milprazon,80,406,2572,Medium,TRUE,TRUE,TRUE
+Milprazon Puppy 1-5kg (4) (per tab),Milprazon,80,405,2571,Milprazon,80,405,2571,High,TRUE,TRUE,TRUE
+MILPRAZON DOG ADULT TAB 5-25KG,Milprazon,80,404,1220,Milprazon,80,404,1331,Medium,TRUE,TRUE,FALSE
+Milprazon 16 mg/40 mg FTA für Katzen 48Tab.,Milprazon,80,403,2569,Milprazon,80,403,2569,High,TRUE,TRUE,TRUE
+Vectra 3d Dog 40kg+ 3 Pipettes,Vectra 3D,52,275,417,Vectra 3D,52,275,417,High,TRUE,TRUE,TRUE
+Vectra 3d Medium Dog  10-25kg,Vectra 3D,52,277,419,Vectra 3D,52,277,2513,High,TRUE,TRUE,FALSE
+VECTRA 3D DOG 4-10KG 3 PIPETTES,Vectra 3D,52,279,415,Vectra 3D,52,279,415,High,TRUE,TRUE,TRUE
+VECTRA 3D DOG 10-25KG 3 PIPETTES,Vectra 3D,52,277,419,Vectra 3D,52,277,419,High,TRUE,TRUE,TRUE
+Vectra 3d Large Dog  25-40kg,Vectra 3D,52,278,414,Vectra 3D,52,278,414,High,TRUE,TRUE,TRUE
+Interceptor White,Interceptor,20,118,933,Unknown,,,,Low,FALSE,FALSE,FALSE
+Interceptor Yellow,Interceptor,20,118,2723,Unknown,,,,Low,FALSE,FALSE,FALSE
+Interceptor Green,Interceptor,20,120,2722,Unknown,,,,Low,FALSE,FALSE,FALSE
+INTERCEPTOR BROWN,Interceptor,20,569,927,Unknown,,,,Low,FALSE,FALSE,FALSE
+Interceptor Yellow 11-22kg,Interceptor,20,118,2434,Advantix,2,10,964,High,FALSE,FALSE,FALSE
+Rearguard 25ml,Rearguard,16,106,138,Rearguard,16,106,138,High,TRUE,TRUE,TRUE
+Rearguard,Rearguard,16,106,138,Rearguard,16,106,138,High,TRUE,TRUE,TRUE
+Rearguard 25ml (1),Rearguard,16,106,138,Rearguard,16,106,3162,High,TRUE,TRUE,FALSE
+Rear Guard 25ml,Rearguard,16,106,138,Rearguard,16,106,138,High,TRUE,TRUE,TRUE
+REAR GUARD,Rearguard,16,106,138,Rearguard,16,106,138,High,TRUE,TRUE,TRUE
+Eliminall S/On Cat (3 pack),Eliminall,69,350,171,Eliminall,69,350,171,High,TRUE,TRUE,TRUE
+Eliminall S/On Dog 10-20kg (3 pack),Eliminall,69,347,182,Eliminall,69,347,182,High,TRUE,TRUE,TRUE
+Eliminall S/On Dog 2kg-10kg (6 pack),Eliminall,69,348,181,Eliminall,69,348,181,Medium,TRUE,TRUE,TRUE
+Eliminall S/On Dog 10-20kg (30) (per pipette),Eliminall,69,347,182,Eliminall,69,347,3348,High,TRUE,TRUE,FALSE
+Eliminall S/On Cat (6 pack),Eliminall,69,350,178,Eliminall,69,350,178,Medium,TRUE,TRUE,TRUE
+Sentinel Yellow 11-22kg,Sentinel,18,110,446,Sentinel Spectrum,19,114,2430,Medium,FALSE,FALSE,FALSE
+Sentinel Chews - Small Dog (4-11kg) GREEN (6 Pack),Sentinel,18,112,447,Sentinel,18,112,447,High,TRUE,TRUE,TRUE
+Sentinel Green 4-11kg,Sentinel,18,112,447,Sentinel,18,112,2428,High,TRUE,TRUE,FALSE
+Sentinel Chews - Large Dog (22-45kg) BLUE (6 Pack),Sentinel,18,111,444,Sentinel,18,111,444,High,TRUE,TRUE,TRUE
+Sentinel White 22-45kg,Sentinel,18,111,2427,Sentinel,18,109,2427,Medium,TRUE,FALSE,FALSE
+Xenex Ultra spot on,Xenex,61,304,318,Xenex,61,304,2527,High,TRUE,TRUE,FALSE
+Xenex Spray 100ml,Xenex,61,304,318,Xenex,61,304,318,High,TRUE,TRUE,TRUE
+XENEX ULTRA SPOT-ON 6'S,Xenex,61,304,318,Xenex,61,304,2527,High,TRUE,TRUE,FALSE
+Xenex Spray 250ml,Xenex,61,304,318,Xenex,61,304,318,Medium,TRUE,TRUE,TRUE
+XENEX ULTRA SPOT ON 1ML^,Xenex,61,304,2527,Xenex,61,,,Medium,TRUE,FALSE,FALSE
+Strongid P Paste,Strongid,17,108,325,Unknown,,,,Low,FALSE,FALSE,FALSE
+Strongid P Syringe Sng,Strongid,17,108,325,Strongid,17,108,2424,High,TRUE,TRUE,FALSE
+Strongid P Paste Original,Strongid,17,108,325,Unknown,,,,Low,FALSE,FALSE,FALSE
+strongid p granules,Strongid,17,108,325,Strongid,17,108,325,Medium,TRUE,TRUE,TRUE
+STRONGID P GRANS,Strongid,17,108,325,Unknown,,,,Low,FALSE,FALSE,FALSE
+Rip Fleas Extra Spray 600ml,Rip Fleas,63,311,326,Rip Fleas,63,311,326,High,TRUE,TRUE,TRUE
+Rip Fleas Extra 600ml,Rip Fleas,63,311,326,Rip Fleas,63,311,326,High,TRUE,TRUE,TRUE
+RIP Flea Spray 600ml,Rip Fleas,63,310,327,Rip Fleas,63,311,326,High,TRUE,FALSE,FALSE
+RIP Fleas 600ml,Rip Fleas,63,311,326,Rip Fleas,63,311,326,Medium,TRUE,TRUE,TRUE
+RIP FLEAS EXTRA SPRAY 600ML (1),Rip Fleas,63,311,326,Rip Fleas,63,311,326,High,TRUE,TRUE,TRUE
+CERTIFECT SMALL DOG 3 PIP,Certifect,33,205,249,Certifect,33,205,249,High,TRUE,TRUE,TRUE
+Certifect Large Dog 3 Pip,Certifect,33,203,251,Certifect,33,203,251,High,TRUE,TRUE,TRUE
+Certifect X-large Dog 3 Pip,Certifect,33,203,251,Certifect,33,203,251,High,TRUE,TRUE,TRUE
+Certifect Medium Dog 3 Pip,Certifect,33,204,253,Certifect,33,204,253,High,TRUE,TRUE,TRUE
+CERTIFECT SPOT ON LGE DOG,Certifect,33,203,251,Certifect,33,203,2467,Medium,TRUE,TRUE,FALSE
+ENDOGARD PLUS FLAV TABS(1 PER 10KG) PK 100,Endogard,41,235,2487,Drontal,3,,,Medium,FALSE,FALSE,FALSE
+ENDOGARD PLUS TABS XL(1 PER 35KG) PK 12,Endogard,41,236,2488,Drontal,3,,,Very Low,FALSE,FALSE,FALSE
+ENDOGARD PLUS TABS XL(>35KG),Endogard,41,236,377,Drontal,3,,,Very Low,FALSE,FALSE,FALSE
+Endogard Dog Plus Flavour (100) (per tab),Endogard,41,235,378,Drontal,3,26,,Medium,FALSE,FALSE,FALSE
+ENDOGARD PLUS FLAVOUR DOG TABS 100,Endogard,41,235,378,Drontal,3,26,,High,FALSE,FALSE,FALSE
+Acclaim 500ml,Vetkem Acclaim,75,385,366,Revolution Plus,181,,,Very Low,FALSE,FALSE,FALSE
+VETKEM ACCLAIM 2000 400ML,Vetkem Acclaim,75,385,366,Vetkem Acclaim,75,385,366,High,TRUE,TRUE,TRUE
+ACCLAIM H/HOLD FLEA SPRY 500ML,Vetkem Acclaim,75,385,366,Vetkem Acclaim,75,385,366,High,TRUE,TRUE,TRUE
+Vetkem Acclaim 2000,Vetkem Acclaim,75,385,366,Vetkem Acclaim,75,385,1295,High,TRUE,TRUE,FALSE
+Acclaim 2000,Vetkem Acclaim,75,385,366,Unknown,,,,Low,FALSE,FALSE,FALSE
+Trifexis 665/11.1mg (6) (each tab),Trifexis,11,73,2399,Trifexis,11,73,2399,High,TRUE,TRUE,TRUE
+Trifexis 425/7.1mg (6) (each tab),Trifexis,11,73,2399,Trifexis,11,73,2399,High,TRUE,TRUE,TRUE
+Trifexis 270/4.5mg (6) (each tab),Trifexis,11,73,2399,Trifexis,11,73,63,High,TRUE,TRUE,FALSE
+Trifexis 1620/27mg (6) (each tab),Trifexis,11,73,2399,Trifexis,11,73,63,High,TRUE,TRUE,FALSE
+Trifexis 1040/17.4mg (6) (each tab),Trifexis,11,73,2399,Trifexis,11,73,63,High,TRUE,TRUE,FALSE
+Moxiclear for Cats over 4kg (3 Pack),Moxiclear,163,1892,3315,Moxiclear,163,1892,3315,High,TRUE,TRUE,TRUE
+Moxiclear for Dogs over 25kg (6 Pack),Moxiclear,163,1891,3312,Moxiclear,163,1891,3312,High,TRUE,TRUE,TRUE
+Moxiclear for Dogs 10-25kg (6 Pack),Moxiclear,163,1888,3297,Moxiclear,163,1888,3297,High,TRUE,TRUE,TRUE
+Moxiclear for Kittens & Small Cats up to 4kg (6 Pack),Moxiclear,163,1890,3307,Moxiclear,163,1890,3307,High,TRUE,TRUE,TRUE
+Moxiclear for Dogs 4-10kg (6 Pack),Moxiclear,163,1887,3292,Moxiclear,163,1887,3292,High,TRUE,TRUE,TRUE
+Milbactor Tabs Dog 12.5/125mg,Milbactor,53,280,427,Milbactor,53,280,1209,Medium,TRUE,TRUE,FALSE
+Milbactor Tabs Puppy 2.5/25mg,Milbactor,53,281,426,Milbactor,53,281,426,Medium,TRUE,TRUE,TRUE
+Milbactor 12.5mg Dog (48) (per tab),Milbactor,53,280,427,Milbactor,53,280,427,High,TRUE,TRUE,TRUE
+Milbactor 12.5mg Dog (4) (per tab),Milbactor,53,280,427,Milbactor,53,280,427,High,TRUE,TRUE,TRUE
+Milbactor 2.5mg Dog (4) (per tab),Milbactor,53,281,426,Milbactor,53,281,426,High,TRUE,TRUE,TRUE
+Révolution PLUS VERT 60mg/10mg/fiole (chat 5.1-10kgs),Revolution Plus,181,1926,3481,Revolution Plus,181,1926,3481,High,TRUE,TRUE,TRUE
+Révolution PLUS ORANGE 30mg/5mg/fiole (chat 2.6-5kgs),Revolution Plus,181,1925,3490,Revolution Plus,181,1925,3490,High,TRUE,TRUE,TRUE
+Revolution Plus 5.1-10kg,Revolution Plus,181,1926,3481,Revolution Plus,181,1926,3481,High,TRUE,TRUE,TRUE
+Revolution Plus for Small Cats & Kittens 1.25-2.5kg Yellow (3 Pack),Revolution Plus,181,1982,3618,Revolution Plus,181,1982,3618,High,TRUE,TRUE,TRUE
+Révolution PLUS DORÉ 15mg/2.5mg/fiole (chat 1.3-2.5kgs),Revolution Plus,181,1984,3621,Revolution Plus,181,1924,3493,Medium,TRUE,FALSE,FALSE
+Sentinel Spectrum Brown 0-4kg,Sentinel Spectrum,19,113,449,Sentinel Spectrum,19,,,Medium,TRUE,FALSE,FALSE
+Sentinel Spectrum Green 4-11kg,Sentinel Spectrum,19,116,451,Sentinel Spectrum,19,116,2432,High,TRUE,TRUE,FALSE
+Sentinel Spectrum Green,Sentinel Spectrum,19,115,450,Sentinel Spectrum,19,531,857,Medium,TRUE,FALSE,FALSE
+Sentinel Spectrum White,Sentinel Spectrum,19,115,450,Sentinel Spectrum,19,,,Medium,TRUE,FALSE,FALSE
+Sentinel Spectrum Yellow,Sentinel Spectrum,19,114,448,Sentinel Spectrum,19,532,859,Medium,TRUE,FALSE,FALSE
+Popantel Tapewormer,Popantel,78,603,2750,Popantel,78,603,2750,High,TRUE,TRUE,TRUE
+Popantel Allwormer Tablets For Dogs,Popantel,78,397,596,Popantel,78,397,596,Medium,TRUE,TRUE,TRUE
+Popantel Allwormer Tablets For Large Dogs,Popantel,78,398,597,Popantel,78,398,597,High,TRUE,TRUE,TRUE
+Popantel Cat Allwormer Tablets (50 Pack),Popantel,78,399,600,Popantel,78,399,600,High,TRUE,TRUE,TRUE
+"Popantel Tapewormer Tablets, Dogs and Cats - Jurox (100 Pack)",Popantel,78,603,2750,Popantel,78,603,2750,High,TRUE,TRUE,TRUE
+FELPREVA SMALL CATS S.O. 1.0 - 2.5kg  PK10,Felpreva,231,2070,3713,Felpreva,231,2070,3713,High,TRUE,TRUE,TRUE
+FELPREVA MEDIUM CATS S.O  >2.5 - 5.0kg  PK10,Felpreva,231,2071,3712,Felpreva,231,2071,3712,High,TRUE,TRUE,TRUE
+FELPREVA LARGE CATS S.O  >5.0 - 8.0kg  PK10,Felpreva,231,2072,3711,Felpreva,231,2072,3711,High,TRUE,TRUE,TRUE
+Felpreva mittl.gr. Katze 10Pip.,Felpreva,231,2071,3712,Felpreva,231,2071,3697,High,TRUE,TRUE,FALSE
+Felpreva kleine Katze 2Pip.,Felpreva,231,2070,3696,Unknown,,,,Low,FALSE,FALSE,FALSE
+Cazitel for Cats (24) (per tab),Cazitel,72,697,2839,Cazitel,72,376,2561,High,TRUE,FALSE,FALSE
+Cazitel Plus for Dogs (104) (per tab),Cazitel,72,376,365,Cazitel,72,376,365,High,TRUE,TRUE,TRUE
+CAZITEL PLUS TABS+DISP ENV,Cazitel,72,376,365,Cazitel,72,376,365,Medium,TRUE,TRUE,TRUE
+CAZITEL FOR CATS 24 TABS,Cazitel,72,376,365,Cazitel,72,697,1293,High,TRUE,FALSE,FALSE
+Cazitel Plus XL for Dog (50) (per tab),Cazitel,72,698,2840,Cazitel,72,698,2840,Medium,TRUE,TRUE,TRUE
+MILQUANTEL ADULT DOG 48 TABS,Milquantel,29,164,575,Milbactor,53,280,1209,High,FALSE,FALSE,FALSE
+MILQUANTEL ADULT CAT 48 TABS,Milquantel,29,165,578,Milbactor,53,694,1280,High,FALSE,FALSE,FALSE
+MILQUANTEL ADULT CAT,Milquantel,29,165,578,Milquantel,29,165,1230,Medium,TRUE,TRUE,FALSE
+Milquantel Adult Dog,Milquantel,29,164,575,Milquantel,29,164,1334,Medium,TRUE,TRUE,FALSE
+MILQUANTEL SML DOG/PUPPY 48 TABS,Milquantel,29,166,576,Milbactor,53,281,1211,High,FALSE,FALSE,FALSE
+Advantage Multi 100 ( 25 à 45kg/ 55 à 99lbs) bte 6,Advantage Multi,93,473,723,Advantage Multi,93,475,727,High,TRUE,FALSE,FALSE
+"Advantage Multi 18 (4 to 8,2kg/8 to 18 pds) box 6",Advantage Multi,93,472,721,Advantage Multi,93,473,723,Medium,TRUE,FALSE,FALSE
+Advantage Multi 100,Advantage Multi,93,471,720,Advantage Multi,93,,,Medium,TRUE,FALSE,FALSE
+Advantage Multi 100 Can.6t/4.0 ml,Advantage Multi,93,475,727,Advantage Multi,93,,,Medium,TRUE,FALSE,FALSE
+Advantage MULTI 20 chiens 4.6kg-9kg(UNITÉ),Advantage Multi,93,473,2626,Advantage Multi,93,473,2626,High,TRUE,TRUE,TRUE
+PANORAMIS 4.6-9KG ORANGE,Panoramis,21,125,2442,Panoramis,21,125,2442,Medium,TRUE,TRUE,TRUE
+PANORAMIS 2.3-4.5KG PINK,Panoramis,21,125,2438,Panoramis,21,122,458,High,TRUE,FALSE,FALSE
+Panoramis 18.1-27kg Blue 6 Tab,Panoramis,21,125,456,Panoramis,21,125,456,High,TRUE,TRUE,TRUE
+Panoramis Orange 4.6-9kg,Panoramis,21,126,2442,Panoramis,21,125,456,Medium,TRUE,FALSE,FALSE
+Panoramis 2.3-4.5kg Pink 6 Tab,Panoramis,21,125,456,Panoramis,21,125,456,High,TRUE,TRUE,TRUE
+Granofen Wormer 1gm Sachet (180) (per sachet),Granofen,42,238,380,Granofen,42,238,380,High,TRUE,TRUE,TRUE
+Granofen Wormer 4gm Sachs (100) (per sachet),Granofen,42,240,382,Granofen,42,240,382,High,TRUE,TRUE,TRUE
+GRANOFEN GRANS 1G SACH CAT/DOG,Granofen,42,238,380,Granofen,42,238,380,High,TRUE,TRUE,TRUE
+GRANOFEN GRANS 4G SACH CAT/DOG,Granofen,42,240,382,Granofen,42,240,382,High,TRUE,TRUE,TRUE
+Granofen Wormer 2gm Sachet (120) (per sachet),Granofen,42,239,381,Granofen,42,239,381,High,TRUE,TRUE,TRUE
+Lapizole 100ml,Lapizole,60,301,316,Lapizole,60,301,316,High,TRUE,TRUE,TRUE
+LAPIZOLE,Lapizole,60,301,316,Lapizole,60,301,316,High,TRUE,TRUE,TRUE
+LAPIZOLE 100ML (1),Lapizole,60,301,316,Lapizole,60,301,316,High,TRUE,TRUE,TRUE
+LAPIZOLE                      100ML,Lapizole,60,301,316,Lapizole,60,301,316,High,TRUE,TRUE,TRUE
+LAPIZOLE 20MG/ML 100ML,Lapizole,60,301,316,Lapizole,60,301,316,High,TRUE,TRUE,TRUE
+flevox cat,Flevox,30,168,267,Flevox,30,168,267,Medium,TRUE,TRUE,TRUE
+Flevox Spot On Cat Sng,Flevox,30,168,267,Flevox,30,168,267,High,TRUE,TRUE,TRUE
+Flevox 50 mg Spot-on Lösung für Katzen 36Pip.,Flevox,30,168,267,Flevox,30,,,Very Low,TRUE,FALSE,FALSE
+Flevox 67 mg Spot-on Lösung für kleine Hunde 36Pip.,Flevox,30,176,261,Flevox,30,176,261,Medium,TRUE,TRUE,TRUE
+FLEVOX SPOT ON MED DOG SNG,Flevox,30,174,265,Flevox,30,174,265,High,TRUE,TRUE,TRUE
