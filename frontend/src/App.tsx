@@ -6,8 +6,10 @@ import ResultsPanel from "./components/ResultsPanel";
 import type { ResultMode } from "./components/ResultsPanel";
 import ProgressBar from "./components/ProgressBar";
 import HowToSection from "./components/HowToSection";
+import PipelineModeSelector from "./components/PipelineModeSelector";
 import { ToastContainer, useToasts } from "./components/Toast";
 import { cancelBatch, getBatchStatus, queryProduct, uploadBatch } from "./api";
+import type { PipelineMode } from "./api";
 import type { BatchJobStatus, QueryResponse } from "./types";
 import "./App.css";
 
@@ -22,6 +24,7 @@ const BATCH_POLL_INTERVAL_MS = 1500;
 
 function App() {
   const [mode, setMode] = useState<ResultMode>("idle");
+  const [pipelineMode, setPipelineMode] = useState<PipelineMode>("structured");
   const [loading, setLoading] = useState(false);
 
   const [queryResult, setQueryResult] = useState<QueryResponse | null>(null);
@@ -56,11 +59,14 @@ function App() {
     queryAbortController.current = controller;
 
     try {
-      const result = await queryProduct(query, enableLiveFallback, enableLlmJudge, controller.signal);
+      const result = await queryProduct(query, enableLiveFallback, enableLlmJudge, pipelineMode, controller.signal);
       setQueryResult(result);
+
+      const idCount = result.id_combinations.length;
+      const idNote = idCount === 1 ? "1 ID" : `${idCount} possible IDs`;
       pushToast(
         "success",
-        `Matched "${query.trim()}" → ${result.primary_match.brand || "Unknown"} (${result.primary_match.confidence || "—"})`
+        `Matched "${query.trim()}" → ${result.product_match.brand || "Unknown"} (${result.product_match.confidence || "—"}, ${idNote})`
       );
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
@@ -93,7 +99,7 @@ function App() {
     setBatchJobId(null);
 
     try {
-      const { job_id, total_rows } = await uploadBatch(file, enableLiveFallback, enableLlmJudge);
+      const { job_id, total_rows } = await uploadBatch(file, enableLiveFallback, enableLlmJudge, pipelineMode);
       setBatchJobId(job_id);
       pushToast("info", `Processing ${total_rows} row(s)...`);
 
@@ -150,6 +156,8 @@ function App() {
       <h1>Veterinary Product Matching System</h1>
 
       <HowToSection />
+
+      <PipelineModeSelector mode={pipelineMode} onChange={setPipelineMode} disabled={loading} />
 
       <ProgressBar
         active={loading}

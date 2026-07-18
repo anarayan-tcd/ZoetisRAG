@@ -334,22 +334,43 @@ button.secondary {
   gap: 0.75rem;
 }
 
-.match-card {
-  border: 1px solid #444;
-  border-radius: 6px;
-  padding: 0.6rem 0.9rem;
+.match-card,
+.id-card {
+  border: 1px solid #2a2f3a;
+  border-radius: 8px;
+  background: #1a1e27;
+  padding: 0.9rem 1.1rem 1rem;
 }
 
-.match-card summary {
-  cursor: pointer;
+.match-card-head,
+.id-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #2a2f3a;
+}
+
+.match-card-head h3,
+.id-card-head h3 {
+  margin: 0;
+  font-size: 0.95rem;
   font-weight: 600;
+}
+
+.confidence-pill {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .match-card dl {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.25rem 0.75rem;
-  margin-top: 0.75rem;
+  gap: 0.3rem 0.75rem;
+  margin: 0;
   font-size: 0.9rem;
 }
 
@@ -359,6 +380,89 @@ button.secondary {
 
 .match-card dd {
   margin: 0;
+}
+
+/* ── ID combinations ────────────────────────────────────────── */
+
+.id-count-pill {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 0.72rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #12151c;
+  border: 1px solid #2a2f3a;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+/* More than one id means the catalog genuinely cannot separate them —
+   worth flagging as something to look at, not styling as an error. */
+.id-count-pill.ambiguous {
+  background: #2b2413;
+  border-color: #6b4f18;
+  color: #e0b341;
+}
+
+.id-table-wrap {
+  overflow-x: auto;
+}
+
+.id-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+
+.id-table th {
+  text-align: left;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #8b96a8;
+  font-weight: 600;
+  padding: 0 0.55rem 0.4rem;
+  white-space: nowrap;
+}
+
+.id-table td {
+  padding: 0.4rem 0.55rem;
+  border-top: 1px solid #2a2f3a;
+  vertical-align: top;
+}
+
+.id-table tbody tr:first-child td {
+  font-weight: 600;
+}
+
+.id-num {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.id-desc {
+  color: #cbd5e1;
+}
+
+.id-occ {
+  color: #6b7688;
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+
+.id-reason {
+  margin: 0.85rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px solid #2a2f3a;
+  font-size: 0.79rem;
+  line-height: 1.5;
+  color: #8b96a8;
+}
+
+.id-empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #8b96a8;
 }
 
 /* ── Progress bar (shared: determinate for batch, indeterminate for query) */
@@ -402,6 +506,26 @@ button.secondary {
   font-size: 0.8rem;
   font-weight: 600;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* ── Usage / cost summary ───────────────────────────────────── */
+
+.usage-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #12151c;
+  border: 1px solid #2a2f3a;
+  font-size: 0.8rem;
+  color: #93b4f8;
+  cursor: help;
+}
+
+.usage-summary span:nth-child(even) {
+  color: #4a5568;
 }
 
 /* ── Batch summary / downloads ─────────────────────────────── */
@@ -475,4 +599,86 @@ button.secondary {
 
 .toast-info {
   background: #2563eb;
+}
+
+/* ── Pipeline mode selector ─────────────────────────────────── */
+
+.pipeline-mode-selector {
+  background: #1a1e27;
+  border: 1px solid #2a2f3a;
+  border-radius: 10px;
+  padding: 1rem 1.25rem 1.1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.pipeline-mode-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #8b96a8;
+}
+
+.pipeline-mode-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 700px) {
+  .pipeline-mode-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pipeline-mode-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid #2a2f3a;
+  border-radius: 8px;
+  background: #12151c;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.pipeline-mode-card:hover:not(.disabled) {
+  border-color: #3b4354;
+}
+
+.pipeline-mode-card.selected {
+  border-color: #2563eb;
+  background: #16203a;
+}
+
+.pipeline-mode-card.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pipeline-mode-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pipeline-mode-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.pipeline-mode-card.selected .pipeline-mode-title {
+  color: #93b4f8;
+}
+
+.pipeline-mode-description {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #8b96a8;
 }
