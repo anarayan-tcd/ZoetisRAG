@@ -1,6 +1,6 @@
 // api.ts — plain fetch calls against the FastAPI backend.
-// Base URL comes from VITE_API_BASE at build time (set it in Azure Static
-// Web Apps' GitHub Actions workflow env, or a local .env.local for dev),
+// Base URL comes from VITE_API_BASE at build time (set it in a local
+// .env.local, or in CI/deployment config once this is hosted somewhere),
 // falling back to localhost so `npm run dev` keeps working unconfigured.
 
 import type { BatchJobStatus, QueryResponse } from "./types";

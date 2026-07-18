@@ -11,14 +11,11 @@ from pipeline.raw import query_agent
 
 app = FastAPI(title="Veterinary Product Matching API")
 
-# Vite's default dev server ports for local dev, plus every
-# *.azurestaticapps.net origin — Azure Static Web Apps serves the
-# production build from one such domain and spins up a distinct one per
-# branch/PR preview environment, so a fixed origin list would break those.
+# Vite's default dev server ports for local dev. This app runs locally
+# only for now — add a production origin here if/when it's deployed again.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:3000"],
-    allow_origin_regex=r"https://.*\.azurestaticapps\.net",
     allow_methods=["*"],
     allow_headers=["*"],
 )
