@@ -1,0 +1,718 @@
+{
+ "Frontline": {
+  "variants_researched": 33,
+  "variants_colored": 16
+ },
+ "Advantage Multi": {
+  "variants_researched": 18,
+  "variants_colored": 16
+ },
+ "Nexgard": {
+  "variants_researched": 29,
+  "variants_colored": 29
+ },
+ "Bravecto": {
+  "variants_researched": 33,
+  "variants_colored": 28
+ },
+ "PetArmor": {
+  "variants_researched": 19,
+  "variants_colored": 0
+ },
+ "Simparica": {
+  "variants_researched": 36,
+  "variants_colored": 36
+ },
+ "Advantage": {
+  "variants_researched": 17,
+  "variants_colored": 4
+ },
+ "Credelio": {
+  "variants_researched": 51,
+  "variants_colored": 29
+ },
+ "Simparica Trio": {
+  "variants_researched": 24,
+  "variants_colored": 24
+ },
+ "Advocate": {
+  "variants_researched": 23,
+  "variants_colored": 18
+ },
+ "Advantix": {
+  "variants_researched": 19,
+  "variants_colored": 18
+ },
+ "Drontal": {
+  "variants_researched": 21,
+  "variants_colored": 0
+ },
+ "Milbeworm": {
+  "variants_researched": 9,
+  "variants_colored": 9
+ },
+ "Virbac": {
+  "variants_researched": 12,
+  "variants_colored": 0
+ },
+ "Interceptor Plus": {
+  "variants_researched": 16,
+  "variants_colored": 15
+ },
+ "Evicto": {
+  "variants_researched": 15,
+  "variants_colored": 6
+ },
+ "Ivermectin": {
+  "variants_researched": 15,
+  "variants_colored": 0
+ },
+ "Wormout": {
+  "variants_researched": 11,
+  "variants_colored": 0
+ },
+ "Panoramis": {
+  "variants_researched": 10,
+  "variants_colored": 10
+ },
+ "Carprieve": {
+  "variants_researched": 68,
+  "variants_colored": 0
+ },
+ "Revolution Plus": {
+  "variants_researched": 9,
+  "variants_colored": 9
+ },
+ "Stronghold": {
+  "variants_researched": 19,
+  "variants_colored": 2
+ },
+ "Effipro": {
+  "variants_researched": 22,
+  "variants_colored": 8
+ },
+ "Activyl": {
+  "variants_researched": 14,
+  "variants_colored": 0
+ },
+ "Milbemax": {
+  "variants_researched": 18,
+  "variants_colored": 18
+ },
+ "Vectra 3D": {
+  "variants_researched": 20,
+  "variants_colored": 20
+ },
+ "Vectra": {
+  "variants_researched": 21,
+  "variants_colored": 6
+ },
+ "Frontline Plus": {
+  "variants_researched": 25,
+  "variants_colored": 9
+ },
+ "Wagg & Purr": {
+  "variants_researched": 29,
+  "variants_colored": 11
+ },
+ "マイフリーガード": {
+  "variants_researched": 0,
+  "variants_colored": 0
+ },
+ "Apoquel": {
+  "variants_researched": 24,
+  "variants_colored": 0
+ },
+ "Sentinel": {
+  "variants_researched": 9,
+  "variants_colored": 9
+ },
+ "Guardian": {
+  "variants_researched": 48,
+  "variants_colored": 0
+ },
+ "Dadektin Combo": {
+  "variants_researched": 15,
+  "variants_colored": 0
+ },
+ "Panacur": {
+  "variants_researched": 7,
+  "variants_colored": 3
+ },
+ "Fiproclear": {
+  "variants_researched": 21,
+  "variants_colored": 8
+ },
+ "Milbevet": {
+  "variants_researched": 19,
+  "variants_colored": 0
+ },
+ "Program": {
+  "variants_researched": 11,
+  "variants_colored": 4
+ },
+ "Endectrid": {
+  "variants_researched": 18,
+  "variants_colored": 0
+ },
+ "VetaHeart": {
+  "variants_researched": 9,
+  "variants_colored": 0
+ },
+ "Mipet": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Heartgard": {
+  "variants_researched": 11,
+  "variants_colored": 11
+ },
+ "Certifect": {
+  "variants_researched": 8,
+  "variants_colored": 6
+ },
+ "Selapro": {
+  "variants_researched": 18,
+  "variants_colored": 18
+ },
+ "Galliprant": {
+  "variants_researched": 11,
+  "variants_colored": 0
+ },
+ "Nexgard Spectra": {
+  "variants_researched": 14,
+  "variants_colored": 14
+ },
+ "Trifexis": {
+  "variants_researched": 5,
+  "variants_colored": 5
+ },
+ "Dolpac": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Feliway": {
+  "variants_researched": 13,
+  "variants_colored": 0
+ },
+ "Imoxat": {
+  "variants_researched": 8,
+  "variants_colored": 0
+ },
+ "Librela": {
+  "variants_researched": 30,
+  "variants_colored": 25
+ },
+ "Fleanil": {
+  "variants_researched": 18,
+  "variants_colored": 0
+ },
+ "Fyperix": {
+  "variants_researched": 15,
+  "variants_colored": 0
+ },
+ "Profender": {
+  "variants_researched": 14,
+  "variants_colored": 5
+ },
+ "Flevox": {
+  "variants_researched": 18,
+  "variants_colored": 16
+ },
+ "Atopica": {
+  "variants_researched": 9,
+  "variants_colored": 5
+ },
+ "Drontal Plus": {
+  "variants_researched": 21,
+  "variants_colored": 0
+ },
+ "Advantage Duo": {
+  "variants_researched": 7,
+  "variants_colored": 7
+ },
+ "Selehold": {
+  "variants_researched": 15,
+  "variants_colored": 15
+ },
+ "Clearspot": {
+  "variants_researched": 19,
+  "variants_colored": 0
+ },
+ "Ezybone Plus": {
+  "variants_researched": 2,
+  "variants_colored": 0
+ },
+ "Strongid": {
+  "variants_researched": 4,
+  "variants_colored": 0
+ },
+ "Felpreva": {
+  "variants_researched": 11,
+  "variants_colored": 5
+ },
+ "Milquantel": {
+  "variants_researched": 15,
+  "variants_colored": 4
+ },
+ "Heartgard Plus": {
+  "variants_researched": 18,
+  "variants_colored": 18
+ },
+ "Cytopoint": {
+  "variants_researched": 12,
+  "variants_colored": 0
+ },
+ "Endogard": {
+  "variants_researched": 18,
+  "variants_colored": 12
+ },
+ "Seresto": {
+  "variants_researched": 7,
+  "variants_colored": 2
+ },
+ "Revolution": {
+  "variants_researched": 24,
+  "variants_colored": 24
+ },
+ "Droncit": {
+  "variants_researched": 13,
+  "variants_colored": 0
+ },
+ "Milprazon": {
+  "variants_researched": 22,
+  "variants_colored": 0
+ },
+ "Preventic": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Amflee": {
+  "variants_researched": 29,
+  "variants_colored": 0
+ },
+ "Promeris": {
+  "variants_researched": 14,
+  "variants_colored": 0
+ },
+ "Moxiclear": {
+  "variants_researched": 19,
+  "variants_colored": 19
+ },
+ "Pestigon": {
+  "variants_researched": 14,
+  "variants_colored": 0
+ },
+ "Fipnil": {
+  "variants_researched": 11,
+  "variants_colored": 0
+ },
+ "Frontline Gold": {
+  "variants_researched": 10,
+  "variants_colored": 10
+ },
+ "MultiGard": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "MultiGard Plus": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Perfikan": {
+  "variants_researched": 5,
+  "variants_colored": 0
+ },
+ "Trocoxil": {
+  "variants_researched": 5,
+  "variants_colored": 0
+ },
+ "Popantel": {
+  "variants_researched": 15,
+  "variants_colored": 0
+ },
+ "Cazitel": {
+  "variants_researched": 11,
+  "variants_colored": 6
+ },
+ "Prazitel": {
+  "variants_researched": 11,
+  "variants_colored": 4
+ },
+ "Comfortis Plus": {
+  "variants_researched": 15,
+  "variants_colored": 15
+ },
+ "イベルメック": {
+  "variants_researched": 8,
+  "variants_colored": 0
+ },
+ "Canine AllWormer": {
+  "variants_researched": 10,
+  "variants_colored": 4
+ },
+ "Exelpet": {
+  "variants_researched": 9,
+  "variants_colored": 0
+ },
+ "Comfortis": {
+  "variants_researched": 34,
+  "variants_colored": 24
+ },
+ "Milpro": {
+  "variants_researched": 8,
+  "variants_colored": 8
+ },
+ "Prac-Tic": {
+  "variants_researched": 4,
+  "variants_colored": 2
+ },
+ "Scalibor": {
+  "variants_researched": 7,
+  "variants_colored": 7
+ },
+ "Eliminall": {
+  "variants_researched": 9,
+  "variants_colored": 0
+ },
+ "Milbactor": {
+  "variants_researched": 4,
+  "variants_colored": 0
+ },
+ "Sentinel Spectrum": {
+  "variants_researched": 14,
+  "variants_colored": 14
+ },
+ "Anthelmin": {
+  "variants_researched": 7,
+  "variants_colored": 0
+ },
+ "Adaptil": {
+  "variants_researched": 10,
+  "variants_colored": 0
+ },
+ "Dronspot": {
+  "variants_researched": 9,
+  "variants_colored": 0
+ },
+ "Cestex": {
+  "variants_researched": 9,
+  "variants_colored": 0
+ },
+ "Equimax": {
+  "variants_researched": 12,
+  "variants_colored": 0
+ },
+ "Veloxa": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Vectra Felis": {
+  "variants_researched": 3,
+  "variants_colored": 3
+ },
+ "Fiprodog": {
+  "variants_researched": 7,
+  "variants_colored": 0
+ },
+ "パナメクチン": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Fiprocat": {
+  "variants_researched": 2,
+  "variants_colored": 0
+ },
+ "Bimectin": {
+  "variants_researched": 19,
+  "variants_colored": 5
+ },
+ "Fleascreen": {
+  "variants_researched": 14,
+  "variants_colored": 0
+ },
+ "Endospec": {
+  "variants_researched": 7,
+  "variants_colored": 7
+ },
+ "Bravecto Quantum": {
+  "variants_researched": 1,
+  "variants_colored": 0
+ },
+ "Prinovox": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Broadline": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Bravecto Plus": {
+  "variants_researched": 9,
+  "variants_colored": 9
+ },
+ "Xenex": {
+  "variants_researched": 0,
+  "variants_colored": 0
+ },
+ "Fenpral": {
+  "variants_researched": 7,
+  "variants_colored": 0
+ },
+ "Prinocate": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Easecto": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Big 5": {
+  "variants_researched": 5,
+  "variants_colored": 3
+ },
+ "Ranvet": {
+  "variants_researched": 37,
+  "variants_colored": 0
+ },
+ "Vetkem": {
+  "variants_researched": 7,
+  "variants_colored": 0
+ },
+ "Chanotal": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Fiprofile": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "HFT Ezybone": {
+  "variants_researched": 5,
+  "variants_colored": 0
+ },
+ "Heart Gold": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Fiprospot": {
+  "variants_researched": 26,
+  "variants_colored": 0
+ },
+ "モキシハート (Moxiheart)": {
+  "variants_researched": 5,
+  "variants_colored": 0
+ },
+ "Quantex": {
+  "variants_researched": 5,
+  "variants_colored": 0
+ },
+ "Aristopet": {
+  "variants_researched": 13,
+  "variants_colored": 0
+ },
+ "Cestem": {
+  "variants_researched": 4,
+  "variants_colored": 0
+ },
+ "Duoflect": {
+  "variants_researched": 5,
+  "variants_colored": 0
+ },
+ "EvictaWorm": {
+  "variants_researched": 11,
+  "variants_colored": 6
+ },
+ "Heart Gold Plus": {
+  "variants_researched": 11,
+  "variants_colored": 0
+ },
+ "Proheart": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Vetkem Acclaim": {
+  "variants_researched": 9,
+  "variants_colored": 0
+ },
+ "Interceptor Spectrum": {
+  "variants_researched": 10,
+  "variants_colored": 10
+ },
+ "Wormazole": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Paragard": {
+  "variants_researched": 5,
+  "variants_colored": 5
+ },
+ "Canex": {
+  "variants_researched": 12,
+  "variants_colored": 0
+ },
+ "Promectin Plus": {
+  "variants_researched": 3,
+  "variants_colored": 2
+ },
+ "Mox": {
+  "variants_researched": 27,
+  "variants_colored": 11
+ },
+ "Ypozane": {
+  "variants_researched": 4,
+  "variants_colored": 0
+ },
+ "Kiltix": {
+  "variants_researched": 9,
+  "variants_colored": 0
+ },
+ "F10": {
+  "variants_researched": 17,
+  "variants_colored": 0
+ },
+ "Moxidex SR for Injection": {
+  "variants_researched": 3,
+  "variants_colored": 0
+ },
+ "Preventic Spot On for Dogs": {
+  "variants_researched": 6,
+  "variants_colored": 0
+ },
+ "Xeno": {
+  "variants_researched": 3,
+  "variants_colored": 0
+ },
+ "Capstar": {
+  "variants_researched": 16,
+  "variants_colored": 16
+ },
+ "Granofen": {
+  "variants_researched": 3,
+  "variants_colored": 0
+ },
+ "Vitrecto": {
+  "variants_researched": 3,
+  "variants_colored": 3
+ },
+ "Felisecto": {
+  "variants_researched": 3,
+  "variants_colored": 3
+ },
+ "Ammo": {
+  "variants_researched": 10,
+  "variants_colored": 2
+ },
+ "Frontera": {
+  "variants_researched": 3,
+  "variants_colored": 0
+ },
+ "Endofluke": {
+  "variants_researched": 3,
+  "variants_colored": 0
+ },
+ "Ambex": {
+  "variants_researched": 0,
+  "variants_colored": 0
+ },
+ "Solensia": {
+  "variants_researched": 2,
+  "variants_colored": 0
+ },
+ "Indorex": {
+  "variants_researched": 3,
+  "variants_colored": 0
+ },
+ "Bolfo Plus": {
+  "variants_researched": 3,
+  "variants_colored": 0
+ },
+ "Canimax": {
+  "variants_researched": 3,
+  "variants_colored": 1
+ },
+ "Skoosh": {
+  "variants_researched": 2,
+  "variants_colored": 0
+ },
+ "Permaguard": {
+  "variants_researched": 8,
+  "variants_colored": 0
+ },
+ "Paratak": {
+  "variants_researched": 3,
+  "variants_colored": 0
+ },
+ "Felex": {
+  "variants_researched": 0,
+  "variants_colored": 0
+ },
+ "Prowormer": {
+  "variants_researched": 4,
+  "variants_colored": 0
+ },
+ "Prascend": {
+  "variants_researched": 3,
+  "variants_colored": 3
+ },
+ "Pentoject": {
+  "variants_researched": 3,
+  "variants_colored": 3
+ },
+ "EasySpot": {
+  "variants_researched": 3,
+  "variants_colored": 0
+ },
+ "Felimintic": {
+  "variants_researched": 1,
+  "variants_colored": 0
+ },
+ "Staykill": {
+  "variants_researched": 2,
+  "variants_colored": 0
+ },
+ "Rearguard": {
+  "variants_researched": 1,
+  "variants_colored": 0
+ },
+ "Rip Fleas": {
+  "variants_researched": 1,
+  "variants_colored": 0
+ },
+ "Lapizole": {
+  "variants_researched": 0,
+  "variants_colored": 0
+ },
+ "Pyratape P": {
+  "variants_researched": 2,
+  "variants_colored": 0
+ },
+ "Troy": {
+  "variants_researched": 8,
+  "variants_colored": 1
+ },
+ "Ilium": {
+  "variants_researched": 3,
+  "variants_colored": 0
+ },
+ "Plerion": {
+  "variants_researched": 2,
+  "variants_colored": 0
+ },
+ "Entera": {
+  "variants_researched": 0,
+  "variants_colored": 0
+ },
+ "Bob Martin": {
+  "variants_researched": 1,
+  "variants_colored": 0
+ },
+ "Canac": {
+  "variants_researched": 2,
+  "variants_colored": 0
+ },
+ "Vet Sect": {
+  "variants_researched": 1,
+  "variants_colored": 1
+ }
+}
