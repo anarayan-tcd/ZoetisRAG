@@ -6,6 +6,7 @@
 
 import json
 import re
+import difflib
 import threading
 from pathlib import Path
 import os
@@ -113,12 +114,66 @@ BRAND_PRODUCT_IDS = _load_brand_product_ids()
 # uses this word -> canonical-brand index to recover a candidate in that
 # case via plain string comparison (no extra DB/LLM call, negligible
 # cost). Built once at startup from the same brand list Phase 2 already
-# treats as authoritative (BRAND_PRODUCT_IDS).
+# treats as authoritative (BRAND_PRODUCT_IDS), PLUS the authoritative
+# catalog's own brand names.
+#
+# Why the catalog names are needed: Phase 1 has two independent gates —
+# the vector search (over vet_products) and this fuzzy index (over
+# BRAND_PRODUCT_IDS, i.e. brand_seed_list.csv, which is derived from
+# Labelled.csv). Those two sources have DRIFTED: research_catalog_brands.py
+# researches catalog-only brands into vet_products but never regenerates
+# brand_seed_list.csv, so 46 brands were vector-findable yet fuzzy-blind
+# (a clean "Cestem" resolved, a garbled "Cest3m" could not be rescued),
+# and 3 catalog brands (Feline Allwormer, Moxidex Tablets, Vetone) were
+# reachable by neither gate at all. Folding the catalog's Product Names in
+# realigns the two gates against the same brand universe.
+#
+# Kept optional on purpose: raw mode is the honest baseline for a
+# deployment where no authoritative catalog exists (§5.7), so a missing or
+# unreadable catalog file degrades to the seed-list-only index rather than
+# breaking Phase 1. Seed brands are inserted FIRST so they keep winning
+# collisions — they carry the ProductIds brand_fallback_product_id needs.
 
 _BRAND_WORD_MIN_LEN = 5
+_SEED_SHADOW_THRESHOLD = 0.85   # catalog name this close to a seed brand is a spelling variant, not a new brand
+
+# Dosage-form / packaging / species / descriptor words. The seed list's
+# brands are LLM-canonicalised ("Frontline", "Bravecto") so they are almost
+# all clean brand tokens, but the catalog's Product Names are descriptive
+# ("F10 WOUND SPRAY + INSECTICIDE", "Moxidex Tablets", "Wagg & Purr All
+# Wormer"), and their generic words are NOT brand-identifying. Indexing them
+# actively broke matching: "frontlne spray 100ml" matched "spray" exactly
+# against F10 and beat the near-miss "frontlne"->"frontline", so a routine
+# Frontline query resolved to a wound spray. These are stripped before a
+# catalog name is indexed; if that leaves nothing, the concatenated whole
+# name is used instead (e.g. "felineallwormer"), which is both distinctive
+# and exactly what clean_query produces from "Feline Allwormer".
+_GENERIC_BRAND_WORDS = frozenset({
+    "spray", "sprays", "wormer", "wormers", "allwormer", "allwormers",
+    "worming", "tablet", "tablets", "chew", "chews", "chewable", "capsule",
+    "capsules", "injection", "injectable", "collar", "collars", "drops",
+    "solution", "suspension", "spoton", "topical", "oral", "wound",
+    "insecticide", "insecticidal", "treatment", "combo", "plus", "extra",
+    "forte", "duo", "dual", "small", "medium", "large", "puppy", "kitten",
+    "feline", "canine", "equine", "flea", "fleas", "tick", "ticks",
+})
 
 
-def _build_known_brand_words(brand_product_ids: dict) -> dict:
+def _load_catalog_brand_names() -> list:
+    """Non-admin brand names from the authoritative catalog, or [] if it
+    isn't available. Import is done lazily inside the function so that
+    importing resources.py never hard-fails on a missing catalog."""
+    try:
+        from knowledge.catalog_common import load_catalog
+
+        catalog = load_catalog()
+        return sorted(catalog.loc[~catalog["is_admin"], "Product Name"].dropna().unique())
+    except Exception as e:
+        print(f"[resources] catalog brand names unavailable for fuzzy index ({type(e).__name__}) — using seed list only.")
+        return []
+
+
+def _build_known_brand_words(brand_product_ids: dict, extra_brands: list = ()) -> dict:
     """Maps each significant word (>=5 letters) of every known brand name
     to that brand. First brand seen for a given word wins on collision —
     rare in practice, and this is only ever an ADDITIONAL candidate
@@ -136,23 +191,73 @@ def _build_known_brand_words(brand_product_ids: dict) -> dict:
     added when NO individual fragment already qualified, so a genuinely
     short, generic-sounding brand ("Xeno", "Troy") isn't given an
     artificial boost the original length floor was there to avoid."""
-    words = {}
-    for brand in brand_product_ids:
-        brand_words = re.findall(r"[a-zA-Z]+", brand.lower())
-        qualified = [w for w in brand_words if len(w) >= _BRAND_WORD_MIN_LEN]
-
+    def index(brand: str, qualified: list, all_words: list):
         for word in qualified:
             words.setdefault(word, brand)
-
         if not qualified:
-            concatenated = "".join(brand_words)
+            concatenated = "".join(all_words)
             if len(concatenated) >= _BRAND_WORD_MIN_LEN:
                 words.setdefault(concatenated, brand)
+
+    words = {}
+
+    # Seed brands first and under the original rules: setdefault means the
+    # first brand to claim a word keeps it, and these carry the ProductIds
+    # brand_fallback_product_id depends on. Unchanged from before, so no
+    # existing match can regress.
+    for brand in brand_product_ids:
+        brand_words = re.findall(r"[a-zA-Z]+", brand.lower())
+        index(brand, [w for w in brand_words if len(w) >= _BRAND_WORD_MIN_LEN], brand_words)
+
+    # Catalog-derived brands are held to three extra tests, because their
+    # names are descriptive rather than canonical:
+    #   * a generic form/species word is never brand-identifying;
+    #   * a word occurring in SEVERAL catalog brand names cannot identify
+    #     one of them ("allwormer" spans Canine/Feline/Ranvet AllWormer —
+    #     picking one arbitrarily produced a cross-SPECIES mismatch);
+    #   * a name that is merely a SPELLING VARIANT of a seed brand is
+    #     skipped entirely, since the seed brand is the one carrying the
+    #     ProductIds and the researched vet_products variants — indexing
+    #     the variant spelling shadows it and dead-ends the pipeline.
+    #     Real regression this caught: the catalog's "RIP Flea" out-matched
+    #     seed brand "Rip Fleas" on "RIP Flea Spray 600ml", and raw mode —
+    #     which has no catalog to fall back on — went from a correct
+    #     63/310/327 to no ids at all. Genuinely distinct siblings
+    #     ("Nexgard" vs "Nexgard Spectra", ratio ~0.7) stay well below this
+    #     bar and are still indexed.
+    seed_lower = [b.lower() for b in brand_product_ids]
+
+    def shadows_seed_brand(name: str) -> bool:
+        n = name.lower()
+        return any(
+            difflib.SequenceMatcher(None, n, s).ratio() >= _SEED_SHADOW_THRESHOLD
+            for s in seed_lower
+        )
+
+    extras = [
+        b for b in extra_brands
+        if b not in brand_product_ids and not shadows_seed_brand(b)
+    ]
+
+    owners = {}
+    for brand in extras:
+        for word in set(re.findall(r"[a-zA-Z]+", brand.lower())):
+            owners.setdefault(word, set()).add(brand)
+
+    for brand in extras:
+        brand_words = re.findall(r"[a-zA-Z]+", brand.lower())
+        qualified = [
+            w for w in brand_words
+            if len(w) >= _BRAND_WORD_MIN_LEN
+            and w not in _GENERIC_BRAND_WORDS
+            and len(owners.get(w, ())) == 1
+        ]
+        index(brand, qualified, brand_words)
 
     return words
 
 
-KNOWN_BRAND_WORDS = _build_known_brand_words(BRAND_PRODUCT_IDS)
+KNOWN_BRAND_WORDS = _build_known_brand_words(BRAND_PRODUCT_IDS, _load_catalog_brand_names())
 
 
 def brand_fallback_product_id(brand: str) -> str:
