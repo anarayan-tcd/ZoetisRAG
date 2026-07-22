@@ -1,5 +1,8 @@
-# Secrets — never commit API keys
+# Secrets — never commit API keys or any env file
+APIKeys.env
 backend/APIKeys.env
+*.env
+!*.env.example
 
 # Python
 __pycache__/
