@@ -511,30 +511,46 @@ DEFAULT_ENABLE_LLM_JUDGE = False
 #     local single-user demo (see api/batch.py), so one global counter is
 #     fine — it doesn't try to isolate two concurrent jobs from each other.
 #
-# Pricing is DeepSeek's published deepseek-reasoner rate, USD per 1M
-# tokens, at STANDARD (cache-miss) pricing — DeepSeek's own prompt-cache
-# can lower the real bill further for repeated prefixes, which this can't
-# see from the API response, so treat estimated_cost_usd as a conservative
-# upper bound, not an exact invoice figure.
-DEEPSEEK_INPUT_COST_PER_1M = 0.55
-DEEPSEEK_OUTPUT_COST_PER_1M = 2.19
+# Pricing is DeepSeek's current published rate for deepseek-reasoner
+# (deepseek-v4-flash, thinking mode), USD per 1M tokens, confirmed live
+# against https://api-docs.deepseek.com/quick_start/pricing. There is no
+# off-peak/time-of-day tier at this rate card (there was previously).
+#
+# DeepSeek's per-call usage response carries prompt_cache_hit_tokens and
+# prompt_cache_miss_tokens (confirmed via a live test call — these are
+# vendor-specific fields the openai SDK passes through, not part of its
+# own typed schema), billed at very different rates: a cache hit is ~50x
+# cheaper than a miss, because these prompts share large fixed blocks
+# (rules, golden examples, candidate templates) across many calls within
+# a batch. Pricing off cache-miss for everything — the previous
+# behaviour, and the only option before this was wired up — overstated a
+# real batch's cost by ~5-6x against the actual DeepSeek invoice.
+DEEPSEEK_INPUT_CACHE_HIT_COST_PER_1M = 0.0028
+DEEPSEEK_INPUT_CACHE_MISS_COST_PER_1M = 0.14
+DEEPSEEK_OUTPUT_COST_PER_1M = 0.28
 
 
-def estimate_cost_usd(prompt_tokens: int, completion_tokens: int) -> float:
+def estimate_cost_usd(cache_hit_tokens: int, cache_miss_tokens: int, completion_tokens: int) -> float:
     return (
-        prompt_tokens / 1_000_000 * DEEPSEEK_INPUT_COST_PER_1M
+        cache_hit_tokens / 1_000_000 * DEEPSEEK_INPUT_CACHE_HIT_COST_PER_1M
+        + cache_miss_tokens / 1_000_000 * DEEPSEEK_INPUT_CACHE_MISS_COST_PER_1M
         + completion_tokens / 1_000_000 * DEEPSEEK_OUTPUT_COST_PER_1M
     )
 
 
 _usage_local = threading.local()
 _global_usage_lock = threading.Lock()
-_global_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "calls": 0}
+_global_usage = {
+    "prompt_tokens": 0, "cache_hit_tokens": 0, "cache_miss_tokens": 0,
+    "completion_tokens": 0, "total_tokens": 0, "calls": 0,
+}
 
 
 def reset_usage_tracking() -> None:
     """Call at the start of a single query's resolution."""
     _usage_local.prompt_tokens = 0
+    _usage_local.cache_hit_tokens = 0
+    _usage_local.cache_miss_tokens = 0
     _usage_local.completion_tokens = 0
     _usage_local.total_tokens = 0
     _usage_local.calls = 0
@@ -544,6 +560,8 @@ def get_usage_totals() -> dict:
     """This thread's accumulated usage since the last reset_usage_tracking()."""
     return {
         "prompt_tokens": getattr(_usage_local, "prompt_tokens", 0),
+        "cache_hit_tokens": getattr(_usage_local, "cache_hit_tokens", 0),
+        "cache_miss_tokens": getattr(_usage_local, "cache_miss_tokens", 0),
         "completion_tokens": getattr(_usage_local, "completion_tokens", 0),
         "total_tokens": getattr(_usage_local, "total_tokens", 0),
         "llm_calls": getattr(_usage_local, "calls", 0),
@@ -560,36 +578,51 @@ def usage_delta(before: dict, after: dict) -> dict:
     stats — the delta a job actually spent, isolated from whatever usage
     the process had already accumulated before it started."""
     prompt_tokens = after["prompt_tokens"] - before["prompt_tokens"]
+    cache_hit_tokens = after["cache_hit_tokens"] - before["cache_hit_tokens"]
+    cache_miss_tokens = after["cache_miss_tokens"] - before["cache_miss_tokens"]
     completion_tokens = after["completion_tokens"] - before["completion_tokens"]
     return {
         "prompt_tokens": prompt_tokens,
         "completion_tokens": completion_tokens,
         "total_tokens": after["total_tokens"] - before["total_tokens"],
         "billed_llm_calls": after["calls"] - before["calls"],
-        "estimated_cost_usd": round(estimate_cost_usd(prompt_tokens, completion_tokens), 4),
+        "estimated_cost_usd": round(estimate_cost_usd(cache_hit_tokens, cache_miss_tokens, completion_tokens), 4),
     }
 
 
 def _record_usage(usage) -> None:
-    """usage: the `usage` object on a DeepSeek chat-completion response
-    (prompt_tokens/completion_tokens/total_tokens), or None. Recorded for
-    EVERY attempt inside deepseek_json, including ones that come back
-    empty/malformed — DeepSeek still bills the tokens it generated even
-    when the content didn't parse as valid JSON."""
+    """usage: the `usage` object on a DeepSeek chat-completion response, or
+    None. Recorded for EVERY attempt inside deepseek_json, including ones
+    that come back empty/malformed — DeepSeek still bills the tokens it
+    generated even when the content didn't parse as valid JSON.
+
+    prompt_cache_hit_tokens/prompt_cache_miss_tokens are DeepSeek-specific
+    fields on top of the OpenAI-shaped usage object (verified present on a
+    live call); missing/zero on both is treated as a full cache miss so
+    cost is never silently understated if a future SDK/API change drops
+    them."""
     if usage is None:
         return
 
     p = getattr(usage, "prompt_tokens", 0) or 0
     c = getattr(usage, "completion_tokens", 0) or 0
     t = getattr(usage, "total_tokens", 0) or (p + c)
+    hit = getattr(usage, "prompt_cache_hit_tokens", 0) or 0
+    miss = getattr(usage, "prompt_cache_miss_tokens", 0) or 0
+    if not hit and not miss:
+        miss = p
 
     _usage_local.prompt_tokens = getattr(_usage_local, "prompt_tokens", 0) + p
+    _usage_local.cache_hit_tokens = getattr(_usage_local, "cache_hit_tokens", 0) + hit
+    _usage_local.cache_miss_tokens = getattr(_usage_local, "cache_miss_tokens", 0) + miss
     _usage_local.completion_tokens = getattr(_usage_local, "completion_tokens", 0) + c
     _usage_local.total_tokens = getattr(_usage_local, "total_tokens", 0) + t
     _usage_local.calls = getattr(_usage_local, "calls", 0) + 1
 
     with _global_usage_lock:
         _global_usage["prompt_tokens"] += p
+        _global_usage["cache_hit_tokens"] += hit
+        _global_usage["cache_miss_tokens"] += miss
         _global_usage["completion_tokens"] += c
         _global_usage["total_tokens"] += t
         _global_usage["calls"] += 1

@@ -172,7 +172,7 @@ def identify_product(query: str, use_cache: bool = True, **_ignored) -> dict:
             "prompt_tokens": usage["prompt_tokens"],
             "completion_tokens": usage["completion_tokens"],
             "total_tokens": usage["total_tokens"],
-            "estimated_cost_usd": round(estimate_cost_usd(usage["prompt_tokens"], usage["completion_tokens"]), 6),
+            "estimated_cost_usd": round(estimate_cost_usd(usage["cache_hit_tokens"], usage["cache_miss_tokens"], usage["completion_tokens"]), 6),
         },
     }
 

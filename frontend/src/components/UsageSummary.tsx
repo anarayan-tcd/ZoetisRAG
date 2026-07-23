@@ -19,7 +19,7 @@ interface QueryUsageSummaryProps {
 
 export function QueryUsageSummary({ usage }: QueryUsageSummaryProps) {
   return (
-    <div className="usage-summary" title="Estimated DeepSeek cost — approximate, may not reflect DeepSeek's own prompt-cache discount">
+    <div className="usage-summary" title="Estimated DeepSeek cost — priced per-call from DeepSeek's actual cache-hit/cache-miss token split, so it should track the real invoice closely">
       <span>⏱ {formatSeconds(usage.elapsed_seconds)}</span>
       <span>·</span>
       <span>{usage.llm_calls} LLM call{usage.llm_calls === 1 ? "" : "s"}</span>
@@ -40,7 +40,7 @@ interface BatchUsageSummaryProps {
 
 export function BatchUsageSummary({ elapsed, avgSecondsPerRow, totalTokens, estimatedCostUsd }: BatchUsageSummaryProps) {
   return (
-    <div className="usage-summary" title="Estimated DeepSeek cost — approximate, may not reflect DeepSeek's own prompt-cache discount">
+    <div className="usage-summary" title="Estimated DeepSeek cost — priced per-call from DeepSeek's actual cache-hit/cache-miss token split, so it should track the real invoice closely">
       <span>⏱ {formatSeconds(elapsed)} total</span>
       <span>·</span>
       <span>~{formatSeconds(avgSecondsPerRow)}/row</span>
