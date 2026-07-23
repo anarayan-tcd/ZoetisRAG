@@ -53,8 +53,8 @@ class UsageStats(BaseModel):
     prompt_tokens: int = 0
     completion_tokens: int = 0
     total_tokens: int = 0
-    # Conservative (cache-miss-rate) DeepSeek pricing estimate — see
-    # pipeline/shared/resources.py's usage-tracking section for caveats.
+    # Priced from DeepSeek's actual cache-hit/cache-miss token split per
+    # call — see pipeline/shared/resources.py's usage-tracking section.
     estimated_cost_usd: float = 0.0
 
 
