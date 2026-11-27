@@ -9,6 +9,20 @@ import unicodedata
 _WHITESPACE_RE = re.compile(r"\s+")
 _DISALLOWED_CHARS_RE = re.compile(r"[^a-zA-Z0-9\s.\-/%(),'&+]")
 
+# Leetspeak SYMBOL substitutions with no legitimate alternate meaning in a
+# vet prescription string — unlike digits (0/1/3/4/5/7), which really are
+# dosage/weight/pack numbers and are decoded only within fuzzy brand
+# matching's word-like-token scope (phase1_brand.py's
+# _LEETSPEAK_TRANSLATION), never globally, precisely to avoid corrupting a
+# real number like "45mg". "$" and "@" carry no such risk here, so they are
+# decoded unconditionally, upstream of the disallowed-character strip below
+# — confirmed failure otherwise: "cap$tar d0g medicine" was cleaned to
+# "cap tar d0g medicine", because the disallowed-character regex drops "$"
+# to a space before anything downstream (embeddings, every LLM prompt, the
+# fuzzy-recovery layer) ever gets a chance to decode it, splitting one
+# brand token into two.
+_SYMBOL_LEETSPEAK_TRANSLATION = str.maketrans({"$": "s", "@": "a"})
+
 
 # ─────────────────────────────────────────────────────────────
 # SPELLED-OUT NUMBERS -> DIGITS (deterministic — no LLM, no API cost)
@@ -151,9 +165,9 @@ def clean_query(text: str) -> str:
     """
     Normalizes a raw prescription string before it is embedded or
     reasoned over: strips stray unicode (curly quotes, accents),
-    drops characters that aren't meaningful for product matching,
-    collapses repeated whitespace, and converts spelled-out numbers
-    to digits.
+    decodes leetspeak symbol substitutions, drops characters that aren't
+    meaningful for product matching, collapses repeated whitespace, and
+    converts spelled-out numbers to digits.
     """
 
     if not text:
@@ -161,6 +175,11 @@ def clean_query(text: str) -> str:
 
     text = unicodedata.normalize("NFKD", text)
     text = text.encode("ascii", "ignore").decode("ascii")
+
+    # Must run BEFORE the disallowed-character strip below, which would
+    # otherwise destroy "$"/"@" as meaningless punctuation before they can
+    # be decoded into the letters they were standing in for.
+    text = text.translate(_SYMBOL_LEETSPEAK_TRANSLATION)
 
     text = _DISALLOWED_CHARS_RE.sub(" ", text)
     text = _WHITESPACE_RE.sub(" ", text)
