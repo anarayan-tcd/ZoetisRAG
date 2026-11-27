@@ -93,6 +93,8 @@ def build_candidates_block(variants: list) -> str:
             parts.append(f'region: {v["gemini_region"]}')
         if v.get("gemini_color"):
             parts.append(f'pack color: {v["gemini_color"]}')
+        if v.get("gemini_ingredients"):
+            parts.append(f'active ingredients: {v["gemini_ingredients"]}')
 
         parts.append(f'pack options: {_pack_options(v)}')
 
@@ -191,8 +193,13 @@ __CANDIDATES__
    that row, not a different product. Both belong in "variant_ids".
 5. Match on species, weight band, and strength FIRST. A hinted species (see
    MULTILINGUAL TERM HINT) is binding: never pick a dog product for a
-   cat-hinted query or vice versa. Pack color is supporting evidence only —
-   never decisive against dosage/weight/species.
+   cat-hinted query or vice versa. Pack color and active ingredients are
+   supporting evidence only — never decisive against dosage/weight/species.
+   If the query names an active ingredient (generic or brand-agnostic,
+   e.g. "selamectin"), treat a candidate whose active ingredients match it
+   as a strong signal, but description wording differences for the SAME
+   ingredient (e.g. "Fipronil" vs "fipronil, s-methoprene" on near-identical
+   candidates) do not by themselves indicate a different product.
 6. Do NOT decide pack size here — a later stage does, and it applies to
    every variant you list. Ignore pack counts entirely unless they're the
    only thing separating two candidates as real products.

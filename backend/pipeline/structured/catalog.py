@@ -131,6 +131,7 @@ def _build():
             "gemini_species": first["GeminiSpecies"],
             "gemini_color": first["GeminiPackColor"],
             "gemini_region": first["GeminiRegion"],
+            "gemini_ingredients": first["GeminiIngredients"],
             "occurrences": _variant_priors.get(int(pid), {}).get(int(vid), 0),
             "skus": sorted(skus, key=lambda s: -s["occurrences"]),
         })
@@ -147,6 +148,7 @@ def _build():
             "gemini_species": r["GeminiSpecies"],
             "gemini_color": r["GeminiPackColor"],
             "gemini_region": r["GeminiRegion"],
+            "gemini_ingredients": r["GeminiIngredients"],
             "occurrences": 0,
             "skus": [],
             "is_new_product": True,
